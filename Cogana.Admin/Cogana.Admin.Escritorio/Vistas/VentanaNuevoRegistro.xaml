@@ -1,0 +1,229 @@
+<Window x:Class="Cogana.Admin.Escritorio.Vistas.VentanaNuevoRegistro"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nuevo registro · Cogana"
+        Width="640" Height="720" MinWidth="590" MinHeight="620"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
+        Background="{StaticResource BrochaFondo}">
+    <Grid Margin="18">
+        <Border Background="{StaticResource BrochaSuperficie}" BorderBrush="#10000000"
+                BorderThickness="1" CornerRadius="28" Padding="32">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel>
+                    <Border Width="44" Height="44" CornerRadius="15" Background="{StaticResource BrochaNegro}" HorizontalAlignment="Left">
+                        <TextBlock x:Name="InicialModulo" Text="+" Foreground="White" FontSize="17" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock x:Name="TituloFormulario" Text="Nuevo registro" FontSize="27" FontWeight="SemiBold"
+                               FontFamily="Segoe UI Variable Display, Segoe UI" Margin="0,17,0,0" />
+                    <TextBlock x:Name="DescripcionFormulario" Text="Completa la información requerida."
+                               Foreground="{StaticResource BrochaTextoSuave}" FontSize="12" Margin="0,6,0,0" />
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,25,0,18">
+                    <StackPanel>
+                        <StackPanel x:Name="SeccionProducto" Visibility="Collapsed">
+                            <TextBlock Text="Nombre del producto *" FontSize="11" FontWeight="SemiBold" />
+                            <TextBox x:Name="ProductoNombre" Style="{StaticResource CampoFormulario}" />
+                            <Grid Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,7,0">
+                                    <TextBlock Text="SKU" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="ProductoSku" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                    <TextBlock Text="Marca" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="ProductoMarca" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="Categoría" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <ComboBox x:Name="ProductoCategoria" Style="{StaticResource SelectorFormulario}"
+                                      DisplayMemberPath="Nombre" SelectedValuePath="Id" />
+                            <Grid Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,7,0">
+                                    <TextBlock Text="Unidad base *" FontSize="11" FontWeight="SemiBold" />
+                                    <ComboBox x:Name="ProductoUnidad" Style="{StaticResource SelectorFormulario}" SelectedValuePath="Tag">
+                                        <ComboBoxItem Content="Gramo (base de peso)" Tag="gram" />
+                                        <ComboBoxItem Content="Unidad" Tag="unit" />
+                                        <ComboBoxItem Content="Mililitro (base de volumen)" Tag="milliliter" />
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                    <TextBlock Text="Stock mínimo" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="ProductoStockMinimo" Text="0" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="Descripción" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <TextBox x:Name="ProductoDescripcion" Style="{StaticResource CampoFormulario}" Height="74"
+                                     AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" />
+                            <CheckBox x:Name="ProductoVencimiento" Content="Controlar fecha de vencimiento"
+                                      Margin="2,16,0,0" FontSize="12" />
+                        </StackPanel>
+
+                        <StackPanel x:Name="SeccionCategoria" Visibility="Collapsed">
+                            <TextBlock Text="Nombre de la categoría *" FontSize="11" FontWeight="SemiBold" />
+                            <TextBox x:Name="CategoriaNombre" Style="{StaticResource CampoFormulario}" />
+                            <TextBlock Text="Orden de presentación" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <TextBox x:Name="CategoriaOrden" Text="0" Style="{StaticResource CampoFormulario}" />
+                            <Border Background="{StaticResource BrochaAcentoSuave}" CornerRadius="15" Padding="14" Margin="0,18,0,0">
+                                <TextBlock Text="El identificador URL se generará automáticamente a partir del nombre."
+                                           Foreground="{StaticResource BrochaAcento}" FontSize="11" TextWrapping="Wrap" />
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="SeccionProveedor" Visibility="Collapsed">
+                            <TextBlock Text="Nombre o razón social *" FontSize="11" FontWeight="SemiBold" />
+                            <TextBox x:Name="ProveedorNombre" Style="{StaticResource CampoFormulario}" />
+                            <TextBlock Text="RUC" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <TextBox x:Name="ProveedorRuc" Style="{StaticResource CampoFormulario}" />
+                            <TextBlock Text="Teléfono" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <TextBox x:Name="ProveedorTelefono" Style="{StaticResource CampoFormulario}" />
+                        </StackPanel>
+
+                        <StackPanel x:Name="SeccionPresentacion" Visibility="Collapsed">
+                            <TextBlock Text="Producto *" FontSize="11" FontWeight="SemiBold" />
+                            <ComboBox x:Name="PresentacionProducto" Style="{StaticResource SelectorFormulario}"
+                                      DisplayMemberPath="Nombre" SelectedValuePath="Id" />
+                            <TextBlock Text="Nombre de la presentación *" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <TextBox x:Name="PresentacionNombre" Style="{StaticResource CampoFormulario}" />
+                            <Grid Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,7,0">
+                                    <TextBlock Text="SKU" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="PresentacionSku" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                    <TextBlock Text="Tipo *" FontSize="11" FontWeight="SemiBold" />
+                                    <ComboBox x:Name="PresentacionTipo" Style="{StaticResource SelectorFormulario}" SelectedValuePath="Tag">
+                                        <ComboBoxItem Content="Granel" Tag="bulk" />
+                                        <ComboBoxItem Content="Unidad" Tag="unit" />
+                                        <ComboBoxItem Content="Paquete" Tag="package" />
+                                        <ComboBoxItem Content="Caja" Tag="box" />
+                                        <ComboBoxItem Content="Saco" Tag="sack" />
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,7,0">
+                                    <TextBlock Text="Cantidad base *" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="PresentacionCantidad" Text="1" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                    <TextBlock Text="Precio en soles *" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="PresentacionPrecio" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                            </Grid>
+                            <CheckBox x:Name="PresentacionSellada" Content="Presentación sellada"
+                                      Margin="2,16,0,0" FontSize="12" />
+                        </StackPanel>
+
+                        <StackPanel x:Name="SeccionLote" Visibility="Collapsed">
+                            <TextBlock Text="Producto *" FontSize="11" FontWeight="SemiBold" />
+                            <ComboBox x:Name="LoteProducto" Style="{StaticResource SelectorFormulario}"
+                                      DisplayMemberPath="Nombre" SelectedValuePath="Id" />
+                            <TextBlock Text="Proveedor" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <ComboBox x:Name="LoteProveedor" Style="{StaticResource SelectorFormulario}"
+                                      DisplayMemberPath="Nombre" SelectedValuePath="Id" />
+                            <Grid Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,7,0">
+                                    <TextBlock Text="Código de lote *" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="LoteCodigo" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                    <TextBlock Text="Cantidad disponible *" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="LoteCantidad" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="Fecha de vencimiento" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <DatePicker x:Name="LoteVencimiento" Background="White" BorderBrush="{StaticResource BrochaBorde}" Padding="8" />
+                            <TextBlock Text="Notas" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <TextBox x:Name="LoteNotas" Style="{StaticResource CampoFormulario}" Height="70"
+                                     AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" />
+                            <Border Background="{StaticResource BrochaAcentoSuave}" CornerRadius="15" Padding="14" Margin="0,17,0,0">
+                                <TextBlock Text="La cantidad se registra en la unidad base del producto: gramos, unidades o mililitros."
+                                           Foreground="{StaticResource BrochaAcento}" FontSize="11" TextWrapping="Wrap" />
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="SeccionPromocion" Visibility="Collapsed">
+                            <TextBlock Text="Nombre de la promoción *" FontSize="11" FontWeight="SemiBold" />
+                            <TextBox x:Name="PromocionNombre" Style="{StaticResource CampoFormulario}" />
+                            <TextBlock Text="Descripción" FontSize="11" FontWeight="SemiBold" Margin="0,15,0,0" />
+                            <TextBox x:Name="PromocionDescripcion" Style="{StaticResource CampoFormulario}" Height="64"
+                                     AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" />
+                            <Grid Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,7,0">
+                                    <TextBlock Text="Tipo *" FontSize="11" FontWeight="SemiBold" />
+                                    <ComboBox x:Name="PromocionTipo" Style="{StaticResource SelectorFormulario}" SelectedValuePath="Tag">
+                                        <ComboBoxItem Content="Porcentaje" Tag="percentage" />
+                                        <ComboBoxItem Content="Monto fijo" Tag="fixed_amount" />
+                                        <ComboBoxItem Content="Delivery gratis" Tag="free_delivery" />
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                    <TextBlock Text="Valor (% o soles)" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBox x:Name="PromocionValor" Text="0" Style="{StaticResource CampoFormulario}" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,7,0">
+                                    <TextBlock Text="Inicio *" FontSize="11" FontWeight="SemiBold" />
+                                    <DatePicker x:Name="PromocionInicio" Background="White" BorderBrush="{StaticResource BrochaBorde}" Padding="8" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                    <TextBlock Text="Fin *" FontSize="11" FontWeight="SemiBold" />
+                                    <DatePicker x:Name="PromocionFin" Background="White" BorderBrush="{StaticResource BrochaBorde}" Padding="8" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="MensajeFormulario" Foreground="#9A443F" FontSize="11"
+                               TextWrapping="Wrap" MinHeight="18" Margin="1,0,0,10" />
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Cancelar" Click="AlCancelar" Style="{StaticResource BotonSecundario}" Margin="0,0,9,0" />
+                        <Button x:Name="BotonGuardar" Content="Guardar registro" Click="AlGuardar" Style="{StaticResource BotonPrincipal}" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

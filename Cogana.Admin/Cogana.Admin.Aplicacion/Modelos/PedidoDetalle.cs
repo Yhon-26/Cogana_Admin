@@ -1,0 +1,28 @@
+namespace Cogana.Admin.Aplicacion.Modelos;
+
+public sealed record PedidoDetalle(
+    Guid Id,
+    string Numero,
+    string Origen,
+    string TipoEntrega,
+    string Estado,
+    string EstadoPago,
+    string MetodoPago,
+    string NombreCliente,
+    string TelefonoCliente,
+    string? CorreoCliente,
+    string? DireccionEntrega,
+    string? ReferenciaEntrega,
+    DateTimeOffset? ProgramadoPara,
+    DateTimeOffset? EstimadoListoEn,
+    long SubtotalEstimadoCentimos,
+    long DescuentoEstimadoCentimos,
+    long TarifaEntregaCentimos,
+    long DescuentoEntregaCentimos,
+    long TotalEstimadoCentimos,
+    long? SubtotalFinalCentimos,
+    long? DescuentoFinalCentimos,
+    long? TotalFinalCentimos,
+    string? Notas,
+    string? MotivoCancelacion,
+    DateTimeOffset CreadoEn);

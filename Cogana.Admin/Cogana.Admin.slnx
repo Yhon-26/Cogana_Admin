@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Cogana.Admin.Escritorio/Cogana.Admin.Escritorio.csproj" />
+  <Project Path="Cogana.Admin.Aplicacion/Cogana.Admin.Aplicacion.csproj" />
+  <Project Path="Cogana.Admin.Dominio/Cogana.Admin.Dominio.csproj" />
+  <Project Path="Cogana.Admin.Infraestructura/Cogana.Admin.Infraestructura.csproj" />
+</Solution>

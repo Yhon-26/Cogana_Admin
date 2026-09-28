@@ -1,0 +1,296 @@
+<Window x:Class="Cogana.Admin.Escritorio.Vistas.VentanaDetallePedido"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Detalle del pedido"
+        Width="1080"
+        Height="820"
+        MinWidth="980"
+        MinHeight="740"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        Background="{StaticResource BrochaFondo}">
+    <Grid Margin="22">
+        <Border Background="{StaticResource BrochaSuperficie}" BorderBrush="#12000000"
+                BorderThickness="1" CornerRadius="28" Padding="26">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="56" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="48" Height="48" CornerRadius="16" Background="{StaticResource BrochaNegro}">
+                        <TextBlock Text="PE" Foreground="White" FontSize="11" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12,0,14,0" VerticalAlignment="Center">
+                        <TextBlock x:Name="TituloPedido" Text="Cargando pedido..."
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"
+                                   FontSize="25" FontWeight="SemiBold" />
+                        <TextBlock x:Name="SubtituloPedido" Text="Detalle operativo y financiero"
+                                   Foreground="{StaticResource BrochaTextoSuave}" FontSize="11" Margin="0,4,0,0" />
+                    </StackPanel>
+                    <Border Grid.Column="2" x:Name="EtiquetaEstado" Background="{StaticResource BrochaAcentoSuave}"
+                            CornerRadius="13" Padding="13,7" VerticalAlignment="Center">
+                        <TextBlock x:Name="TextoEstado" Text="Consultando" Foreground="{StaticResource BrochaAcento}"
+                                   FontSize="10" FontWeight="SemiBold" />
+                    </Border>
+                </Grid>
+
+                <UniformGrid Grid.Row="1" Columns="4" Margin="0,22,0,18">
+                    <Border Style="{StaticResource Tarjeta}" Padding="16" Margin="0,0,7,0">
+                        <StackPanel>
+                            <TextBlock Text="Subtotal" FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" />
+                            <TextBlock x:Name="ImporteSubtotal" Text="—" FontSize="21" FontWeight="SemiBold" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Tarjeta}" Padding="16" Margin="3,0">
+                        <StackPanel>
+                            <TextBlock Text="Descuentos" FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" />
+                            <TextBlock x:Name="ImporteDescuentos" Text="—" FontSize="21" FontWeight="SemiBold" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Tarjeta}" Padding="16" Margin="3,0">
+                        <StackPanel>
+                            <TextBlock Text="Entrega" FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" />
+                            <TextBlock x:Name="ImporteEntrega" Text="—" FontSize="21" FontWeight="SemiBold" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+                    <Border Background="{StaticResource BrochaNegro}" CornerRadius="22" Padding="16" Margin="7,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Total del pedido" FontSize="10" Foreground="#BFC4C0" />
+                            <TextBlock x:Name="ImporteTotal" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="White" Margin="0,5,0,0" />
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.65*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Background="White" BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
+                            CornerRadius="20" Padding="12" Margin="0,0,8,0">
+                        <TabControl Background="Transparent" BorderThickness="0">
+                            <TabItem Header="Productos">
+                                <Grid Margin="7,13,7,5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock x:Name="ResumenItems" Text="Consultando productos..." FontSize="10"
+                                               Foreground="{StaticResource BrochaTextoSuave}" Margin="0,0,0,10" />
+                                    <ListBox Grid.Row="1" x:Name="ListaItems" Background="Transparent" BorderThickness="0"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                        <ListBox.ItemContainerStyle>
+                                            <Style TargetType="ListBoxItem">
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="IsHitTestVisible" Value="False" />
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="{StaticResource BrochaBorde}" BorderThickness="0,0,0,1" Padding="8,11">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="1.3*" />
+                                                            <ColumnDefinition Width="1.05*" />
+                                                            <ColumnDefinition Width="1.1*" />
+                                                            <ColumnDefinition Width="80" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Producto}" FontSize="11" FontWeight="SemiBold" />
+                                                            <TextBlock Text="{Binding Presentacion}" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" />
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Solicitud}" FontSize="10" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="2" Text="{Binding Preparado}" FontSize="10" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="3" Text="{Binding Total}" FontSize="11" FontWeight="SemiBold"
+                                                                   HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Historial">
+                                <ListBox x:Name="ListaHistorial" Margin="7,13,7,5" Background="Transparent" BorderThickness="0"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="IsHitTestVisible" Value="False" />
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{StaticResource BrochaBorde}" BorderThickness="0,0,0,1" Padding="8,11">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="120" />
+                                                        <ColumnDefinition Width="150" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Fecha}" FontSize="9" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding EstadoNuevo}" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="{Binding Motivo, TargetNullValue=Sin motivo}" FontSize="9" />
+                                                        <TextBlock Text="{Binding Nota, TargetNullValue=Sin nota}" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" TextTrimming="CharacterEllipsis" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </TabItem>
+
+                            <TabItem Header="Pagos">
+                                <Grid Margin="7,13,7,5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock x:Name="ResumenPagos" Text="Consultando pagos..." FontSize="10"
+                                               Foreground="{StaticResource BrochaTextoSuave}" Margin="0,0,0,10" />
+                                    <ListBox Grid.Row="1" x:Name="ListaPagos" Background="Transparent" BorderThickness="0"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                        <ListBox.ItemContainerStyle>
+                                            <Style TargetType="ListBoxItem">
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="IsHitTestVisible" Value="False" />
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="{StaticResource BrochaBorde}" BorderThickness="0,0,0,1" Padding="8,11">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="112" />
+                                                            <ColumnDefinition Width="100" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="100" />
+                                                            <ColumnDefinition Width="82" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Fecha}" FontSize="9" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding Tipo}" FontSize="10" VerticalAlignment="Center" />
+                                                        <StackPanel Grid.Column="2">
+                                                            <TextBlock Text="{Binding Metodo}" FontSize="10" FontWeight="SemiBold" />
+                                                            <TextBlock Text="{Binding Proveedor}" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" />
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="3" Text="{Binding Estado}" FontSize="9" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="4" Text="{Binding Importe}" FontSize="10" FontWeight="SemiBold"
+                                                                   HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Entrega">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Margin="9,14">
+                                        <TextBlock x:Name="EstadoEntrega" Text="Sin asignación de reparto" FontSize="14" FontWeight="SemiBold" />
+                                        <TextBlock x:Name="DetalleEntrega" Text="" FontSize="10" Foreground="{StaticResource BrochaTextoSuave}"
+                                                   TextWrapping="Wrap" Margin="0,5,0,12" />
+                                        <ListBox x:Name="ListaEventosEntrega" Background="Transparent" BorderThickness="0"
+                                                 IsHitTestVisible="False">
+                                            <ListBox.ItemContainerStyle>
+                                                <Style TargetType="ListBoxItem">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                    <Setter Property="Padding" Value="0" />
+                                                </Style>
+                                            </ListBox.ItemContainerStyle>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border BorderBrush="{StaticResource BrochaBorde}" BorderThickness="0,0,0,1" Padding="6,10">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="125" />
+                                                                <ColumnDefinition Width="145" />
+                                                                <ColumnDefinition Width="*" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="{Binding Fecha}" FontSize="9" />
+                                                            <TextBlock Grid.Column="1" Text="{Binding Tipo}" FontSize="10" FontWeight="SemiBold" />
+                                                            <TextBlock Grid.Column="2" Text="{Binding Nota, TargetNullValue=Sin nota}" FontSize="9"
+                                                                       Foreground="{StaticResource BrochaTextoSuave}" />
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+                        </TabControl>
+                    </Border>
+
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="8,0,5,0">
+                            <Border Background="White" BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
+                                    CornerRadius="20" Padding="18">
+                                <StackPanel>
+                                    <TextBlock Text="Cliente" FontSize="16" FontWeight="SemiBold" />
+                                    <TextBlock x:Name="NombreCliente" Text="—" FontSize="12" FontWeight="SemiBold" Margin="0,12,0,0" />
+                                    <TextBlock x:Name="ContactoCliente" Text="—" FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="White" BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
+                                    CornerRadius="20" Padding="18" Margin="0,14,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Entrega y pago" FontSize="16" FontWeight="SemiBold" />
+                                    <TextBlock Text="Modalidad" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,11,0,0" />
+                                    <TextBlock x:Name="ModalidadEntrega" Text="—" FontSize="11" FontWeight="SemiBold" />
+                                    <TextBlock Text="Dirección" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,9,0,0" />
+                                    <TextBlock x:Name="DireccionEntrega" Text="—" FontSize="10" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="ReferenciaEntrega" Text="" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" TextWrapping="Wrap" Margin="0,3,0,0" />
+                                    <TextBlock Text="Programación" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,9,0,0" />
+                                    <TextBlock x:Name="HorarioPedido" Text="—" FontSize="10" />
+                                    <TextBlock Text="Método de pago" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,9,0,0" />
+                                    <TextBlock x:Name="MetodoPago" Text="—" FontSize="10" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="{StaticResource BrochaAcentoSuave}" CornerRadius="20" Padding="18" Margin="0,14,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Información operativa" FontSize="16" FontWeight="SemiBold" />
+                                    <TextBlock x:Name="OrigenPedido" Text="—" Foreground="{StaticResource BrochaAcento}" FontSize="10" Margin="0,8,0,0" />
+                                    <TextBlock x:Name="FechaPedido" Text="—" Foreground="{StaticResource BrochaAcento}" FontSize="10" Margin="0,4,0,0" />
+                                    <TextBlock x:Name="NotasPedido" Text="Sin notas" Foreground="{StaticResource BrochaAcento}"
+                                               FontSize="10" TextWrapping="Wrap" Margin="0,9,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+
+                <Grid Grid.Row="3" Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="MensajeVentana" Foreground="{StaticResource BrochaTextoSuave}" FontSize="10"
+                               TextWrapping="Wrap" VerticalAlignment="Center" Margin="1,0,14,0" />
+                    <Button Grid.Column="1" x:Name="BotonGestionar" Content="Cambiar estado" Click="AlGestionar"
+                            Style="{StaticResource BotonSecundario}" Margin="0,0,9,0" IsEnabled="False" />
+                    <Button Grid.Column="2" Content="Cerrar" Click="AlCerrar" Style="{StaticResource BotonPrincipal}" />
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

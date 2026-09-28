@@ -1,0 +1,524 @@
+<Application x:Class="Cogana.Admin.Escritorio.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Application.Resources>
+
+        <BooleanToVisibilityConverter x:Key="BoolAVisibilidad" />
+
+        <!-- ======================= Paleta base ======================= -->
+        <Color x:Key="ColorFondo">#E7E8E5</Color>
+        <Color x:Key="ColorSuperficie">#F7F7F5</Color>
+        <Color x:Key="ColorTarjeta">#FFFFFF</Color>
+        <Color x:Key="ColorAcento">#456F62</Color>
+        <Color x:Key="ColorAcentoSuave">#D7E2DD</Color>
+        <Color x:Key="ColorNegro">#141615</Color>
+        <Color x:Key="ColorTexto">#1C211E</Color>
+        <Color x:Key="ColorTextoSuave">#747B76</Color>
+        <Color x:Key="ColorBorde">#D8DAD6</Color>
+
+        <!-- Estados semánticos: positivo, neutro, peligro, atención e informativo -->
+        <Color x:Key="ColorExito">#3E7C4F</Color>
+        <Color x:Key="ColorExitoSuave">#DEEDE1</Color>
+        <Color x:Key="ColorNeutro">#6E7570</Color>
+        <Color x:Key="ColorNeutroSuave">#ECEDEA</Color>
+        <Color x:Key="ColorPeligro">#A8433C</Color>
+        <Color x:Key="ColorPeligroSuave">#F7E1DE</Color>
+        <Color x:Key="ColorAlerta">#9A7519</Color>
+        <Color x:Key="ColorAlertaSuave">#F6EBD2</Color>
+        <Color x:Key="ColorInfo">#3D6480</Color>
+        <Color x:Key="ColorInfoSuave">#DDE9F0</Color>
+
+        <SolidColorBrush x:Key="BrochaFondo" Color="{StaticResource ColorFondo}" />
+        <SolidColorBrush x:Key="BrochaSuperficie" Color="{StaticResource ColorSuperficie}" />
+        <SolidColorBrush x:Key="BrochaTarjeta" Color="{StaticResource ColorTarjeta}" />
+        <SolidColorBrush x:Key="BrochaAcento" Color="{StaticResource ColorAcento}" />
+        <SolidColorBrush x:Key="BrochaAcentoSuave" Color="{StaticResource ColorAcentoSuave}" />
+        <SolidColorBrush x:Key="BrochaNegro" Color="{StaticResource ColorNegro}" />
+        <SolidColorBrush x:Key="BrochaTexto" Color="{StaticResource ColorTexto}" />
+        <SolidColorBrush x:Key="BrochaTextoSuave" Color="{StaticResource ColorTextoSuave}" />
+        <SolidColorBrush x:Key="BrochaBorde" Color="{StaticResource ColorBorde}" />
+
+        <SolidColorBrush x:Key="BrochaExito" Color="{StaticResource ColorExito}" />
+        <SolidColorBrush x:Key="BrochaExitoSuave" Color="{StaticResource ColorExitoSuave}" />
+        <SolidColorBrush x:Key="BrochaNeutro" Color="{StaticResource ColorNeutro}" />
+        <SolidColorBrush x:Key="BrochaNeutroSuave" Color="{StaticResource ColorNeutroSuave}" />
+        <SolidColorBrush x:Key="BrochaPeligro" Color="{StaticResource ColorPeligro}" />
+        <SolidColorBrush x:Key="BrochaPeligroSuave" Color="{StaticResource ColorPeligroSuave}" />
+        <SolidColorBrush x:Key="BrochaAlerta" Color="{StaticResource ColorAlerta}" />
+        <SolidColorBrush x:Key="BrochaAlertaSuave" Color="{StaticResource ColorAlertaSuave}" />
+        <SolidColorBrush x:Key="BrochaInfo" Color="{StaticResource ColorInfo}" />
+        <SolidColorBrush x:Key="BrochaInfoSuave" Color="{StaticResource ColorInfoSuave}" />
+
+        <Style TargetType="Window">
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+            <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
+            <!-- Nitidez: alinear diseño y glifos a los píxeles físicos del monitor -->
+            <Setter Property="UseLayoutRounding" Value="True" />
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+        </Style>
+
+        <!-- ======================= Tarjetas ======================= -->
+        <!-- Sin efectos de bitmap: DropShadow degrada el texto a escala de grises y lo vuelve borroso -->
+        <Style x:Key="Tarjeta" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource BrochaTarjeta}" />
+            <Setter Property="BorderBrush" Value="#11000000" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="22" />
+            <Setter Property="Padding" Value="22" />
+        </Style>
+
+        <!-- ======================= Botones ======================= -->
+        <Style x:Key="BotonPrincipal" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource BrochaNegro}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="18,11" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="FondoBoton"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="18"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="FondoBoton" Property="Opacity" Value="0.84" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="FondoBoton" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BotonSecundario" TargetType="Button" BasedOn="{StaticResource BotonPrincipal}">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
+        </Style>
+
+        <!-- ======================= Campos de formulario ======================= -->
+        <Style x:Key="CampoFormulario" TargetType="TextBox">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrochaBorde}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="13,10" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="SelectionBrush" Value="{StaticResource BrochaAcento}" />
+            <Setter Property="CaretBrush" Value="{StaticResource BrochaTexto}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Marco"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Auto" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Marco" Property="BorderBrush" Value="#BFC3BE" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="Marco" Property="BorderBrush" Value="{StaticResource BrochaAcento}" />
+                                <Setter TargetName="Marco" Property="BorderThickness" Value="1.4" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Marco" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ======================= Selector desplegable ======================= -->
+        <Style x:Key="SelectorFormulario" TargetType="ComboBox">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrochaBorde}" />
+            <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="MaxDropDownHeight" Value="280" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border x:Name="FondoOpcion" Background="Transparent" CornerRadius="9" Padding="11,8" Margin="0,1">
+                                        <ContentPresenter VerticalAlignment="Center" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="FondoOpcion" Property="Background" Value="{StaticResource BrochaSuperficie}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="FondoOpcion" Property="Background" Value="{StaticResource BrochaAcentoSuave}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="Alternador"
+                                          Focusable="False"
+                                          ClickMode="Press"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="Marco"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="12">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Path Grid.Column="1" Data="M0,0 L4,4 8,0" Stroke="#747B76" StrokeThickness="1.6"
+                                                      StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,12,0" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Marco" Property="BorderBrush" Value="#BFC3BE" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="Marco" Property="BorderBrush" Value="{StaticResource BrochaAcento}" />
+                                                <Setter TargetName="Marco" Property="BorderThickness" Value="1.4" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"
+                                              IsHitTestVisible="False" />
+                            <Popup x:Name="VentanaOpciones"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Placement="Bottom"
+                                   PopupAnimation="Fade"
+                                   Focusable="False">
+                                <Border Background="White"
+                                        BorderBrush="{StaticResource BrochaBorde}"
+                                        BorderThickness="1"
+                                        CornerRadius="14"
+                                        Padding="6"
+                                        Margin="0,4,10,14"
+                                        MinWidth="{TemplateBinding ActualWidth}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Alternador" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ======================= Selector de fecha ======================= -->
+        <Style TargetType="DatePickerTextBox">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrochaBorde}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="13,8" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePicker">
+                        <Border x:Name="Marco"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12">
+                            <Grid Margin="{TemplateBinding Padding}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <DatePickerTextBox x:Name="PART_TextBox"
+                                                   Foreground="{TemplateBinding Foreground}"
+                                                   VerticalAlignment="Center" />
+                                <Button x:Name="PART_Button" Grid.Column="1" Focusable="False" Cursor="Hand" Margin="8,0,0,0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="Transparent" Padding="3" >
+                                                <Path Data="M7,1 L7,2 M2,1 L2,2 M0.5,4 L8.5,4 M1,2.5 L8,2.5 A1,1 0 0 1 9,3.5 L9,8.5 A1,1 0 0 1 8,9.5 L1,9.5 A1,1 0 0 1 0,8.5 L0,3.5 A1,1 0 0 1 1,2.5 Z"
+                                                      Stroke="#747B76" StrokeThickness="1.1" StrokeLineJoin="Round"
+                                                      Width="10" Height="11" Stretch="None"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                <Popup x:Name="PART_Popup"
+                                       AllowsTransparency="True"
+                                       Placement="Bottom"
+                                       PlacementTarget="{Binding ElementName=Marco}"
+                                       StaysOpen="False" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Marco" Property="BorderBrush" Value="#BFC3BE" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="Marco" Property="BorderBrush" Value="{StaticResource BrochaAcento}" />
+                                <Setter TargetName="Marco" Property="BorderThickness" Value="1.4" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Marco" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ======================= Casilla de verificación ======================= -->
+        <Style TargetType="CheckBox">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal" Background="Transparent">
+                            <Border x:Name="Marco"
+                                    Width="18" Height="18"
+                                    Background="White"
+                                    BorderBrush="{StaticResource BrochaBorde}"
+                                    BorderThickness="1.2"
+                                    CornerRadius="6"
+                                    VerticalAlignment="Center">
+                                <Path x:Name="Marca" Data="M3,8 L6.5,11.5 12.5,4.5"
+                                      Stroke="White" StrokeThickness="2"
+                                      StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Visibility="Collapsed"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Marco" Property="Background" Value="{StaticResource BrochaAcento}" />
+                                <Setter TargetName="Marco" Property="BorderBrush" Value="{StaticResource BrochaAcento}" />
+                                <Setter TargetName="Marca" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Marco" Property="BorderBrush" Value="{StaticResource BrochaAcento}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ======================= Chip de estado semántico ======================= -->
+        <!-- El color responde al texto de la propiedad Estado del elemento enlazado -->
+        <Style x:Key="ChipEstado" TargetType="ContentControl">
+            <Setter Property="IsTabStop" Value="False" />
+            <Setter Property="Foreground" Value="{StaticResource BrochaAcento}" />
+            <Setter Property="Background" Value="{StaticResource BrochaAcentoSuave}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="11"
+                                Padding="9,4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <!-- Positivo -->
+                <DataTrigger Binding="{Binding Estado}" Value="Activo">
+                    <Setter Property="Background" Value="{StaticResource BrochaExitoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaExito}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Activa">
+                    <Setter Property="Background" Value="{StaticResource BrochaExitoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaExito}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Disponible">
+                    <Setter Property="Background" Value="{StaticResource BrochaExitoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaExito}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Pagado">
+                    <Setter Property="Background" Value="{StaticResource BrochaExitoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaExito}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Completado">
+                    <Setter Property="Background" Value="{StaticResource BrochaExitoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaExito}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Configurado">
+                    <Setter Property="Background" Value="{StaticResource BrochaExitoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaExito}" />
+                </DataTrigger>
+                <!-- Neutro -->
+                <DataTrigger Binding="{Binding Estado}" Value="Inactivo">
+                    <Setter Property="Background" Value="{StaticResource BrochaNeutroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaNeutro}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Inactiva">
+                    <Setter Property="Background" Value="{StaticResource BrochaNeutroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaNeutro}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Agotado">
+                    <Setter Property="Background" Value="{StaticResource BrochaNeutroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaNeutro}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Archivado">
+                    <Setter Property="Background" Value="{StaticResource BrochaNeutroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaNeutro}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Reembolsado">
+                    <Setter Property="Background" Value="{StaticResource BrochaNeutroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaNeutro}" />
+                </DataTrigger>
+                <!-- Peligro -->
+                <DataTrigger Binding="{Binding Estado}" Value="Vencido">
+                    <Setter Property="Background" Value="{StaticResource BrochaPeligroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaPeligro}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Bloqueado">
+                    <Setter Property="Background" Value="{StaticResource BrochaPeligroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaPeligro}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Fallido">
+                    <Setter Property="Background" Value="{StaticResource BrochaPeligroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaPeligro}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Cancelado">
+                    <Setter Property="Background" Value="{StaticResource BrochaPeligroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaPeligro}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Suspendido">
+                    <Setter Property="Background" Value="{StaticResource BrochaPeligroSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaPeligro}" />
+                </DataTrigger>
+                <!-- Atención -->
+                <DataTrigger Binding="{Binding Estado}" Value="Pago pendiente">
+                    <Setter Property="Background" Value="{StaticResource BrochaAlertaSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaAlerta}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="En preparación">
+                    <Setter Property="Background" Value="{StaticResource BrochaAlertaSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaAlerta}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Pendiente">
+                    <Setter Property="Background" Value="{StaticResource BrochaAlertaSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaAlerta}" />
+                </DataTrigger>
+                <!-- Informativo -->
+                <DataTrigger Binding="{Binding Estado}" Value="Recibido">
+                    <Setter Property="Background" Value="{StaticResource BrochaInfoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaInfo}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Confirmado">
+                    <Setter Property="Background" Value="{StaticResource BrochaInfoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaInfo}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="Listo">
+                    <Setter Property="Background" Value="{StaticResource BrochaInfoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaInfo}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="En reparto">
+                    <Setter Property="Background" Value="{StaticResource BrochaInfoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaInfo}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ======================= Indicador de carga ======================= -->
+        <Style x:Key="IndicadorCarga" TargetType="ProgressBar">
+            <Setter Property="IsIndeterminate" Value="True" />
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Ellipse x:Name="Anillo"
+                                 Stroke="{StaticResource BrochaAcento}"
+                                 StrokeThickness="2.6"
+                                 StrokeDashArray="14 37"
+                                 StrokeDashCap="Round"
+                                 RenderTransformOrigin="0.5,0.5">
+                            <Ellipse.RenderTransform>
+                                <RotateTransform Angle="0" />
+                            </Ellipse.RenderTransform>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Ellipse.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetName="Anillo"
+                                                             Storyboard.TargetProperty="(Ellipse.RenderTransform).(RotateTransform.Angle)"
+                                                             From="0" To="360" Duration="0:0:0.9" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Application.Resources>
+</Application>

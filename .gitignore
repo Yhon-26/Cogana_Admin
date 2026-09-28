@@ -1,0 +1,14 @@
+# Artefactos de compilación
+[Bb]in/
+[Oo]bj/
+publish/
+Releases/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Sistema
+Thumbs.db
+Desktop.ini
