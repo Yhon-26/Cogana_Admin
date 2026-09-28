@@ -2,13 +2,15 @@ using System.Reflection;
 using Cogana.Admin.Aplicacion.Contratos;
 using Cogana.Admin.Aplicacion.Modelos;
 using Velopack;
+using Velopack.Sources;
 
 namespace Cogana.Admin.Infraestructura.Servicios;
 
 /// <summary>
-/// Actualizaciones mediante Velopack. Los paquetes se alojan en un repositorio
-/// estático (por defecto, un bucket público de Supabase Storage) y cada versión
-/// se publica con la herramienta `vpk` (ver Publicar-Instalador.ps1).
+/// Actualizaciones mediante Velopack. El canal de actualizaciones es, por defecto,
+/// un repositorio de GitHub (publicado con `vpk publish github` desde
+/// Publicar-Instalador.ps1, variable COGANA_GITHUB_REPO); si no está configurado,
+/// usa el repositorio estático de Supabase Storage (COGANA_ACTUALIZACIONES_URL).
 /// </summary>
 public sealed class ServicioActualizacionesVelopack : IServicioActualizaciones
 {
@@ -16,14 +18,21 @@ public sealed class ServicioActualizacionesVelopack : IServicioActualizaciones
         "https://mstcxtpjncozqztkawjg.supabase.co/storage/v1/object/public/actualizaciones";
 
     private const string VariableEntornoUrl = "COGANA_ACTUALIZACIONES_URL";
+    private const string VariableEntornoRepositorio = "COGANA_GITHUB_REPO";
 
-    private readonly string _url;
+    private readonly string? _url;
+    private readonly string? _repositorioGithub;
     private UpdateInfo? _ultimaBusqueda;
 
     public ServicioActualizacionesVelopack()
     {
-        var url = Environment.GetEnvironmentVariable(VariableEntornoUrl);
-        _url = string.IsNullOrWhiteSpace(url) ? UrlPorDefecto : url;
+        _repositorioGithub = Environment.GetEnvironmentVariable(VariableEntornoRepositorio);
+        if (string.IsNullOrWhiteSpace(_repositorioGithub))
+        {
+            _repositorioGithub = null;
+            var url = Environment.GetEnvironmentVariable(VariableEntornoUrl);
+            _url = string.IsNullOrWhiteSpace(url) ? UrlPorDefecto : url;
+        }
 
         VersionActual = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "1.0.0";
     }
@@ -63,7 +72,19 @@ public sealed class ServicioActualizacionesVelopack : IServicioActualizaciones
             progreso is null ? null : valor => progreso.Report(valor));
     }
 
-    private UpdateManager CrearAdministrador() => new(_url);
+    private UpdateManager CrearAdministrador()
+    {
+        if (_repositorioGithub is not null)
+        {
+            var fuente = new GithubSource(
+                $"https://github.com/{_repositorioGithub}",
+                null,
+                false);
+            return new UpdateManager(fuente);
+        }
+
+        return new UpdateManager(_url!);
+    }
 
     public void InstalarYReiniciar(InfoActualizacionDisponible version)
     {

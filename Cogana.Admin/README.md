@@ -45,12 +45,48 @@ desde la propia interfaz con el botón **Buscar actualizaciones** (tarjeta
 Para generar una versión instalable:
 
 1. Sube el número de versión en `Cogana.Admin.Escritorio\Cogana.Admin.Escritorio.csproj` (`<Version>`).
-2. Ejecuta en PowerShell: `.\Publicar-Instalador.ps1` (publica en Release, win-x64, self-contained, y empaqueta con `vpk`).
-3. Crea el bucket público `actualizaciones` en Supabase Storage (solo la primera vez) y sube el contenido de la carpeta `Releases` a su raíz.
+2. Ejecuta en PowerShell: `.\Publicar-Instalador.ps1` (publica en Release, win-x64, framework-dependent, y empaqueta con `vpk`).
+3. Sube el contenido de la carpeta `Releases` a la raíz del bucket `actualizaciones` de Supabase Storage.
 
 Cada equipo instala con `CoganaAdmin-win-Setup.exe`. Al publicar una versión nueva,
 la app la detecta, descarga solo los archivos cambiados (paquete delta), reinstala
 y se reinicia; las versiones antiguas se limpian automáticamente.
+
+## Git y GitHub (canal de actualizaciones recomendado)
+
+El proyecto usa git para el código y GitHub Releases como canal de actualizaciones:
+publicar una versión queda en un solo comando, sin subir archivos a mano.
+
+**Configuración única:**
+
+1. Instala GitHub CLI y autentícate:
+   ```powershell
+   winget install GitHub.cli
+   gh auth login
+   ```
+2. Crea el repositorio y sube el código (recomendado público, para que las apps
+   descarguen actualizaciones sin tokens):
+   ```powershell
+   git remote add origin https://github.com/TU_USUARIO/cogana-admin.git
+   git push -u origin main
+   ```
+3. Define la variable de entorno del usuario y reinicia la app:
+   ```powershell
+   setx COGANA_GITHUB_REPO "TU_USUARIO/cogana-admin"
+   ```
+
+**Cada versión nueva:**
+
+```powershell
+git add -A
+git commit -m "Descripción del cambio"
+.\Publicar-Instalador.ps1 -Github "TU_USUARIO/cogana-admin"
+```
+
+El script compila, empaqueta y publica la versión en GitHub Releases. Los equipos
+con `COGANA_GITHUB_REPO` definido la detectan con "Buscar actualizaciones" y se
+actualizan solos (delta incluido). Sin esa variable, la app sigue usando el bucket
+de Supabase (útil como respaldo o durante la transición).
 
 ## Acceso administrativo
 
