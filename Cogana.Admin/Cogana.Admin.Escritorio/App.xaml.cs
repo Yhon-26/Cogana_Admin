@@ -19,6 +19,8 @@ public partial class App : Application
     private ServicioInventarioAdministrativoSupabase? _servicioInventario;
     private ServicioPromocionesAdministrativasSupabase? _servicioPromociones;
     private ServicioClientesAdministrativosSupabase? _servicioClientes;
+    private ServicioUsuariosAdministrativosSupabase? _servicioUsuarios;
+    private ServicioConfiguracionTiendaSupabase? _servicioConfiguracion;
     private ServicioActualizacionesVelopack? _servicioActualizaciones;
     private IServicioPanelInicio? _servicioPanelInicio;
     private VentanaInicioSesion? _ventanaInicioSesion;
@@ -41,6 +43,8 @@ public partial class App : Application
         _servicioInventario = new ServicioInventarioAdministrativoSupabase(_clienteSupabase);
         _servicioPromociones = new ServicioPromocionesAdministrativasSupabase(_clienteSupabase);
         _servicioClientes = new ServicioClientesAdministrativosSupabase(_clienteSupabase);
+        _servicioUsuarios = new ServicioUsuariosAdministrativosSupabase(_clienteSupabase);
+        _servicioConfiguracion = new ServicioConfiguracionTiendaSupabase(_clienteSupabase);
         _servicioActualizaciones = new ServicioActualizacionesVelopack();
         _servicioPanelInicio = new ServicioPanelInicioArchivo();
         var servicioAutenticacion = new ServicioAutenticacionSupabase(_clienteSupabase);
@@ -66,6 +70,8 @@ public partial class App : Application
             _servicioInventario is null ||
             _servicioPromociones is null ||
             _servicioClientes is null ||
+            _servicioUsuarios is null ||
+            _servicioConfiguracion is null ||
             _servicioActualizaciones is null)
         {
             return;
@@ -85,6 +91,8 @@ public partial class App : Application
             ServicioInventario = _servicioInventario,
             ServicioPromociones = _servicioPromociones,
             ServicioClientes = _servicioClientes,
+            ServicioUsuarios = _servicioUsuarios,
+            ServicioConfiguracion = _servicioConfiguracion,
             TiendaId = sesion.TiendaId
         };
 

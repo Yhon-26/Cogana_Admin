@@ -195,23 +195,21 @@ public sealed class ServicioModulosAdministrativosSupabase(ClienteSupabaseRest c
 
     private async Task<ModuloDatos> ObtenerUsuariosAsync(Guid tiendaId, CancellationToken token)
     {
-        var filas = await ConsultarAsync(
-            "/rest/v1/store_memberships?select=user_id,role,is_active,created_at" +
-            $"&store_id=eq.{tiendaId:D}&order=created_at.asc&limit=250",
-            item =>
-            {
-                var id = GuidValor(item, "user_id");
-                return new FilaModuloDatos(
-                    id,
-                    $"Usuario {id.ToString("N")[..8].ToUpperInvariant()}",
-                    TraducirRol(Texto(item, "role")),
-                    Booleano(item, "is_active") ? "Acceso permitido" : "Acceso suspendido",
-                    Fecha(item, "created_at"),
-                    "Perfil protegido por RLS",
-                    Booleano(item, "is_active") ? "Activo" : "Inactivo");
-            },
-            token);
-        return new("Usuario", "Rol", "Acceso", "Desde", "Información", "Actualizar", filas);
+        var servicioUsuarios = new ServicioUsuariosAdministrativosSupabase(cliente);
+        var usuarios = await servicioUsuarios.ObtenerUsuariosAsync(tiendaId, token);
+        var filas = usuarios.Select(usuario => new FilaModuloDatos(
+            usuario.Id,
+            usuario.NombreCompleto,
+            usuario.Correo,
+            TraducirRol(usuario.Rol),
+            usuario.EstaActivo ? "Acceso permitido" : "Acceso suspendido",
+            usuario.UltimoAcceso is null
+                ? "Sin ingreso registrado"
+                : usuario.UltimoAcceso.Value.LocalDateTime.ToString("dd/MM/yyyy HH:mm", CulturaPeru),
+            usuario.EstaActivo ? "Activo" : "Inactivo",
+            usuario.Rol)).ToList();
+
+        return new("Usuario", "Correo", "Rol", "Acceso", "Último ingreso", "Crear acceso", filas);
     }
 
     private async Task<ModuloDatos> ObtenerConfiguracionAsync(Guid tiendaId, CancellationToken token)
@@ -248,6 +246,23 @@ public sealed class ServicioModulosAdministrativosSupabase(ClienteSupabaseRest c
                 cerrado ? "Cerrado" : $"{Texto(item, "opens_at")} – {Texto(item, "closes_at")}",
                 "Hora local",
                 "Atención al público",
+                cerrado ? "Cerrado" : "Abierto"));
+        }
+
+        var excepciones = await ObtenerJsonAsync(
+            "/rest/v1/store_schedule_exceptions?select=id,local_date,opens_at,closes_at,is_closed,public_message" +
+            $"&store_id=eq.{tiendaId:D}&order=local_date.asc&limit=100",
+            token);
+        foreach (var item in excepciones.EnumerateArray())
+        {
+            var cerrado = Booleano(item, "is_closed");
+            filas.Add(new FilaModuloDatos(
+                GuidValor(item, "id"),
+                "Fecha especial",
+                FechaSolo(item, "local_date", "Sin fecha"),
+                cerrado ? "Cerrado" : $"{Texto(item, "opens_at")} – {Texto(item, "closes_at")}",
+                Texto(item, "public_message", "Sin mensaje"),
+                "Excepción del horario",
                 cerrado ? "Cerrado" : "Abierto"));
         }
 

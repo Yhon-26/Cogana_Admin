@@ -18,6 +18,8 @@ public partial class MainWindow : Window
     public IServicioInventarioAdministrativo? ServicioInventario { get; init; }
     public IServicioPromocionesAdministrativas? ServicioPromociones { get; init; }
     public IServicioClientesAdministrativos? ServicioClientes { get; init; }
+    public IServicioUsuariosAdministrativos? ServicioUsuarios { get; init; }
+    public IServicioConfiguracionTienda? ServicioConfiguracion { get; init; }
     public Guid TiendaId { get; init; }
 
     public MainWindow()
@@ -58,20 +60,29 @@ public partial class MainWindow : Window
 
     private async void AlCrearRegistro(object sender, RoutedEventArgs e)
     {
-        if (ServicioCatalogo is null ||
-            DataContext is not VentanaPrincipalViewModel { ModuloSeleccionado: not null } viewModel ||
+        if (DataContext is not VentanaPrincipalViewModel { ModuloSeleccionado: not null } viewModel ||
             !viewModel.PuedeCrearRegistro)
         {
             return;
         }
 
-        var ventana = new Vistas.VentanaNuevoRegistro(
-            ServicioCatalogo,
-            TiendaId,
-            viewModel.ModuloSeleccionado.Nombre)
+        Window? ventana = viewModel.ModuloSeleccionado.Nombre == "Usuarios"
+            ? ServicioUsuarios is null
+                ? null
+                : new Vistas.VentanaUsuarioAcceso(ServicioUsuarios, TiendaId)
+            : ServicioCatalogo is null
+                ? null
+                : new Vistas.VentanaNuevoRegistro(
+                    ServicioCatalogo,
+                    TiendaId,
+                    viewModel.ModuloSeleccionado.Nombre);
+
+        if (ventana is null)
         {
-            Owner = this
-        };
+            return;
+        }
+
+        ventana.Owner = this;
 
         if (ventana.ShowDialog() == true)
         {
@@ -357,8 +368,7 @@ public partial class MainWindow : Window
     {
         if (DataContext is not VentanaPrincipalViewModel
             {
-                ModuloSeleccionado: not null,
-                FilaModuloSeleccionada: not null
+                ModuloSeleccionado: not null
             } viewModel ||
             !viewModel.PuedeEditarRegistro)
         {
@@ -366,14 +376,25 @@ public partial class MainWindow : Window
         }
 
         Window? ventana;
-        if (viewModel.ModuloSeleccionado.Nombre == "Inventario y lotes")
+        var fila = viewModel.FilaModuloSeleccionada;
+        if (viewModel.ModuloSeleccionado.Nombre == "Configuración")
+        {
+            ventana = ServicioConfiguracion is null
+                ? null
+                : new Vistas.VentanaConfiguracionTienda(ServicioConfiguracion, TiendaId);
+        }
+        else if (fila is null)
+        {
+            return;
+        }
+        else if (viewModel.ModuloSeleccionado.Nombre == "Inventario y lotes")
         {
             ventana = ServicioInventario is null
                 ? null
                 : new Vistas.VentanaDetalleLote(
                     ServicioInventario,
                     TiendaId,
-                    viewModel.FilaModuloSeleccionada.Id);
+                    fila.Id);
         }
         else if (viewModel.ModuloSeleccionado.Nombre == "Promociones")
         {
@@ -382,7 +403,7 @@ public partial class MainWindow : Window
                 : new Vistas.VentanaEditarPromocion(
                     ServicioPromociones,
                     TiendaId,
-                    viewModel.FilaModuloSeleccionada.Id);
+                    fila.Id);
         }
         else if (viewModel.ModuloSeleccionado.Nombre == "Clientes")
         {
@@ -391,7 +412,16 @@ public partial class MainWindow : Window
                 : new Vistas.VentanaDetalleCliente(
                     ServicioClientes,
                     TiendaId,
-                    viewModel.FilaModuloSeleccionada.Id);
+                    fila.Id);
+        }
+        else if (viewModel.ModuloSeleccionado.Nombre == "Usuarios")
+        {
+            ventana = ServicioUsuarios is null
+                ? null
+                : new Vistas.VentanaUsuarioAcceso(
+                    ServicioUsuarios,
+                    TiendaId,
+                    fila.Id);
         }
         else if (ServicioCatalogo is not null)
         {
@@ -399,11 +429,11 @@ public partial class MainWindow : Window
                 ? new Vistas.VentanaEditarProducto(
                     ServicioCatalogo,
                     TiendaId,
-                    viewModel.FilaModuloSeleccionada.Id)
+                    fila.Id)
                 : new Vistas.VentanaEditarCatalogo(
                     ServicioCatalogo,
                     TiendaId,
-                    viewModel.FilaModuloSeleccionada.Id,
+                    fila.Id,
                     viewModel.ModuloSeleccionado.Nombre);
         }
         else

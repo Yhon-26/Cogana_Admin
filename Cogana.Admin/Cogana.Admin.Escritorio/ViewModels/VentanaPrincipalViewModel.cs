@@ -302,8 +302,10 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
 
     public bool EsModuloInicio => ModuloSeleccionado?.Nombre == "Inicio";
     public bool EsModuloPendiente => !EsModuloInicio;
-    public bool PuedeCrearRegistro => ModuloSeleccionado?.Nombre is
-        "Productos" or "Categorías" or "Presentaciones" or "Inventario y lotes" or "Proveedores" or "Promociones";
+    public bool PuedeCrearRegistro =>
+        ModuloSeleccionado?.Nombre is
+            "Productos" or "Categorías" or "Presentaciones" or "Inventario y lotes" or "Proveedores" or "Promociones" ||
+        (ModuloSeleccionado?.Nombre == "Usuarios" && _sesion.Rol == "owner");
 
     public string EstadoConexion
     {
@@ -475,14 +477,20 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         FilaModuloSeleccionada is { CodigoEstado.Length: > 0 };
 
     public bool PuedeEditarRegistro =>
-        FilaModuloSeleccionada is not null &&
-        ModuloSeleccionado?.Nombre is
-            "Productos" or "Categorías" or "Presentaciones" or "Inventario y lotes" or "Proveedores" or "Clientes" or "Promociones";
+        ModuloSeleccionado?.Nombre == "Configuración" ||
+        (FilaModuloSeleccionada is not null &&
+         ModuloSeleccionado?.Nombre is
+            "Productos" or "Categorías" or "Presentaciones" or "Inventario y lotes" or "Proveedores" or "Clientes" or "Promociones") ||
+        (FilaModuloSeleccionada is not null &&
+         ModuloSeleccionado?.Nombre == "Usuarios" &&
+         _sesion.Rol == "owner");
 
     public string TextoEditarRegistro => ModuloSeleccionado?.Nombre switch
     {
         "Inventario y lotes" => "Ver lote",
         "Clientes" => "Ver cliente",
+        "Usuarios" => "Gestionar acceso",
+        "Configuración" => "Editar configuración",
         _ => "Editar"
     };
 
