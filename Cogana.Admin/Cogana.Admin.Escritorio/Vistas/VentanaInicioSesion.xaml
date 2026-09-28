@@ -74,13 +74,13 @@
                     <CubicEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetName="TarjetaE" Storyboard.TargetProperty="ScaleX"
+            <DoubleAnimation Storyboard.TargetName="TarjetaEscala" Storyboard.TargetProperty="ScaleX"
                              From="0.94" To="1" Duration="0:0:0.7">
                 <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetName="TarjetaE" Storyboard.TargetProperty="ScaleY"
+            <DoubleAnimation Storyboard.TargetName="TarjetaEscala" Storyboard.TargetProperty="ScaleY"
                              From="0.94" To="1" Duration="0:0:0.7">
                 <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseOut"/>
@@ -158,7 +158,7 @@
         </EventTrigger>
     </Window.Triggers>
 
-    <Grid Background="#06090C" MouseMove="AlMoverMouse">
+    <Grid Background="#06090C" MouseMove="AlMoverMouse" MouseLeave="AlSalirMouse">
 
         <!-- Capa 1: aurora viva -->
         <Grid IsHitTestVisible="False">
@@ -239,19 +239,22 @@
             </Ellipse.RenderTransform>
         </Ellipse>
 
-        <!-- FASE LOGIN -->
+        <!-- FASE LOGIN: la tarjeta se inclina hacia el mouse (rotación + sesgo + parallax) -->
         <Grid x:Name="PantallaLogin">
             <Border x:Name="TarjetaAcceso"
-                    HorizontalAlignment="Center" VerticalAlignment="Center"
                     Width="424"
                     Background="#0BFFFFFF"
                     BorderThickness="1"
                     CornerRadius="26"
-                    Opacity="0">
+                    Opacity="0"
+                    ClipToBounds="True"
+                    RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
                     <TransformGroup>
+                        <RotateTransform x:Name="TarjetaRotacion"/>
+                        <ScaleTransform x:Name="TarjetaEscala"/>
+                        <SkewTransform x:Name="TarjetaSesgo"/>
                         <TranslateTransform x:Name="TarjetaT"/>
-                        <ScaleTransform x:Name="TarjetaE" CenterX="0.5" CenterY="0.5"/>
                     </TransformGroup>
                 </Border.RenderTransform>
 

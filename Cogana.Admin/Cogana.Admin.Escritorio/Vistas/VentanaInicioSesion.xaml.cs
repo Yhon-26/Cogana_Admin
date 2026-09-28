@@ -292,14 +292,45 @@ public partial class VentanaInicioSesion : Window
         FocoMouseT.X = posicion.X - raiz.ActualWidth / 2;
         FocoMouseT.Y = posicion.Y - raiz.ActualHeight / 2;
 
-        // Parallax sutil de la tarjeta
+        // Inclinación de la tarjeta hacia la posición del mouse:
+        // rotación + sesgo + escala + parallax (pseudo-3D sin pipeline 3D)
         if (PantallaLogin.IsHitTestVisible)
         {
             var relativoX = posicion.X / raiz.ActualWidth - 0.5;
             var relativoY = posicion.Y / raiz.ActualHeight - 0.5;
-            TarjetaT.X = relativoX * -10;
-            TarjetaT.Y = relativoY * -8;
+
+            // Libera las animaciones retenidas para poder fijar valores directos
+            TarjetaSesgo.BeginAnimation(SkewTransform.AngleXProperty, null);
+            TarjetaSesgo.BeginAnimation(SkewTransform.AngleYProperty, null);
+            TarjetaRotacion.BeginAnimation(RotateTransform.AngleProperty, null);
+            TarjetaEscala.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            TarjetaEscala.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            TarjetaT.BeginAnimation(TranslateTransform.XProperty, null);
+            TarjetaT.BeginAnimation(TranslateTransform.YProperty, null);
+
+            TarjetaSesgo.AngleX = relativoX * -5;
+            TarjetaSesgo.AngleY = relativoY * 4;
+            TarjetaRotacion.Angle = relativoX * -2.5;
+            var alejamiento = Math.Min(Math.Abs(relativoX) + Math.Abs(relativoY), 1);
+            TarjetaEscala.ScaleX = 1 - alejamiento * 0.03;
+            TarjetaEscala.ScaleY = 1 - alejamiento * 0.03;
+            TarjetaT.X = relativoX * -14;
+            TarjetaT.Y = relativoY * -12;
         }
+    }
+
+    private void AlSalirMouse(object sender, MouseEventArgs e)
+    {
+        const int duracion = 400;
+        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+
+        TarjetaSesgo.BeginAnimation(SkewTransform.AngleXProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
+        TarjetaSesgo.BeginAnimation(SkewTransform.AngleYProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
+        TarjetaRotacion.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
+        TarjetaEscala.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(1, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
+        TarjetaEscala.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
+        TarjetaT.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
+        TarjetaT.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
     }
 
     // ============================ UTILIDADES ============================
