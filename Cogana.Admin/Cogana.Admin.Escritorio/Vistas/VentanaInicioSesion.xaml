@@ -14,6 +14,36 @@
 
     <Window.Resources>
 
+        <!-- Botón de acceso con esquinas suaves (radio 14 como el diseño) -->
+        <Style x:Key="BotonEntrar" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#0A0A0A"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="FondoBoton"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="14"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="FondoBoton" Property="Opacity" Value="0.92"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="FondoBoton" Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Deriva lenta de las capas de aurora -->
         <Storyboard x:Key="AnimacionAurora">
             <DoubleAnimation Storyboard.TargetName="LavadoVerdeT" Storyboard.TargetProperty="X"
@@ -239,24 +269,9 @@
                     </LinearGradientBrush>
                 </Border.BorderBrush>
 
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                <Grid ClipToBounds="True">
 
-                    <!-- Brillo superior -->
-                    <Border Height="1" Width="338" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-1,0,0">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#00FFFFFF" Offset="0"/>
-                                <GradientStop Color="#2EFFFFFF" Offset="0.5"/>
-                                <GradientStop Color="#00FFFFFF" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
-
-                    <!-- Blob flotante tras el contenido -->
+                    <!-- Blob flotante tras el contenido (superpuesto, no ocupa flujo) -->
                     <Ellipse Width="220" Height="220" Margin="0,-70,-50,0"
                              HorizontalAlignment="Right" VerticalAlignment="Top" IsHitTestVisible="False">
                         <Ellipse.Fill>
@@ -270,7 +285,18 @@
                         </Ellipse.RenderTransform>
                     </Ellipse>
 
-                    <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                    <!-- Brillo superior -->
+                    <Border Height="1" Width="338" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-1,0,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#00FFFFFF" Offset="0"/>
+                                <GradientStop Color="#2EFFFFFF" Offset="0.5"/>
+                                <GradientStop Color="#00FFFFFF" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+
+                    <StackPanel Margin="38,36,38,38">
 
                         <!-- Logo y estado -->
                         <Grid Margin="0,0,0,28">
@@ -419,7 +445,7 @@
                                 Click="AlIniciarSesion"
                                 IsDefault="True"
                                 Height="50"
-                                Style="{StaticResource BotonPrincipal}"/>
+                                Style="{StaticResource BotonEntrar}"/>
 
                         <TextBlock Text="Sistema protegido · COGANA 2026" FontSize="11"
                                    Foreground="#38FFFFFF" HorizontalAlignment="Center" Margin="0,18,0,0"/>
