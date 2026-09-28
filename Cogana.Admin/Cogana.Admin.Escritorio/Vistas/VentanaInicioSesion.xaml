@@ -242,6 +242,7 @@
         <!-- FASE LOGIN: la tarjeta se inclina hacia el mouse (rotación + sesgo + parallax) -->
         <Grid x:Name="PantallaLogin">
             <Border x:Name="TarjetaAcceso"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
                     Width="424"
                     Background="#0BFFFFFF"
                     BorderThickness="1"
