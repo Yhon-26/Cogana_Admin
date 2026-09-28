@@ -57,6 +57,14 @@ if (-not (Test-Path (Join-Path $carpetaPublicacion "Cogana.Admin.Escritorio.exe"
 }
 
 Write-Host "-- Empaquetando con vpk --"
+$salida = Join-Path $raiz "Releases"
+
+# Si esta misma version ya fue empaquetada antes, retirarla para poder regenerarla
+Get-ChildItem $salida -Filter "CoganaAdmin-$Version-*.nupkg" -ErrorAction SilentlyContinue | Remove-Item -Force
+Remove-Item (Join-Path $salida "RELEASES") -Force -ErrorAction SilentlyContinue
+Remove-Item (Join-Path $salida "releases.win.json") -Force -ErrorAction SilentlyContinue
+Remove-Item (Join-Path $salida "assets.win.json") -Force -ErrorAction SilentlyContinue
+
 $argumentosVpk = @(
     'pack',
     '--packId', 'CoganaAdmin',
