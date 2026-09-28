@@ -1,7 +1,7 @@
 # Cogana Admin: estado y hoja de ruta
 
 **Ubicación del proyecto:** `D:\Cogana_Admin\Cogana.Admin`  
-**Actualizado:** 27 de septiembre de 2026
+**Actualizado:** 28 de septiembre de 2026
 
 Esta guía resume el estado conocido del software de escritorio. El código fuente es la referencia para el comportamiento actual; las funciones indicadas como pendientes todavía no deben considerarse disponibles.
 
@@ -40,10 +40,13 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 - Consulta de datos de la tienda y horarios de atención.
 - Exportación CSV del módulo de reportes disponible actualmente.
 - Interfaz propia del escritorio, separada de los estilos de la aplicación móvil.
-- Empaquetado con Velopack: instalador `CoganaAdmin-win-Setup.exe` generado por `Publicar-Instalador.ps1`.
-- Actualizaciones desde la app: botón "Buscar actualizaciones" que detecta, descarga (delta), instala y reinicia, usando un bucket público de Supabase Storage como repositorio.
+- Panel de inicio configurable: secciones por módulo que se agregan arrastrándolas desde el menú o con un botón, se quitan con un clic y se reordenan arrastrándolas entre sí; la disposición se guarda por equipo (archivo local JSON).
+- Login inmersivo: fondo aurora animado con rejilla y foco de luz que sigue el mouse, tarjeta glass con anillo de luz giratorio, campos con etiqueta flotante e íconos, estado EN LÍNEA, animación de entrada e inclinación de la tarjeta siguiendo el mouse.
+- Pantalla de carga del acceso: red de 150 partículas conectadas, anillos expansivos, orbe con halo giratorio, barra de progreso con porcentaje y pasos ("Verificando credenciales...", "Bienvenido al sistema").
+- Nitidez en pantallas escaladas: manifiesto PerMonitorV2, UseLayoutRounding y modo de texto Display.
+- Control de versiones con git; publicación automática a GitHub Releases (`Publicar-Instalador.ps1 -Github`) como canal de actualizaciones de la app (variable COGANA_GITHUB_REPO), con el bucket de Supabase como respaldo.
 
-La solución compiló correctamente al cerrar el bloque de actualizaciones: cero errores y cero advertencias. Esa comprobación confirma compilación, no una revisión funcional de cada pantalla ni una publicación instalable probada en un equipo limpio.
+La solución compiló correctamente al cerrar el login inmersivo: cero errores y cero advertencias. Esa comprobación confirma compilación, no una revisión funcional de cada pantalla ni una publicación instalable probada en un equipo limpio.
 
 ## Qué aparece en el menú y qué falta
 
@@ -68,7 +71,75 @@ La solución compiló correctamente al cerrar el bloque de actualizaciones: cero
 2. **Configuración de tienda:** formularios de edición para datos comerciales, canales y horarios; guardar con validaciones y permisos.
 3. **Reportes:** confirmar con la tienda las métricas y periodos necesarios, luego agregar filtros y exportaciones correspondientes.
 4. **Revisión funcional:** recorrer cada flujo en Windows con la cuenta administrativa y datos de prueba controlados; confirmar errores de red, permisos, formularios, importes y estados.
-5. **Instalador y publicación:** el empaquetado y las actualizaciones están implementados con Velopack (`Publicar-Instalador.ps1` + bucket `actualizaciones`). Pendiente: probar el instalador en un equipo limpio de Windows y decidir si se requiere firma de código.
+5. **Instalador y publicación:** el empaquetado y las actualizaciones están implementados con Velopack (`Publicar-Instalador.ps1`); el canal activo es GitHub Releases (variable COGANA_GITHUB_REPO) y el bucket `actualizaciones` de Supabase queda como respaldo. Pendiente: probar el instalador en un equipo limpio de Windows y decidir si se requiere firma de código.
+6. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario y cálculos de promociones (ver tabla de módulos).
+7. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
+
+## Memo técnico: login en 3D (bloque pospuesto)
+
+El diseño de referencia (proyecto React de Figma Make) inclina la tarjeta del login con perspectiva real — el equivalente de CSS `rotateX/rotateY`. Se implementó en WPF y se desactivó el 28/09/2026 por una limitación del equipo de desarrollo, no del software.
+
+**Qué se encontró:** en la máquina actual el pipeline 3D de WPF no renderiza nada, aunque `RenderCapability.Tier` reporta nivel 2 (aceleración disponible). Incluso una escena mínima — `Viewport3D` + `AmbientLight` + un cuadrado con `DiffuseMaterial` — no aparece en pantalla, mientras el 2D renderiza acelerado con normalidad. Causa probable: el controlador de GPU bloquea el Direct3D 9 (D3D9Ex) que WPF usa internamente para 3D. No es un defecto de la aplicación.
+
+**Por eso la tarjeta usa inclinación 2D:** en `AlMoverMouse` de `VentanaInicioSesion.xaml.cs` se aplican `SkewTransform` (AngleX/AngleY), `RotateTransform`, `ScaleTransform` y `TranslateTransform` (nombres `TarjetaSesgo`, `TarjetaRotacion`, `TarjetaEscala`, `TarjetaT`) en función de la posición del mouse, y en `AlSalirMouse` se devuelven a cero animados. Se ve similar en movimiento, pero las líneas permanecen paralelas (no hay trapecio de perspectiva).
+
+**Cómo implementar el 3D real cuando se desee** — primero verificar que el equipo destino renderiza WPF 3D con una escena mínima; si no lo hace, actualizar el controlador de GPU o probar otro equipo:
+
+1. Envolver la tarjeta (`TarjetaAcceso`) en un `Viewport3D` dentro de `PantallaLogin`, dándole tamaño fijo (la geometría 3D exige dimensiones conocidas):
+
+```xml
+<Viewport3D Width="424" Height="600" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Viewport3D.Camera>
+        <PerspectiveCamera Position="0,0,540" LookDirection="0,0,-1"
+                           UpDirection="0,1,0" FieldOfView="60"/>
+    </Viewport3D.Camera>
+    <ModelVisual3D>
+        <ModelVisual3D.Content><AmbientLight Color="White"/></ModelVisual3D.Content>
+    </ModelVisual3D>
+    <Viewport2DVisual3D>
+        <Viewport2DVisual3D.Geometry>
+            <MeshGeometry3D Positions="-212,300,0 212,300,0 -212,-300,0 212,-300,0"
+                            TriangleIndices="0 1 2 2 1 3"
+                            TextureCoordinates="0,0 1,0 0,1 1,1"/>
+        </Viewport2DVisual3D.Geometry>
+        <Viewport2DVisual3D.Material>
+            <DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" Brush="White"/>
+        </Viewport2DVisual3D.Material>
+        <Viewport2DVisual3D.Transform>
+            <Transform3DGroup>
+                <RotateTransform3D>
+                    <RotateTransform3D.Rotation>
+                        <AxisAngleRotation3D x:Name="InclinacionHorizontal" Axis="0,1,0" Angle="0"/>
+                    </RotateTransform3D.Rotation>
+                </RotateTransform3D>
+                <RotateTransform3D>
+                    <RotateTransform3D.Rotation>
+                        <AxisAngleRotation3D x:Name="InclinacionVertical" Axis="1,0,0" Angle="0"/>
+                    </RotateTransform3D.Rotation>
+                </RotateTransform3D>
+                <TranslateTransform3D x:Name="ParalajeTarjeta"/>
+            </Transform3DGroup>
+        </Viewport2DVisual3D.Transform>
+
+        <!-- TarjetaAcceso aquí, con Width="424" Height="600" fijos -->
+    </Viewport2DVisual3D>
+</Viewport3D>
+```
+
+2. En `AlMoverMouse` (VentanaInicioSesion.xaml.cs), con la posición relativa al centro de la ventana:
+
+```csharp
+InclinacionHorizontal.Angle = relativoX * 14;   // giro lateral (±7°)
+InclinacionVertical.Angle   = -relativoY * 12;  // giro vertical (±6°)
+ParalajeTarjeta.OffsetX     = relativoX * -14;
+ParalajeTarjeta.OffsetY     = relativoY * -12;
+```
+
+En `AlSalirMouse`, animar los cuatro valores de vuelta a 0 (350 ms). La animación de entrada de la tarjeta debe apuntar a `ParalajeTarjeta.OffsetY` (de 40 a 0) y a la opacidad de la tarjeta, porque los transformadores 2D ya no existen.
+
+3. Comprobado en esta sesión: `RenderTargetBitmap` y `PrintWindow` no capturan el contenido 3D de forma fiable; para verificarlo visualmente usar captura de pantalla (`CopyFromScreen`) con la ventana `Topmost`.
+
+4. Alternativa sin el pipeline 3D de WPF: dibujar la tarjeta con SkiaSharp aplicando una matriz de perspectiva manual (permite el trapecio real). Implica rehacer los campos como lienzo dibujado, con más trabajo de interacción.
 
 ## Conexión y seguridad
 
