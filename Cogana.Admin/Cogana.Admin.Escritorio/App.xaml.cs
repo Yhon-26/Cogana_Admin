@@ -56,7 +56,7 @@ public partial class App : Application
         _ventanaInicioSesion.Show();
     }
 
-    private void AbrirPanelPrincipal(SesionUsuario sesion)
+    private async void AbrirPanelPrincipal(SesionUsuario sesion)
     {
         if (_servicioEstado is null ||
             _servicioResumenInicio is null ||
@@ -90,8 +90,14 @@ public partial class App : Application
 
         MainWindow = panel;
         panel.Show();
-        _ventanaInicioSesion?.Close();
-        _ventanaInicioSesion = null;
+
+        if (_ventanaInicioSesion is not null)
+        {
+            // Deja ver el "Bienvenido al sistema" de la pantalla de carga antes de cerrar.
+            await Task.Delay(1200);
+            _ventanaInicioSesion.Close();
+            _ventanaInicioSesion = null;
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
