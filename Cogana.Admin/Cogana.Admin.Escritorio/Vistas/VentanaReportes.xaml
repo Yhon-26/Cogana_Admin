@@ -5,6 +5,85 @@
         Width="1160" Height="820" MinWidth="980" MinHeight="700"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
         Background="{StaticResource BrochaFondo}">
+    <Window.Resources>
+        <Style x:Key="PestanaReporte" TargetType="TabItem">
+            <Setter Property="Foreground" Value="{StaticResource BrochaTextoSuave}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="FondoPestana" Background="Transparent" CornerRadius="13"
+                                Padding="14,8" Margin="0,0,6,0">
+                            <ContentPresenter ContentSource="Header" HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="FondoPestana" Property="Background" Value="#ECEEEC" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="FondoPestana" Property="Background" Value="{StaticResource BrochaNegro}" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="EncabezadoTablaReporte" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F2F3F1" />
+            <Setter Property="Foreground" Value="{StaticResource BrochaTextoSuave}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrochaBorde}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style x:Key="CeldaTablaReporte" TargetType="DataGridCell">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        </Style>
+
+        <Style x:Key="FilaTablaReporte" TargetType="DataGridRow">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#ECEDEA" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F7F5" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrochaAcentoSuave}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TablaReporte" TargetType="DataGrid">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrochaBorde}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="GridLinesVisibility" Value="None" />
+            <Setter Property="HeadersVisibility" Value="Column" />
+            <Setter Property="RowHeaderWidth" Value="0" />
+            <Setter Property="ColumnHeaderHeight" Value="38" />
+            <Setter Property="RowHeight" Value="42" />
+            <Setter Property="CanUserAddRows" Value="False" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="SelectionMode" Value="Single" />
+            <Setter Property="SelectionUnit" Value="FullRow" />
+            <Setter Property="ColumnHeaderStyle" Value="{StaticResource EncabezadoTablaReporte}" />
+            <Setter Property="CellStyle" Value="{StaticResource CeldaTablaReporte}" />
+            <Setter Property="RowStyle" Value="{StaticResource FilaTablaReporte}" />
+        </Style>
+    </Window.Resources>
     <Grid Margin="22">
         <Border Background="{StaticResource BrochaSuperficie}" BorderBrush="#12000000"
                 BorderThickness="1" CornerRadius="28" Padding="24">
@@ -76,20 +155,21 @@
                                FontSize="10" Foreground="#34473F" />
                 </Border>
 
-                <TabControl Grid.Row="3" Background="Transparent" BorderThickness="0">
+                <TabControl Grid.Row="3" Background="Transparent" BorderThickness="0"
+                            ItemContainerStyle="{StaticResource PestanaReporte}">
                     <TabItem Header="Ventas y pedidos">
                         <Grid Margin="8,15,12,8">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="1.45*" /><ColumnDefinition Width="14" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                            <DataGrid x:Name="TablaVentasDiarias" AutoGenerateColumns="False" IsReadOnly="True"
-                                      CanUserAddRows="False" HeadersVisibility="Column" GridLinesVisibility="Horizontal" RowHeaderWidth="0">
+                            <DataGrid x:Name="TablaVentasDiarias" AutoGenerateColumns="False"
+                                      Style="{StaticResource TablaReporte}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha}" Width="*" />
                                     <DataGridTextColumn Header="Pedidos completados" Binding="{Binding Pedidos}" Width="150" />
                                     <DataGridTextColumn Header="Ventas" Binding="{Binding Ventas}" Width="150" />
                                 </DataGrid.Columns>
                             </DataGrid>
-                            <DataGrid Grid.Column="2" x:Name="TablaEstados" AutoGenerateColumns="False" IsReadOnly="True"
-                                      CanUserAddRows="False" HeadersVisibility="Column" GridLinesVisibility="Horizontal" RowHeaderWidth="0">
+                            <DataGrid Grid.Column="2" x:Name="TablaEstados" AutoGenerateColumns="False"
+                                      Style="{StaticResource TablaReporte}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" />
                                     <DataGridTextColumn Header="Pedidos" Binding="{Binding Pedidos}" Width="90" />
@@ -100,8 +180,8 @@
                     </TabItem>
 
                     <TabItem Header="Productos vendidos">
-                        <DataGrid x:Name="TablaProductos" Margin="8,15,12,8" AutoGenerateColumns="False" IsReadOnly="True"
-                                  CanUserAddRows="False" HeadersVisibility="Column" GridLinesVisibility="Horizontal" RowHeaderWidth="0">
+                        <DataGrid x:Name="TablaProductos" Margin="8,15,12,8" AutoGenerateColumns="False"
+                                  Style="{StaticResource TablaReporte}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*" />
                                 <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" Width="130" />
@@ -112,8 +192,8 @@
                     </TabItem>
 
                     <TabItem Header="Métodos de pago">
-                        <DataGrid x:Name="TablaPagos" Margin="8,15,12,8" AutoGenerateColumns="False" IsReadOnly="True"
-                                  CanUserAddRows="False" HeadersVisibility="Column" GridLinesVisibility="Horizontal" RowHeaderWidth="0">
+                        <DataGrid x:Name="TablaPagos" Margin="8,15,12,8" AutoGenerateColumns="False"
+                                  Style="{StaticResource TablaReporte}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Método" Binding="{Binding Metodo}" Width="*" />
                                 <DataGridTextColumn Header="Pedidos completados" Binding="{Binding Pedidos}" Width="180" />
@@ -126,8 +206,8 @@
                         <Grid Margin="8,15,12,8">
                             <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="12" /><RowDefinition Height="*" /></Grid.RowDefinitions>
                             <GroupBox Header="Productos con stock bajo" Padding="8">
-                                <DataGrid x:Name="TablaStockBajo" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
-                                          HeadersVisibility="Column" GridLinesVisibility="Horizontal" RowHeaderWidth="0">
+                                <DataGrid x:Name="TablaStockBajo" AutoGenerateColumns="False"
+                                          Style="{StaticResource TablaReporte}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*" />
                                         <DataGridTextColumn Header="Unidad" Binding="{Binding Unidad}" Width="110" />
@@ -137,8 +217,8 @@
                                 </DataGrid>
                             </GroupBox>
                             <GroupBox Grid.Row="2" Header="Lotes vencidos o próximos a vencer" Padding="8">
-                                <DataGrid x:Name="TablaVencimientos" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
-                                          HeadersVisibility="Column" GridLinesVisibility="Horizontal" RowHeaderWidth="0">
+                                <DataGrid x:Name="TablaVencimientos" AutoGenerateColumns="False"
+                                          Style="{StaticResource TablaReporte}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Lote" Binding="{Binding Lote}" Width="130" />
                                         <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*" />
