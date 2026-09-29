@@ -38,7 +38,7 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 - Detalle de pedido con productos, importes, entrega, pagos e historial de estados. El cambio de estado usa la operación validada por el backend.
 - Consulta del directorio de miembros de la tienda.
 - Consulta y edición de datos de la tienda, canales de atención, métodos de pago, tiempo de preparación, horario semanal y fechas especiales. El guardado se realiza como una sola operación validada en Supabase.
-- Exportación CSV del módulo de reportes disponible actualmente.
+- Exportación CSV del módulo de reportes con resumen, ventas diarias, estados de pedido, productos vendidos, métodos de pago, stock bajo y vencimientos; los errores de escritura se muestran sin cerrar la ventana.
 - Interfaz propia del escritorio, separada de los estilos de la aplicación móvil.
 - Panel de inicio configurable: secciones por módulo que se agregan arrastrándolas desde el menú o con un botón, se quitan con un clic y se reordenan arrastrándolas entre sí; la disposición se guarda por equipo (archivo local JSON).
 - Login inmersivo: fondo aurora animado con rejilla y foco de luz que sigue el mouse, tarjeta glass con anillo de luz giratorio, campos con etiqueta flotante e íconos, estado EN LÍNEA, animación de entrada e inclinación de la tarjeta siguiendo el mouse.

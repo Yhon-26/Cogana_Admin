@@ -174,10 +174,29 @@ public partial class VentanaReportes : Window
         };
         if (dialogo.ShowDialog(this) != true) return;
 
-        var lineas = CrearCsv(_reporte);
-        File.WriteAllLines(dialogo.FileName, lineas, new UTF8Encoding(true));
-        MessageBox.Show("Reporte exportado correctamente.", "Exportación completada",
-            MessageBoxButton.OK, MessageBoxImage.Information);
+        try
+        {
+            var lineas = CrearCsv(_reporte);
+            File.WriteAllLines(dialogo.FileName, lineas, new UTF8Encoding(true));
+            MessageBox.Show("Reporte exportado correctamente.", "Exportación completada",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            MessageBox.Show(
+                "Windows no permitió guardar el reporte en esa ubicación. Elige otra carpeta.",
+                "No se pudo exportar",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+        catch (IOException)
+        {
+            MessageBox.Show(
+                "No se pudo escribir el archivo. Comprueba que no esté abierto en otro programa e inténtalo nuevamente.",
+                "No se pudo exportar",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 
     private List<string> CrearCsv(ReporteAdministrativo reporte)
@@ -192,15 +211,28 @@ public partial class VentanaReportes : Window
             Csv("Activos", reporte.Resumen.Activos.ToString()),
             Csv("Cancelados", reporte.Resumen.Cancelados.ToString()),
             Csv("Ticket promedio", Moneda(reporte.Resumen.TicketPromedioCentimos)),
+            Csv("Descuentos", Moneda(reporte.Resumen.DescuentosCentimos)),
+            Csv("Productos activos", reporte.Resumen.ProductosActivos.ToString()),
+            Csv("Productos con stock bajo", reporte.Resumen.ProductosStockBajo.ToString()),
+            Csv("Lotes por vencer", reporte.Resumen.LotesPorVencer.ToString()),
+            Csv("Lotes vencidos", reporte.Resumen.LotesVencidos.ToString()),
             string.Empty,
             Csv("VENTAS DIARIAS", "Pedidos", "Ventas")
         };
         lineas.AddRange(reporte.VentasDiarias.Select(item => Csv(
             item.Fecha.ToString("dd/MM/yyyy"), item.Pedidos.ToString(), Moneda(item.VentasCentimos))));
         lineas.Add(string.Empty);
+        lineas.Add(Csv("ESTADOS DE PEDIDO", "Pedidos", "Importe"));
+        lineas.AddRange(reporte.EstadosPedido.Select(item => Csv(
+            TraducirEstado(item.Estado), item.Pedidos.ToString(), Moneda(item.TotalCentimos))));
+        lineas.Add(string.Empty);
         lineas.Add(Csv("PRODUCTOS VENDIDOS", "Cantidad", "Pedidos", "Ventas"));
         lineas.AddRange(reporte.ProductosVendidos.Select(item => Csv(
             item.Producto, item.Cantidad.ToString(), item.Pedidos.ToString(), Moneda(item.VentasCentimos))));
+        lineas.Add(string.Empty);
+        lineas.Add(Csv("MÉTODOS DE PAGO", "Pedidos", "Importe"));
+        lineas.AddRange(reporte.MetodosPago.Select(item => Csv(
+            TraducirMetodo(item.Metodo), item.Pedidos.ToString(), Moneda(item.TotalCentimos))));
         lineas.Add(string.Empty);
         lineas.Add(Csv("STOCK BAJO", "Unidad", "Stock actual", "Stock mínimo"));
         lineas.AddRange(reporte.StockBajo.Select(item => Csv(
