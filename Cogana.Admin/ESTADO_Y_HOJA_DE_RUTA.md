@@ -48,7 +48,7 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 - Administración segura de personal: directorio con nombre, correo, rol, estado y último acceso; alta con correo y contraseña inicial; edición de perfil, rol y acceso; protección del último propietario y auditoría de cambios mediante la Edge Function `admin-users`.
 - Reportes administrativos por periodo: resumen de ventas y pedidos, ventas diarias, estados, productos más vendidos, métodos de pago, stock bajo y lotes vencidos o próximos a vencer; exportación consolidada a CSV.
 
-La solución compiló correctamente al cerrar los bloques de usuarios, accesos, configuración y reportes: cero errores y cero advertencias. Esa comprobación confirma compilación, no una revisión funcional de cada pantalla ni una publicación instalable probada en un equipo limpio.
+La solución compiló correctamente al cerrar los bloques de usuarios, accesos, configuración y reportes: cero errores y cero advertencias. La compilación Release y el arranque desde la salida publicada también fueron comprobados. El recorrido autenticado de todas las pantallas y la instalación en un equipo limpio siguen pendientes.
 
 ## Qué aparece en el menú y qué falta
 
@@ -69,8 +69,8 @@ La solución compiló correctamente al cerrar los bloques de usuarios, accesos, 
 
 ## Siguientes bloques recomendados
 
-1. **Revisión funcional:** recorrer cada flujo en Windows con la cuenta administrativa y datos de prueba controlados; confirmar errores de red, permisos, formularios, importes, reportes y estados. Incluir alta, primer ingreso y cambios de acceso con cuentas controladas.
-2. **Instalador y publicación:** el empaquetado y las actualizaciones están implementados con Velopack (`Publicar-Instalador.ps1`); el canal activo es GitHub Releases (variable COGANA_GITHUB_REPO) y el bucket `actualizaciones` de Supabase queda como respaldo. Pendiente: empaquetar la versión 1.10.0, probar el instalador en un equipo limpio de Windows y decidir si se requiere firma de código.
+1. **Revisión funcional autenticada:** recorrer cada flujo en Windows con la cuenta administrativa y datos de prueba controlados; confirmar errores de red, permisos, formularios, importes, reportes y estados. Incluir alta, primer ingreso y cambios de acceso con cuentas controladas.
+2. **Instalador y publicación:** la versión 1.10.0 fue compilada en Release y empaquetada con Velopack; se generaron Setup, paquete completo, delta y portátil en `Releases`. El arranque del ejecutable publicado fue correcto. Pendiente: probar la instalación en un equipo limpio, decidir si se requiere firma de código y publicar los archivos en GitHub Releases.
 3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos).
 4. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
 
@@ -143,6 +143,16 @@ En `AlSalirMouse`, animar los cuatro valores de vuelta a 0 (350 ms). La animaci�
 ## Conexión y seguridad
 
 La aplicación lee `COGANA_SUPABASE_URL` y `COGANA_SUPABASE_PUBLIC_KEY` desde variables de entorno. El proyecto de Supabase configurado para Cogana es `mstcxtpjncozqztkawjg`. En la app de escritorio solo debe usarse la clave pública/publicable; nunca una clave `service_role` o secreta.
+
+## Verificación de la versión 1.10.0
+
+- Compilación Debug: cero errores y cero advertencias.
+- Compilación Release `win-x64`: completada.
+- Arranque desde la carpeta publicada: proceso respondiendo y ventana `Acceso administrativo · Cogana` visible.
+- Integración Velopack: `VelopackApp.Run()` se ejecuta al inicio de `Main`, antes de crear WPF, y el empaquetador confirmó el punto de entrada.
+- Paquetes generados: instalador, portable, paquete completo y actualización delta 1.8.1 → 1.10.0.
+- Firma digital: el instalador actual no está firmado.
+- Pendiente de verificación manual: inicio de sesión y navegación autenticada, operaciones que modifican datos, instalación en un Windows limpio y actualización desde una versión instalada anterior.
 
 El acceso usa Supabase Auth y membresías activas de la tienda. La aplicación depende de RLS y de las operaciones protegidas ya existentes en el backend. Las acciones que afecten pedidos o inventario deben continuar pasando por esas operaciones controladas.
 

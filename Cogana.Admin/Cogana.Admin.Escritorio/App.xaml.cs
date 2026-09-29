@@ -26,12 +26,18 @@ public partial class App : Application
     private IServicioPanelInicio? _servicioPanelInicio;
     private VentanaInicioSesion? _ventanaInicioSesion;
 
-    protected override void OnStartup(StartupEventArgs e)
+    [STAThread]
+    private static void Main(string[] args)
     {
-        // Gancho obligatorio de Velopack: debe ejecutarse antes de cualquier otra cosa
-        // para atender los eventos de instalación/actualización/desinstalación.
         VelopackApp.Build().Run();
 
+        var aplicacion = new App();
+        aplicacion.InitializeComponent();
+        aplicacion.Run();
+    }
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
         base.OnStartup(e);
 
         var configuracion = ConfiguracionSupabase.DesdeVariablesDeEntorno();

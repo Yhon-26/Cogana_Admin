@@ -6,6 +6,11 @@
     <ProjectReference Include="..\Cogana.Admin.Infraestructura\Cogana.Admin.Infraestructura.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ApplicationDefinition Remove="App.xaml" />
+    <Page Include="App.xaml" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
@@ -13,6 +18,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <StartupObject>Cogana.Admin.Escritorio.App</StartupObject>
     <Version>1.10.0</Version>
   </PropertyGroup>
 
