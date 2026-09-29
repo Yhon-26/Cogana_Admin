@@ -70,7 +70,7 @@ La solución compiló correctamente al cerrar los bloques de usuarios, accesos, 
 ## Siguientes bloques recomendados
 
 1. **Revisión funcional autenticada:** recorrer cada flujo en Windows con la cuenta administrativa y datos de prueba controlados; confirmar errores de red, permisos, formularios, importes, reportes y estados. Incluir alta, primer ingreso y cambios de acceso con cuentas controladas.
-2. **Instalador y publicación:** la versión 1.10.0 fue compilada en Release y empaquetada con Velopack; se generaron Setup, paquete completo, delta y portátil en `Releases`. El arranque del ejecutable publicado fue correcto. Pendiente: probar la instalación en un equipo limpio, decidir si se requiere firma de código y publicar los archivos en GitHub Releases.
+2. **Instalador y publicación:** la versión 1.10.1 fue compilada en Release y empaquetada con Velopack; se generaron Setup, paquete completo, delta y portátil en `Releases`. El arranque del ejecutable publicado fue correcto. Pendiente: probar la instalación en un equipo limpio, decidir si se requiere firma de código y publicar los archivos en GitHub Releases.
 3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos).
 4. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
 
@@ -144,19 +144,20 @@ En `AlSalirMouse`, animar los cuatro valores de vuelta a 0 (350 ms). La animaci�
 
 La aplicación lee `COGANA_SUPABASE_URL` y `COGANA_SUPABASE_PUBLIC_KEY` desde variables de entorno. El proyecto de Supabase configurado para Cogana es `mstcxtpjncozqztkawjg`. En la app de escritorio solo debe usarse la clave pública/publicable; nunca una clave `service_role` o secreta.
 
-## Verificación de la versión 1.10.0
+## Verificación de la versión 1.10.1
 
 - Compilación Debug: cero errores y cero advertencias.
 - Compilación Release `win-x64`: completada.
 - Arranque desde la carpeta publicada: proceso respondiendo y ventana `Acceso administrativo · Cogana` visible.
 - Integración Velopack: `VelopackApp.Run()` se ejecuta al inicio de `Main`, antes de crear WPF, y el empaquetador confirmó el punto de entrada.
-- Paquetes generados: instalador, portable, paquete completo y actualización delta 1.8.1 → 1.10.0.
+- Paquetes generados: instalador, portable, paquete completo 1.10.1 y actualización delta 1.10.0 → 1.10.1.
 - Firma digital: el instalador actual no está firmado.
 - Inicio de sesión real confirmado con una membresía propietaria activa; el panel principal cargó la tienda, 25 productos y 11 categorías desde Supabase.
 - Se corrigió el conteo de las tarjetas superiores del Inicio: las consultas ahora envían el rango de elementos requerido por PostgREST y leen el total exacto de `Content-Range`.
 - Verificación segura del backend con el rol `authenticated`: la cuenta propietaria puede leer los módulos de la tienda bajo RLS y `get_admin_report` devuelve 25 productos activos, 25 productos sin existencia, 0 pedidos y 0 lotes para los datos actuales.
 - La Edge Function `admin-users` está activa, exige JWT y valida una membresía `owner` o `admin`; las altas y modificaciones de acceso se reservan al propietario.
-- Pendiente de verificación manual: navegación visual por Reportes, Usuarios y Configuración, operaciones que modifican datos, instalación en un Windows limpio y actualización desde una versión instalada anterior.
+- Navegación autenticada confirmada visualmente en Reportes, Usuarios y las cuatro pestañas de Configuración. Se corrigieron la fecha al reanudar, el nombre de Domingo, el contraste de pestañas y las casillas de horarios.
+- Pendiente de verificación manual: operaciones que modifican datos, instalación en un Windows limpio y actualización desde una versión instalada anterior.
 
 El acceso usa Supabase Auth y membresías activas de la tienda. La aplicación depende de RLS y de las operaciones protegidas ya existentes en el backend. Las acciones que afecten pedidos o inventario deben continuar pasando por esas operaciones controladas.
 
