@@ -81,13 +81,19 @@
 
                         <StackPanel x:Name="SeccionContrasena" Margin="0,16,0,0">
                             <TextBlock Text="Contraseña inicial *" FontSize="11" FontWeight="SemiBold" />
-                            <PasswordBox x:Name="Contrasena" Height="44" Margin="0,7,0,0" Padding="13,10"
-                                         Background="White" BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
-                                         FontSize="13" />
+                            <Border Background="White" BorderBrush="{StaticResource BrochaBorde}"
+                                    BorderThickness="1" CornerRadius="12" Margin="0,7,0,0">
+                                <PasswordBox x:Name="Contrasena" Height="42" Margin="13,0"
+                                             Background="Transparent" BorderThickness="0"
+                                             FontSize="13" VerticalContentAlignment="Center"/>
+                            </Border>
                             <TextBlock Text="Confirmar contraseña *" FontSize="11" FontWeight="SemiBold" Margin="0,16,0,0" />
-                            <PasswordBox x:Name="ConfirmarContrasena" Height="44" Margin="0,7,0,0" Padding="13,10"
-                                         Background="White" BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
-                                         FontSize="13" />
+                            <Border Background="White" BorderBrush="{StaticResource BrochaBorde}"
+                                    BorderThickness="1" CornerRadius="12" Margin="0,7,0,0">
+                                <PasswordBox x:Name="ConfirmarContrasena" Height="42" Margin="13,0"
+                                             Background="Transparent" BorderThickness="0"
+                                             FontSize="13" VerticalContentAlignment="Center"/>
+                            </Border>
                             <TextBlock Text="Debe tener al menos 10 caracteres. Si la cuenta ya existe, su contraseña actual se conserva."
                                        FontSize="10" Foreground="{StaticResource BrochaTextoSuave}"
                                        TextWrapping="Wrap" Margin="2,7,0,0" />

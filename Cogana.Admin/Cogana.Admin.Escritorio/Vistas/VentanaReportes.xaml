@@ -141,12 +141,12 @@
                         <StackPanel><TextBlock Text="TICKET PROMEDIO" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" />
                             <TextBlock x:Name="TicketPromedio" Text="S/ 0.00" FontSize="22" FontWeight="SemiBold" Margin="0,5,0,0" /></StackPanel>
                     </Border>
-                    <Border Background="#F7EFE4" CornerRadius="16" Padding="15" Margin="0,0,8,0">
-                        <StackPanel><TextBlock Text="STOCK BAJO" FontSize="9" Foreground="#80623E" />
+                    <Border Background="{StaticResource BrochaAlertaSuave}" CornerRadius="16" Padding="15" Margin="0,0,8,0">
+                        <StackPanel><TextBlock Text="STOCK BAJO" FontSize="9" Foreground="{StaticResource BrochaAlerta}" />
                             <TextBlock x:Name="TotalStockBajo" Text="0" FontSize="22" FontWeight="SemiBold" Margin="0,5,0,0" /></StackPanel>
                     </Border>
-                    <Border Background="#F4E8E6" CornerRadius="16" Padding="15">
-                        <StackPanel><TextBlock Text="LOTES POR VENCER" FontSize="9" Foreground="#8C514B" />
+                    <Border Background="{StaticResource BrochaPeligroSuave}" CornerRadius="16" Padding="15">
+                        <StackPanel><TextBlock Text="LOTES POR VENCER" FontSize="9" Foreground="{StaticResource BrochaPeligro}" />
                             <TextBlock x:Name="TotalVencimientos" Text="0" FontSize="22" FontWeight="SemiBold" Margin="0,5,0,0" /></StackPanel>
                     </Border>
                 </UniformGrid>
@@ -172,7 +172,15 @@
                             <DataGrid Grid.Column="2" x:Name="TablaEstados" AutoGenerateColumns="False"
                                       Style="{StaticResource TablaReporte}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" />
+                                    <DataGridTemplateColumn Header="Estado" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ContentControl Style="{StaticResource ChipEstado}" HorizontalAlignment="Left">
+                                                    <TextBlock Text="{Binding Estado}" FontSize="10" FontWeight="SemiBold"/>
+                                                </ContentControl>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="Pedidos" Binding="{Binding Pedidos}" Width="90" />
                                     <DataGridTextColumn Header="Importe" Binding="{Binding Total}" Width="120" />
                                 </DataGrid.Columns>
@@ -206,29 +214,59 @@
                     <TabItem Header="Inventario">
                         <Grid Margin="8,15,12,8">
                             <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="12" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-                            <GroupBox Header="Productos con stock bajo" Padding="8">
-                                <DataGrid x:Name="TablaStockBajo" AutoGenerateColumns="False"
-                                          Style="{StaticResource TablaReporte}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*" />
-                                        <DataGridTextColumn Header="Unidad" Binding="{Binding Unidad}" Width="110" />
-                                        <DataGridTextColumn Header="Stock actual" Binding="{Binding Actual}" Width="130" />
-                                        <DataGridTextColumn Header="Stock mínimo" Binding="{Binding Minimo}" Width="130" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </GroupBox>
-                            <GroupBox Grid.Row="2" Header="Lotes vencidos o próximos a vencer" Padding="8">
-                                <DataGrid x:Name="TablaVencimientos" AutoGenerateColumns="False"
-                                          Style="{StaticResource TablaReporte}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Lote" Binding="{Binding Lote}" Width="130" />
-                                        <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*" />
-                                        <DataGridTextColumn Header="Vencimiento" Binding="{Binding Fecha}" Width="130" />
-                                        <DataGridTextColumn Header="Cantidad suelta" Binding="{Binding Cantidad}" Width="130" />
-                                        <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="120" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </GroupBox>
+                            <Border BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
+                                    CornerRadius="14" Background="White" Padding="12,10">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Horizontal" Margin="2,0,0,8">
+                                        <Ellipse Width="8" Height="8" Fill="{StaticResource BrochaAlerta}" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Productos con stock bajo" FontSize="13" FontWeight="SemiBold" Margin="7,0,0,0"/>
+                                    </StackPanel>
+                                    <DataGrid Grid.Row="1" x:Name="TablaStockBajo" AutoGenerateColumns="False"
+                                              Style="{StaticResource TablaReporte}" BorderThickness="0">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*" />
+                                            <DataGridTextColumn Header="Unidad" Binding="{Binding Unidad}" Width="110" />
+                                            <DataGridTextColumn Header="Stock actual" Binding="{Binding Actual}" Width="130" />
+                                            <DataGridTextColumn Header="Stock mínimo" Binding="{Binding Minimo}" Width="130" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Row="2" BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
+                                    CornerRadius="14" Background="White" Padding="12,10">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Horizontal" Margin="2,0,0,8">
+                                        <Ellipse Width="8" Height="8" Fill="{StaticResource BrochaPeligro}" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Lotes vencidos o próximos a vencer" FontSize="13" FontWeight="SemiBold" Margin="7,0,0,0"/>
+                                    </StackPanel>
+                                    <DataGrid Grid.Row="1" x:Name="TablaVencimientos" AutoGenerateColumns="False"
+                                              Style="{StaticResource TablaReporte}" BorderThickness="0">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Lote" Binding="{Binding Lote}" Width="130" />
+                                            <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*" />
+                                            <DataGridTextColumn Header="Vencimiento" Binding="{Binding Fecha}" Width="130" />
+                                            <DataGridTextColumn Header="Cantidad suelta" Binding="{Binding Cantidad}" Width="130" />
+                                            <DataGridTemplateColumn Header="Estado" Width="130">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ContentControl Style="{StaticResource ChipEstado}" HorizontalAlignment="Left">
+                                                            <TextBlock Text="{Binding Estado}" FontSize="10" FontWeight="SemiBold"/>
+                                                        </ContentControl>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </Border>
                         </Grid>
                     </TabItem>
                 </TabControl>
