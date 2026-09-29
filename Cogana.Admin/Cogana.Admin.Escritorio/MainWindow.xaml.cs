@@ -27,6 +27,15 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Loaded += AlCargarVentana;
+        Activated += AlActivarVentana;
+    }
+
+    private void AlActivarVentana(object? sender, EventArgs e)
+    {
+        if (DataContext is VentanaPrincipalViewModel viewModel)
+        {
+            viewModel.ActualizarFechaActual();
+        }
     }
 
     private async void AlCargarVentana(object sender, RoutedEventArgs e)
@@ -53,7 +62,13 @@ public partial class MainWindow : Window
 
     private async void AlCambiarModulo(object sender, SelectionChangedEventArgs e)
     {
-        if (DataContext is VentanaPrincipalViewModel viewModel && viewModel.EsModuloPendiente)
+        if (DataContext is not VentanaPrincipalViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.ActualizarFechaActual();
+        if (viewModel.EsModuloPendiente)
         {
             await viewModel.CargarModuloActualAsync();
         }

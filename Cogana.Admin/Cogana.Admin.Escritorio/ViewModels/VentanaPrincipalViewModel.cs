@@ -95,6 +95,9 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
     public string FechaActual => DateTime.Now.ToString(
         "dddd, d 'de' MMMM",
         new CultureInfo("es-PE"));
+
+    public void ActualizarFechaActual() => Notificar(nameof(FechaActual));
+
     public string CorreoUsuario => _sesion.Correo;
     public string RolUsuario => _sesion.Rol == "owner" ? "Propietario" : "Administrador";
     public string InicialesUsuario => string.IsNullOrWhiteSpace(_sesion.Correo)
