@@ -48,7 +48,7 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 - Administración segura de personal: directorio con nombre, correo, rol, estado y último acceso; alta con correo y contraseña inicial; edición de perfil, rol y acceso; protección del último propietario y auditoría de cambios mediante la Edge Function `admin-users`.
 - Reportes administrativos por periodo: resumen de ventas y pedidos, ventas diarias, estados, productos más vendidos, métodos de pago, stock bajo y lotes vencidos o próximos a vencer; exportación consolidada a CSV.
 
-La solución compiló correctamente al cerrar los bloques de usuarios, accesos, configuración y reportes: cero errores y cero advertencias. La compilación Release y el arranque desde la salida publicada también fueron comprobados. El recorrido autenticado de todas las pantallas y la instalación en un equipo limpio siguen pendientes.
+La solución compiló correctamente al cerrar los bloques de usuarios, accesos, configuración y reportes: cero errores y cero advertencias. La compilación Release y el arranque desde la salida publicada también fueron comprobados. El inicio de sesión real con la cuenta propietaria y la carga del panel principal fueron confirmados. El recorrido autenticado de todas las pantallas y la instalación en un equipo limpio siguen pendientes.
 
 ## Qué aparece en el menú y qué falta
 
@@ -152,7 +152,11 @@ La aplicación lee `COGANA_SUPABASE_URL` y `COGANA_SUPABASE_PUBLIC_KEY` desde va
 - Integración Velopack: `VelopackApp.Run()` se ejecuta al inicio de `Main`, antes de crear WPF, y el empaquetador confirmó el punto de entrada.
 - Paquetes generados: instalador, portable, paquete completo y actualización delta 1.8.1 → 1.10.0.
 - Firma digital: el instalador actual no está firmado.
-- Pendiente de verificación manual: inicio de sesión y navegación autenticada, operaciones que modifican datos, instalación en un Windows limpio y actualización desde una versión instalada anterior.
+- Inicio de sesión real confirmado con una membresía propietaria activa; el panel principal cargó la tienda, 25 productos y 11 categorías desde Supabase.
+- Se corrigió el conteo de las tarjetas superiores del Inicio: las consultas ahora envían el rango de elementos requerido por PostgREST y leen el total exacto de `Content-Range`.
+- Verificación segura del backend con el rol `authenticated`: la cuenta propietaria puede leer los módulos de la tienda bajo RLS y `get_admin_report` devuelve 25 productos activos, 25 productos sin existencia, 0 pedidos y 0 lotes para los datos actuales.
+- La Edge Function `admin-users` está activa, exige JWT y valida una membresía `owner` o `admin`; las altas y modificaciones de acceso se reservan al propietario.
+- Pendiente de verificación manual: navegación visual por Reportes, Usuarios y Configuración, operaciones que modifican datos, instalación en un Windows limpio y actualización desde una versión instalada anterior.
 
 El acceso usa Supabase Auth y membresías activas de la tienda. La aplicación depende de RLS y de las operaciones protegidas ya existentes en el backend. Las acciones que afecten pedidos o inventario deben continuar pasando por esas operaciones controladas.
 

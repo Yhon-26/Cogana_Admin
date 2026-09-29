@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -105,12 +104,36 @@ public sealed class ServicioResumenInicioSupabase(ClienteSupabaseRest cliente)
     {
         using var solicitud = new HttpRequestMessage(HttpMethod.Get, ruta);
         solicitud.Headers.TryAddWithoutValidation("Prefer", "count=exact");
-        solicitud.Headers.Range = new RangeHeaderValue(0, 0);
+        solicitud.Headers.TryAddWithoutValidation("Range-Unit", "items");
+        solicitud.Headers.TryAddWithoutValidation("Range", "0-0");
 
         using var respuesta = await cliente.EnviarAsync(solicitud, cancellationToken);
         respuesta.EnsureSuccessStatusCode();
 
-        return checked((int)(respuesta.Content.Headers.ContentRange?.Length ?? 0));
+        var total = respuesta.Content.Headers.ContentRange?.Length;
+        if (total.HasValue)
+        {
+            return checked((int)total.Value);
+        }
+
+        if (respuesta.Headers.TryGetValues("Content-Range", out var valores) ||
+            respuesta.Content.Headers.TryGetValues("Content-Range", out valores))
+        {
+            var valor = valores.FirstOrDefault();
+            var separador = valor?.LastIndexOf('/') ?? -1;
+            if (separador >= 0 &&
+                long.TryParse(valor![(separador + 1)..], out var totalEncabezado))
+            {
+                return checked((int)totalEncabezado);
+            }
+        }
+
+        using var documento = await JsonDocument.ParseAsync(
+            await respuesta.Content.ReadAsStreamAsync(cancellationToken),
+            cancellationToken: cancellationToken);
+        return documento.RootElement.ValueKind == JsonValueKind.Array
+            ? documento.RootElement.GetArrayLength()
+            : 0;
     }
 
     private async Task<RespuestaTienda?> ObtenerTiendaAsync(
