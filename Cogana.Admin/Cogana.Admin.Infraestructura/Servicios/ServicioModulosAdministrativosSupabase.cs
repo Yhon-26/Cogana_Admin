@@ -469,7 +469,7 @@ public sealed class ServicioModulosAdministrativosSupabase(ClienteSupabaseRest c
 
     private static string NombreDia(int dia) => dia switch
     {
-        0 => "Domingo",
+        0 or 7 => "Domingo",
         1 => "Lunes",
         2 => "Martes",
         3 => "Miércoles",
