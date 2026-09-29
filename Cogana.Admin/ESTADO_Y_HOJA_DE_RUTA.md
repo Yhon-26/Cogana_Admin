@@ -46,8 +46,9 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 - Nitidez en pantallas escaladas: manifiesto PerMonitorV2, UseLayoutRounding y modo de texto Display.
 - Control de versiones con git; publicación automática a GitHub Releases (`Publicar-Instalador.ps1 -Github`) como canal de actualizaciones de la app (variable COGANA_GITHUB_REPO), con el bucket de Supabase como respaldo.
 - Administración segura de personal: directorio con nombre, correo, rol, estado y último acceso; alta con correo y contraseña inicial; edición de perfil, rol y acceso; protección del último propietario y auditoría de cambios mediante la Edge Function `admin-users`.
+- Reportes administrativos por periodo: resumen de ventas y pedidos, ventas diarias, estados, productos más vendidos, métodos de pago, stock bajo y lotes vencidos o próximos a vencer; exportación consolidada a CSV.
 
-La solución compiló correctamente al cerrar los bloques de usuarios, accesos y configuración: cero errores y cero advertencias. Esa comprobación confirma compilación, no una revisión funcional de cada pantalla ni una publicación instalable probada en un equipo limpio.
+La solución compiló correctamente al cerrar los bloques de usuarios, accesos, configuración y reportes: cero errores y cero advertencias. Esa comprobación confirma compilación, no una revisión funcional de cada pantalla ni una publicación instalable probada en un equipo limpio.
 
 ## Qué aparece en el menú y qué falta
 
@@ -62,17 +63,16 @@ La solución compiló correctamente al cerrar los bloques de usuarios, accesos y
 | Pedidos | Lista, detalle completo e intervención mediante cambios de estado permitidos. | Verificación funcional con pedidos reales, especialmente entrega y pagos. |
 | Clientes | Consulta y detalle de perfil, direcciones, preferencias e historial. | Las modificaciones de información personal no están habilitadas. |
 | Promociones | Consulta, alta, edición, estado y asignación de productos. | Validar cálculo y vigencia con casos comerciales reales. |
-| Reportes | Consulta del reporte disponible y exportación CSV. | Definir reportes finales, filtros, periodos y formato solicitado por la tienda. |
+| Reportes | Periodos de 7 y 30 días, mes actual o rango personalizado; ventas, pedidos, productos, pagos, stock y vencimientos; exportación CSV. | Validar resultados y criterios contables con pedidos reales de la tienda. |
 | Usuarios | Directorio del personal, alta con contraseña inicial, edición de nombre/teléfono, roles y suspensión/reactivación. Las operaciones sensibles están limitadas al propietario y auditadas en Supabase. | Verificar el primer ingreso y todos los cambios con cuentas reales controladas. |
 | Configuración | Consulta y edición de datos comerciales, contacto, atención, pagos, preparación, horario semanal y fechas especiales. | Verificar los cambios con datos operativos reales y confirmar cómo se mostrarán las excepciones en la aplicación móvil. |
 
 ## Siguientes bloques recomendados
 
-1. **Reportes:** confirmar con la tienda las métricas y periodos necesarios, luego agregar filtros y exportaciones correspondientes.
-2. **Revisión funcional:** recorrer cada flujo en Windows con la cuenta administrativa y datos de prueba controlados; confirmar errores de red, permisos, formularios, importes y estados. Incluir alta, primer ingreso y cambios de acceso con cuentas controladas.
-3. **Instalador y publicación:** el empaquetado y las actualizaciones están implementados con Velopack (`Publicar-Instalador.ps1`); el canal activo es GitHub Releases (variable COGANA_GITHUB_REPO) y el bucket `actualizaciones` de Supabase queda como respaldo. Pendiente: empaquetar la versión 1.9.0, probar el instalador en un equipo limpio de Windows y decidir si se requiere firma de código.
-4. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario y cálculos de promociones (ver tabla de módulos).
-5. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
+1. **Revisión funcional:** recorrer cada flujo en Windows con la cuenta administrativa y datos de prueba controlados; confirmar errores de red, permisos, formularios, importes, reportes y estados. Incluir alta, primer ingreso y cambios de acceso con cuentas controladas.
+2. **Instalador y publicación:** el empaquetado y las actualizaciones están implementados con Velopack (`Publicar-Instalador.ps1`); el canal activo es GitHub Releases (variable COGANA_GITHUB_REPO) y el bucket `actualizaciones` de Supabase queda como respaldo. Pendiente: empaquetar la versión 1.10.0, probar el instalador en un equipo limpio de Windows y decidir si se requiere firma de código.
+3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos).
+4. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
 
 ## Memo técnico: login en 3D (bloque pospuesto)
 

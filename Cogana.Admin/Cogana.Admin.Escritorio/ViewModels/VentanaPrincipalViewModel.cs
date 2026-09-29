@@ -388,7 +388,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
     public bool TienePedidosRecientes => PedidosRecientes.Count > 0;
     public bool TieneFilasModulo => FilasModulo.Count > 0;
     public bool PuedeExportarReporte =>
-        ModuloSeleccionado?.Nombre == "Reportes" && FilasModulo.Count > 0;
+        false;
 
     public bool EstaCargandoModulo
     {
@@ -477,7 +477,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         FilaModuloSeleccionada is { CodigoEstado.Length: > 0 };
 
     public bool PuedeEditarRegistro =>
-        ModuloSeleccionado?.Nombre == "Configuración" ||
+        ModuloSeleccionado?.Nombre is "Reportes" or "Configuración" ||
         (FilaModuloSeleccionada is not null &&
          ModuloSeleccionado?.Nombre is
             "Productos" or "Categorías" or "Presentaciones" or "Inventario y lotes" or "Proveedores" or "Clientes" or "Promociones") ||
@@ -490,6 +490,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         "Inventario y lotes" => "Ver lote",
         "Clientes" => "Ver cliente",
         "Usuarios" => "Gestionar acceso",
+        "Reportes" => "Abrir reportes",
         "Configuración" => "Editar configuración",
         _ => "Editar"
     };

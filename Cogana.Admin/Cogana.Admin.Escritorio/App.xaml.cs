@@ -21,6 +21,7 @@ public partial class App : Application
     private ServicioClientesAdministrativosSupabase? _servicioClientes;
     private ServicioUsuariosAdministrativosSupabase? _servicioUsuarios;
     private ServicioConfiguracionTiendaSupabase? _servicioConfiguracion;
+    private ServicioReportesAdministrativosSupabase? _servicioReportes;
     private ServicioActualizacionesVelopack? _servicioActualizaciones;
     private IServicioPanelInicio? _servicioPanelInicio;
     private VentanaInicioSesion? _ventanaInicioSesion;
@@ -45,6 +46,7 @@ public partial class App : Application
         _servicioClientes = new ServicioClientesAdministrativosSupabase(_clienteSupabase);
         _servicioUsuarios = new ServicioUsuariosAdministrativosSupabase(_clienteSupabase);
         _servicioConfiguracion = new ServicioConfiguracionTiendaSupabase(_clienteSupabase);
+        _servicioReportes = new ServicioReportesAdministrativosSupabase(_clienteSupabase);
         _servicioActualizaciones = new ServicioActualizacionesVelopack();
         _servicioPanelInicio = new ServicioPanelInicioArchivo();
         var servicioAutenticacion = new ServicioAutenticacionSupabase(_clienteSupabase);
@@ -72,6 +74,7 @@ public partial class App : Application
             _servicioClientes is null ||
             _servicioUsuarios is null ||
             _servicioConfiguracion is null ||
+            _servicioReportes is null ||
             _servicioActualizaciones is null)
         {
             return;
@@ -93,6 +96,7 @@ public partial class App : Application
             ServicioClientes = _servicioClientes,
             ServicioUsuarios = _servicioUsuarios,
             ServicioConfiguracion = _servicioConfiguracion,
+            ServicioReportes = _servicioReportes,
             TiendaId = sesion.TiendaId
         };
 

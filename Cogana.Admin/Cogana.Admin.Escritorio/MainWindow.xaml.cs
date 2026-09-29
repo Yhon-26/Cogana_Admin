@@ -20,6 +20,7 @@ public partial class MainWindow : Window
     public IServicioClientesAdministrativos? ServicioClientes { get; init; }
     public IServicioUsuariosAdministrativos? ServicioUsuarios { get; init; }
     public IServicioConfiguracionTienda? ServicioConfiguracion { get; init; }
+    public IServicioReportesAdministrativos? ServicioReportes { get; init; }
     public Guid TiendaId { get; init; }
 
     public MainWindow()
@@ -377,7 +378,13 @@ public partial class MainWindow : Window
 
         Window? ventana;
         var fila = viewModel.FilaModuloSeleccionada;
-        if (viewModel.ModuloSeleccionado.Nombre == "Configuración")
+        if (viewModel.ModuloSeleccionado.Nombre == "Reportes")
+        {
+            ventana = ServicioReportes is null
+                ? null
+                : new Vistas.VentanaReportes(ServicioReportes, TiendaId);
+        }
+        else if (viewModel.ModuloSeleccionado.Nombre == "Configuración")
         {
             ventana = ServicioConfiguracion is null
                 ? null
