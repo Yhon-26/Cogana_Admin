@@ -224,7 +224,14 @@
                                       Style="{StaticResource TablaConfiguracion}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Día" Binding="{Binding NombreDia}" IsReadOnly="True" Width="*" />
-                                    <DataGridCheckBoxColumn Header="Cerrado" Binding="{Binding Cerrado}" Width="110" />
+                                    <DataGridTemplateColumn Header="Cerrado" Width="110">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Cerrado, UpdateSourceTrigger=PropertyChanged}"
+                                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="Apertura" Binding="{Binding Apertura}" Width="150" />
                                     <DataGridTextColumn Header="Cierre" Binding="{Binding Cierre}" Width="150" />
                                 </DataGrid.Columns>
@@ -257,7 +264,14 @@
                                       Style="{StaticResource TablaConfiguracion}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha}" Width="130" />
-                                    <DataGridCheckBoxColumn Header="Cerrado" Binding="{Binding Cerrado}" Width="90" />
+                                    <DataGridTemplateColumn Header="Cerrado" Width="90">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Cerrado, UpdateSourceTrigger=PropertyChanged}"
+                                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="Apertura" Binding="{Binding Apertura}" Width="110" />
                                     <DataGridTextColumn Header="Cierre" Binding="{Binding Cierre}" Width="110" />
                                     <DataGridTextColumn Header="Mensaje para clientes" Binding="{Binding Mensaje}" Width="*" />
