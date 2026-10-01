@@ -167,6 +167,8 @@
                                     <RowDefinition Height="290" />
                                     <RowDefinition Height="14" />
                                     <RowDefinition Height="250" />
+                                    <RowDefinition Height="14" />
+                                    <RowDefinition Height="250" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1.45*" />
@@ -206,7 +208,7 @@
                                     </Grid>
                                 </Border>
 
-                                <Border Grid.Row="2" Grid.ColumnSpan="3" Background="White"
+                                <Border Grid.Row="2" Background="White"
                                         BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
                                         CornerRadius="18" Padding="18,14">
                                     <Grid>
@@ -220,6 +222,52 @@
                                                        FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,3,0,0" />
                                         </StackPanel>
                                         <controles:GraficoBarrasProductos x:Name="GraficoProductos" Grid.Row="1" Margin="0,12,0,0" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Grid.Row="2" Grid.Column="2" Background="White"
+                                        BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
+                                        CornerRadius="18" Padding="18,14">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Métodos de pago" FontSize="14" FontWeight="SemiBold" />
+                                            <TextBlock Text="Distribución de cobros completados"
+                                                       FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,3,0,0" />
+                                        </StackPanel>
+                                        <controles:GraficoDonaPagos x:Name="GraficoPagos" Grid.Row="1" Margin="0,8,0,0" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Grid.Row="4" Grid.ColumnSpan="3" Background="White"
+                                        BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
+                                        CornerRadius="18" Padding="18,14">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Inventario que requiere atención" FontSize="14" FontWeight="SemiBold" />
+                                                <TextBlock Text="Stock actual frente al mínimo configurado"
+                                                           FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,3,0,0" />
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Background="{StaticResource BrochaAlertaSuave}"
+                                                    CornerRadius="11" Padding="10,6" VerticalAlignment="Center">
+                                                <TextBlock x:Name="ResumenAlertasInventario" Text="Sin alertas"
+                                                           FontSize="9" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource BrochaAlerta}" />
+                                            </Border>
+                                        </Grid>
+                                        <controles:GraficoBarrasStock x:Name="GraficoStock" Grid.Row="1" Margin="0,14,0,0" />
                                     </Grid>
                                 </Border>
                             </Grid>

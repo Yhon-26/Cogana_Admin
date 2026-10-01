@@ -117,6 +117,11 @@ public partial class VentanaReportes : Window
         GraficoVentas.EstablecerDatos(reporte.VentasDiarias);
         GraficoEstados.EstablecerDatos(reporte.EstadosPedido);
         GraficoProductos.EstablecerDatos(reporte.ProductosVendidos);
+        GraficoPagos.EstablecerDatos(reporte.MetodosPago);
+        GraficoStock.EstablecerDatos(reporte.StockBajo);
+        ResumenAlertasInventario.Text = reporte.StockBajo.Count == 0
+            ? "Sin alertas"
+            : $"{reporte.StockBajo.Count:N0} productos";
         ResumenPeriodo.Text =
             $"Del {reporte.FechaInicio:dd/MM/yyyy} al {reporte.FechaFin:dd/MM/yyyy} · " +
             $"{reporte.Resumen.Completados:N0} completados · {reporte.Resumen.Activos:N0} activos · " +
