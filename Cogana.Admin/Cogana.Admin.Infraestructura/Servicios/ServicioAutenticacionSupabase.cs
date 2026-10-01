@@ -58,7 +58,7 @@ public sealed class ServicioAutenticacionSupabase(ClienteSupabaseRest cliente)
                     "Supabase no devolvió una sesión válida.");
             }
 
-            cliente.EstablecerTokenAcceso(autenticacion.TokenAcceso);
+            cliente.EstablecerSesion(autenticacion.TokenAcceso, autenticacion.TokenRenovacion ?? string.Empty);
             var membresia = await ObtenerMembresiaAdministrativaAsync(
                 autenticacion.Usuario.Id,
                 cancellationToken);

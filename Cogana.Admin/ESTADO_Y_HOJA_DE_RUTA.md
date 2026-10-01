@@ -47,8 +47,31 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 - Control de versiones con git; publicación automática a GitHub Releases (`Publicar-Instalador.ps1 -Github`) como canal de actualizaciones de la app (variable COGANA_GITHUB_REPO), con el bucket de Supabase como respaldo.
 - Administración segura de personal: directorio con nombre, correo, rol, estado y último acceso; alta con correo y contraseña inicial; edición de perfil, rol y acceso; protección del último propietario y auditoría de cambios mediante la Edge Function `admin-users`.
 - Reportes administrativos por periodo: resumen de ventas y pedidos, ventas diarias, estados, productos más vendidos, métodos de pago, stock bajo y lotes vencidos o próximos a vencer; exportación consolidada a CSV.
+- **Renovación automática de sesión:** `ClienteSupabaseRest` detecta respuestas 401, renueva el token con el token de renovación y reintenta la solicitud. Antes, tras una hora de uso la app mostraba errores genéricos en todos los módulos hasta reiniciarla.
 
 La solución compiló correctamente al cerrar los bloques de usuarios, accesos, configuración y reportes: cero errores y cero advertencias. La compilación Release y el arranque desde la salida publicada también fueron comprobados. El inicio de sesión real con la cuenta propietaria y la carga del panel principal fueron confirmados. El recorrido autenticado de todas las pantallas y la instalación en un equipo limpio siguen pendientes.
+
+## Revisión funcional autenticada (30/09/2026)
+
+Recorrido completo con sesión real de propietario contra la base de datos de producción, automatizado sobre la interfaz y verificado paso a paso también por REST con el token de la sesión:
+
+| Flujo | Resultado |
+| --- | --- |
+| Inicio (resumen, contadores, widgets con datos reales) | Correcto |
+| Productos: consulta, alta, edición, detalle, desactivar/activar | Correcto (producto QA-REV-001) |
+| Categorías: consulta, alta, desactivación | Correcto (slug autogenerado) |
+| Presentaciones: consulta | Correcto (30 presentaciones con precios reales) |
+| Inventario y lotes: alta de lote con producto y proveedor | Correcto (QA-LOTE-001, 100 unidades) |
+| Proveedores: consulta, alta, desactivación | Correcto |
+| Pedidos y Clientes | Vacíos reales (tienda sin actividad aún); estado vacío correcto |
+| Promociones: alta con fechas vía DatePicker, desactivación | Correcto |
+| Reportes: consulta 30 días, pestañas, exportación CSV | Correcto |
+| Usuarios: invitación (Edge Function protegida), gestión, suspensión | Correcto (verificado en `store_memberships`) |
+| Configuración: carga, guardado, persistencia y reversión | Correcto (dos ciclos verificados en BD) |
+
+**Hallazgo corregido durante la revisión:** el token de sesión expiraba a la hora y todos los módulos pasaban a fallar con mensajes genéricos ("No fue posible cargar...") hasta reiniciar la app, porque el cliente REST no renovaba la sesión. Corregido con renovación automática transparente al recibir 401. Pendiente de confirmar en la práctica: dejar la app abierta más de una hora y verificar que los módulos siguen cargando.
+
+**Hallazgos menores:** la cuenta propietaria aparece como "Sin nombre registrado" (no hay nombre completo en el perfil de Supabase Auth; se puede completar desde el dashboard); el lote QA-LOTE-001 quedó activo con 100 unidades del producto QA desactivado (borrar desde el dashboard si se desea, o usar el ajuste de stock); la cuenta de prueba `qa.prueba@cogana.test` quedó suspendida (su borrado definitivo requiere el dashboard de Supabase).
 
 ## Qué aparece en el menú y qué falta
 
@@ -69,9 +92,9 @@ La solución compiló correctamente al cerrar los bloques de usuarios, accesos, 
 
 ## Siguientes bloques recomendados
 
-1. **Revisión funcional autenticada:** recorrer cada flujo en Windows con la cuenta administrativa y datos de prueba controlados; confirmar errores de red, permisos, formularios, importes, reportes y estados. Incluir alta, primer ingreso y cambios de acceso con cuentas controladas.
-2. **Instalador y publicación:** la versión 1.10.1 fue compilada en Release y empaquetada con Velopack; se generaron Setup, paquete completo, delta y portátil en `Releases`. El arranque del ejecutable publicado fue correcto. Pendiente: probar la instalación en un equipo limpio, decidir si se requiere firma de código y publicar los archivos en GitHub Releases.
-3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos).
+1. ~~**Revisión funcional autenticada**~~ **Completada el 30/09/2026** (ver sección "Revisión funcional autenticada"). Queda pendiente verificar el primer ingreso real del usuario invitado de prueba y el comportamiento tras una hora de sesión abierta (renovación de token).
+2. **Instalador y publicación:** la versión 1.10.1 fue compilada en Release y empaquetada con Velopack; se generaron Setup, paquete completo, delta y portátil en `Releases`. El arranque del ejecutable publicado fue correcto. Las versiones recientes se publican en GitHub Releases automáticamente. Pendiente: probar la instalación en un equipo limpio y decidir si se requiere firma de código.
+3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos). La revisión funcional cubrió la mecánica de los formularios; estas validaciones de negocio siguen abiertas.
 4. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
 
 ## Memo técnico: login en 3D (bloque pospuesto)
