@@ -92,6 +92,7 @@ public partial class App : Application
                 _servicioEstado,
                 _servicioResumenInicio,
                 _servicioModulos,
+                _servicioReportes,
                 _servicioActualizaciones,
                 _servicioPanelInicio ?? new ServicioPanelInicioArchivo(),
                 sesion),

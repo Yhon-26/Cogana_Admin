@@ -16,7 +16,19 @@ public sealed class WidgetInicioViewModel : BaseViewModel
 
     public string Nombre { get; }
     public string Inicial { get; }
+    public bool EsReporte => Nombre == "Reportes";
     public ObservableCollection<FilaModuloDatos> Filas { get; } = [];
+
+    private ReporteAdministrativo? _reporte;
+    public ReporteAdministrativo? Reporte
+    {
+        get => _reporte;
+        private set => Establecer(ref _reporte, value);
+    }
+
+    public string ResumenReporte => Reporte is null
+        ? Mensaje
+        : $"Últimos 30 días · {Reporte.Resumen.Pedidos:N0} pedidos · S/ {Reporte.Resumen.VentasCentimos / 100m:N2}";
 
     private int _total;
     public int Total
@@ -54,20 +66,33 @@ public sealed class WidgetInicioViewModel : BaseViewModel
         Notificar(nameof(TieneFilas));
     }
 
+    public void AplicarReporte(ReporteAdministrativo reporte)
+    {
+        Reporte = reporte;
+        EstaCargando = false;
+        Mensaje = string.Empty;
+        Total = (int)Math.Min(int.MaxValue, reporte.Resumen.Pedidos);
+        Notificar(nameof(ResumenReporte));
+    }
+
     public void IndicarFallo(string mensaje)
     {
         EstaCargando = false;
         Mensaje = mensaje;
+        Reporte = null;
         Filas.Clear();
         Notificar(nameof(TieneFilas));
+        Notificar(nameof(ResumenReporte));
     }
 
     public void IndicarCarga()
     {
         EstaCargando = true;
         Mensaje = "Consultando Supabase...";
+        Reporte = null;
         Filas.Clear();
         Notificar(nameof(TieneFilas));
+        Notificar(nameof(ResumenReporte));
     }
 
     public void SolicitarQuitar() => QuitarSolicitado?.Invoke(this);

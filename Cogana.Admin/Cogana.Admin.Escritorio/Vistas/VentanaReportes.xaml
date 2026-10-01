@@ -1,6 +1,7 @@
 <Window x:Class="Cogana.Admin.Escritorio.Vistas.VentanaReportes"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controles="clr-namespace:Cogana.Admin.Escritorio.Controles"
         Title="Reportes de Cogana"
         Width="1160" Height="820" MinWidth="980" MinHeight="700"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
@@ -158,6 +159,73 @@
 
                 <TabControl Grid.Row="3" Background="Transparent" BorderThickness="0"
                             ItemContainerStyle="{StaticResource PestanaReporte}">
+                    <TabItem Header="Resumen visual">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                      Margin="8,15,12,8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="290" />
+                                    <RowDefinition Height="14" />
+                                    <RowDefinition Height="250" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.45*" />
+                                    <ColumnDefinition Width="14" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border Background="White" BorderBrush="{StaticResource BrochaBorde}"
+                                        BorderThickness="1" CornerRadius="18" Padding="18,14">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Ventas por día" FontSize="14" FontWeight="SemiBold" />
+                                            <TextBlock Text="Evolución del importe vendido en el periodo seleccionado"
+                                                       FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,3,0,0" />
+                                        </StackPanel>
+                                        <controles:GraficoLineasVentas x:Name="GraficoVentas" Grid.Row="1" Margin="0,8,0,0" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Grid.Column="2" Background="White" BorderBrush="{StaticResource BrochaBorde}"
+                                        BorderThickness="1" CornerRadius="18" Padding="18,14">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Estado de pedidos" FontSize="14" FontWeight="SemiBold" />
+                                            <TextBlock Text="Distribución de pedidos registrados"
+                                                       FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,3,0,0" />
+                                        </StackPanel>
+                                        <controles:GraficoDonaPedidos x:Name="GraficoEstados" Grid.Row="1" Margin="0,8,0,0" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Grid.Row="2" Grid.ColumnSpan="3" Background="White"
+                                        BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1"
+                                        CornerRadius="18" Padding="18,14">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Productos con mayores ventas" FontSize="14" FontWeight="SemiBold" />
+                                            <TextBlock Text="Cinco productos destacados por importe vendido"
+                                                       FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,3,0,0" />
+                                        </StackPanel>
+                                        <controles:GraficoBarrasProductos x:Name="GraficoProductos" Grid.Row="1" Margin="0,12,0,0" />
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </ScrollViewer>
+                    </TabItem>
+
                     <TabItem Header="Ventas y pedidos">
                         <Grid Margin="8,15,12,8">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="1.45*" /><ColumnDefinition Width="14" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>

@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controles="clr-namespace:Cogana.Admin.Escritorio.Controles"
         mc:Ignorable="d"
         Title="Cogana Admin"
         Height="850"
@@ -448,6 +449,17 @@
                                                 <ProgressBar Style="{StaticResource IndicadorCarga}"
                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
                                                              Visibility="{Binding EstaCargando, Converter={StaticResource BoolAVisibilidad}}" />
+                                                <Grid>
+                                                    <Grid.Style>
+                                                        <Style TargetType="Grid">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding EsReporte}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Grid.Style>
                                                 <ItemsControl ItemsSource="{Binding Filas}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
@@ -487,6 +499,33 @@
                                                     <TextBlock Text="{Binding Mensaje}" FontSize="11" HorizontalAlignment="Center"
                                                                Foreground="{StaticResource BrochaTextoSuave}" TextWrapping="Wrap" />
                                                 </StackPanel>
+                                                </Grid>
+
+                                                <Grid>
+                                                    <Grid.Style>
+                                                        <Style TargetType="Grid">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <MultiDataTrigger>
+                                                                    <MultiDataTrigger.Conditions>
+                                                                        <Condition Binding="{Binding EsReporte}" Value="True" />
+                                                                        <Condition Binding="{Binding EstaCargando}" Value="False" />
+                                                                    </MultiDataTrigger.Conditions>
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </MultiDataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Grid.Style>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="150" />
+                                                    </Grid.RowDefinitions>
+                                                    <TextBlock Text="{Binding ResumenReporte}" FontSize="10"
+                                                               Foreground="{StaticResource BrochaTextoSuave}" />
+                                                    <controles:GraficoLineasVentas Grid.Row="1"
+                                                                                   Datos="{Binding Reporte.VentasDiarias}"
+                                                                                   Margin="0,4,0,0" />
+                                                </Grid>
                                             </Grid>
 
                                             <Button Grid.Row="2" Content="Abrir módulo completo →" Tag="{Binding Nombre}" Click="AlAbrirModulo"

@@ -11,6 +11,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
     private readonly IServicioEstadoBackend _servicioEstadoBackend;
     private readonly IServicioResumenInicio _servicioResumenInicio;
     private readonly IServicioModulosAdministrativos _servicioModulos;
+    private readonly IServicioReportesAdministrativos _servicioReportes;
     private readonly IServicioActualizaciones _servicioActualizaciones;
     private readonly IServicioPanelInicio _servicioPanelInicio;
     private readonly SesionUsuario _sesion;
@@ -49,6 +50,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         IServicioEstadoBackend servicioEstadoBackend,
         IServicioResumenInicio servicioResumenInicio,
         IServicioModulosAdministrativos servicioModulos,
+        IServicioReportesAdministrativos servicioReportes,
         IServicioActualizaciones servicioActualizaciones,
         IServicioPanelInicio servicioPanelInicio,
         SesionUsuario sesion)
@@ -56,6 +58,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         _servicioEstadoBackend = servicioEstadoBackend;
         _servicioResumenInicio = servicioResumenInicio;
         _servicioModulos = servicioModulos;
+        _servicioReportes = servicioReportes;
         _servicioActualizaciones = servicioActualizaciones;
         _servicioPanelInicio = servicioPanelInicio;
         _sesion = sesion;
@@ -250,6 +253,17 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
 
         try
         {
+            if (widget.EsReporte)
+            {
+                var fechaFin = DateOnly.FromDateTime(DateTime.Today);
+                var reporte = await _servicioReportes.ObtenerAsync(
+                    _sesion.TiendaId,
+                    fechaFin.AddDays(-29),
+                    fechaFin);
+                widget.AplicarReporte(reporte);
+                return;
+            }
+
             var resultado = await _servicioModulos.ObtenerAsync(widget.Nombre, _sesion.TiendaId);
 
             if (resultado.EsExitoso && resultado.Datos is not null)
