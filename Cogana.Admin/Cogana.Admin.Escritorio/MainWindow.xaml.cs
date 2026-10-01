@@ -150,63 +150,77 @@ public partial class MainWindow : Window
     }
 
     private const string FormatoArrastreModulo = "modulo-cogana";
+    private Point? _inicioArrastreModulo;
 
-    private void AlMoverElementoMenuParaArrastre(object sender, MouseEventArgs e)
+    private void AlPresionarOpcionPanel(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            _inicioArrastreModulo = e.GetPosition(this);
+        }
+    }
+
+    private void AlMoverOpcionPanel(object sender, MouseEventArgs e)
     {
         if (e.LeftButton != MouseButtonState.Pressed ||
-            e.OriginalSource is not DependencyObject origen ||
-            DataContext is not VentanaPrincipalViewModel)
+            _inicioArrastreModulo is not Point inicio ||
+            sender is not Button { Tag: string nombreModulo } boton)
+        {
+            _inicioArrastreModulo = null;
+            return;
+        }
+
+        var posicion = e.GetPosition(this);
+        if (Math.Abs(posicion.X - inicio.X) < SystemParameters.MinimumHorizontalDragDistance &&
+            Math.Abs(posicion.Y - inicio.Y) < SystemParameters.MinimumVerticalDragDistance)
         {
             return;
         }
 
-        var elemento = BuscarAncestro<ListBoxItem>(origen);
-        if (elemento?.Content is not ModuloAdministrativo modulo || modulo.Nombre == "Inicio")
-        {
-            return;
-        }
-
-        var posicion = e.GetPosition(elemento);
-        if (Math.Abs(posicion.X - _posicionArrastre.X) < SystemParameters.MinimumHorizontalDragDistance &&
-            Math.Abs(posicion.Y - _posicionArrastre.Y) < SystemParameters.MinimumVerticalDragDistance)
-        {
-            return;
-        }
-
-        _posicionArrastre = posicion;
-        OverlaySoltarSeccion.Visibility = Visibility.Visible;
+        _inicioArrastreModulo = null;
 
         try
         {
             DragDrop.DoDragDrop(
-                elemento,
-                new DataObject(FormatoArrastreModulo, modulo.Nombre),
-                DragDropEffects.Move);
+                boton,
+                new DataObject(FormatoArrastreModulo, nombreModulo),
+                DragDropEffects.Copy);
         }
         finally
         {
-            OverlaySoltarSeccion.Visibility = Visibility.Collapsed;
+            OcultarDestinoModulo();
         }
     }
 
-    private Point _posicionArrastre;
-
-    private void AlArrastrarSobrePanel(object sender, DragEventArgs e)
+    private void AlArrastrarModuloSobrePanel(object sender, DragEventArgs e)
     {
-        e.Effects = e.Data.GetDataPresent(FormatoArrastreModulo)
-            ? DragDropEffects.Move
-            : DragDropEffects.None;
+        if (!e.Data.GetDataPresent(FormatoArrastreModulo))
+        {
+            return;
+        }
+
+        e.Effects = DragDropEffects.Copy;
+        ZonaDestinoWidgets.Background = new SolidColorBrush(Color.FromArgb(18, 75, 126, 112));
+        ZonaDestinoWidgets.BorderBrush = (Brush)FindResource("BrochaAcento");
+        AvisoDestinoWidgets.Visibility = Visibility.Visible;
         e.Handled = true;
     }
 
-    private void AlSalirArrastrePanel(object sender, DragEventArgs e)
+    private void AlSalirArrastreModulo(object sender, DragEventArgs e)
     {
-        // La capa de arrastre se oculta cuando DoDragDrop termina; aquí no hay estado que limpiar.
+        var posicion = e.GetPosition(ZonaDestinoWidgets);
+        if (posicion.X <= 0 || posicion.Y <= 0 ||
+            posicion.X >= ZonaDestinoWidgets.ActualWidth ||
+            posicion.Y >= ZonaDestinoWidgets.ActualHeight)
+        {
+            OcultarDestinoModulo();
+        }
     }
 
     private void AlSoltarModuloEnPanel(object sender, DragEventArgs e)
     {
-        if (DataContext is not VentanaPrincipalViewModel viewModel)
+        if (!e.Data.GetDataPresent(FormatoArrastreModulo) ||
+            DataContext is not VentanaPrincipalViewModel viewModel)
         {
             return;
         }
@@ -214,19 +228,17 @@ public partial class MainWindow : Window
         if (e.Data.GetData(FormatoArrastreModulo) is string nombreModulo)
         {
             viewModel.AgregarWidgetPorNombre(nombreModulo);
-            viewModel.ModuloSeleccionado = viewModel.Modulos.FirstOrDefault(
-                modulo => modulo.Nombre == "Inicio");
         }
 
+        OcultarDestinoModulo();
         e.Handled = true;
     }
 
-    private void AlAlternarSelectorSecciones(object sender, RoutedEventArgs e)
+    private void OcultarDestinoModulo()
     {
-        if (DataContext is VentanaPrincipalViewModel viewModel)
-        {
-            viewModel.AlternarSelectorSecciones();
-        }
+        ZonaDestinoWidgets.Background = Brushes.Transparent;
+        ZonaDestinoWidgets.BorderBrush = Brushes.Transparent;
+        AvisoDestinoWidgets.Visibility = Visibility.Collapsed;
     }
 
     private void AlAgregarDesdeSelector(object sender, RoutedEventArgs e)

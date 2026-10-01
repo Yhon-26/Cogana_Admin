@@ -1,7 +1,7 @@
 # Cogana Admin: estado y hoja de ruta
 
 **Ubicación del proyecto:** `D:\Cogana_Admin\Cogana.Admin`  
-**Actualizado:** 28 de septiembre de 2026
+**Actualizado:** 30 de septiembre de 2026
 
 Esta guía resume el estado conocido del software de escritorio. El código fuente es la referencia para el comportamiento actual; las funciones indicadas como pendientes todavía no deben considerarse disponibles.
 
@@ -40,7 +40,7 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 - Consulta y edición de datos de la tienda, canales de atención, métodos de pago, tiempo de preparación, horario semanal y fechas especiales. El guardado se realiza como una sola operación validada en Supabase.
 - Exportación CSV del módulo de reportes con resumen, ventas diarias, estados de pedido, productos vendidos, métodos de pago, stock bajo y vencimientos; los errores de escritura se muestran sin cerrar la ventana.
 - Interfaz propia del escritorio, separada de los estilos de la aplicación móvil.
-- Panel de inicio configurable: secciones por módulo que se agregan arrastrándolas desde el menú o con un botón, se quitan con un clic y se reordenan arrastrándolas entre sí; la disposición se guarda por equipo (archivo local JSON).
+- Panel de inicio configurable: las secciones disponibles permanecen en una bandeja dentro de Inicio y pueden agregarse con un clic o arrastrándolas al área de tarjetas, sin abrir otro módulo ni cubrir la pantalla. Las tarjetas se quitan con un clic, se reordenan desde su cabecera y la disposición se guarda por equipo (archivo local JSON).
 - Login inmersivo: fondo aurora animado con rejilla y foco de luz que sigue el mouse, tarjeta glass con anillo de luz giratorio, campos con etiqueta flotante e íconos, estado EN LÍNEA, animación de entrada e inclinación de la tarjeta siguiendo el mouse.
 - Pantalla de carga del acceso: red de 150 partículas conectadas, anillos expansivos, orbe con halo giratorio, barra de progreso con porcentaje y pasos ("Verificando credenciales...", "Bienvenido al sistema").
 - Nitidez en pantallas escaladas: manifiesto PerMonitorV2, UseLayoutRounding y modo de texto Display.

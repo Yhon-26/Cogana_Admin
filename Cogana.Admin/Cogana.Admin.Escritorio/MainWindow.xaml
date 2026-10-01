@@ -161,7 +161,6 @@
                          ItemsSource="{Binding Modulos}"
                          SelectedItem="{Binding ModuloSeleccionado}"
                          SelectionChanged="AlCambiarModulo"
-                         PreviewMouseMove="AlMoverElementoMenuParaArrastre"
                          Background="Transparent"
                          BorderThickness="0"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -317,11 +316,7 @@
 
 
                 <Border Grid.Row="2"
-                        x:Name="ZonaWidgets"
-                        AllowDrop="True"
-                        Drop="AlSoltarModuloEnPanel"
-                        DragOver="AlArrastrarSobrePanel"
-                        DragLeave="AlSalirArrastrePanel">
+                        x:Name="ZonaWidgets">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="Visibility" Value="Visible" />
@@ -343,23 +338,14 @@
                         </Grid.RowDefinitions>
 
                         <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
                             <StackPanel>
                                 <TextBlock Text="Secciones del panel" FontSize="19" FontWeight="SemiBold" />
-                                <TextBlock Text="Arrastra un módulo del menú lateral hasta aquí o añádelo con el botón. Reordena las tarjetas arrastrándolas por su cabecera (el título) y quítalas con ✕."
+                                <TextBlock Text="Arrastra una opción de la bandeja al panel o haz clic para agregarla. Reordena las tarjetas desde su cabecera y quítalas con ✕."
                                            FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,5,0,0" TextWrapping="Wrap" />
                             </StackPanel>
-                            <Button Grid.Column="1" Content="＋ Agregar sección"
-                                    Click="AlAlternarSelectorSecciones"
-                                    Style="{StaticResource BotonPrincipal}"
-                                    VerticalAlignment="Top" />
                         </Grid>
 
                         <Border Grid.Row="1"
-                                Visibility="{Binding SelectorSeccionesVisible, Converter={StaticResource BoolAVisibilidad}}"
                                 Background="{StaticResource BrochaSuperficie}"
                                 BorderBrush="{StaticResource BrochaBorde}"
                                 BorderThickness="1"
@@ -377,6 +363,10 @@
                                         <DataTemplate>
                                             <Button Content="{Binding Nombre}" Tag="{Binding Nombre}"
                                                     Click="AlAgregarDesdeSelector"
+                                                    PreviewMouseLeftButtonDown="AlPresionarOpcionPanel"
+                                                    PreviewMouseMove="AlMoverOpcionPanel"
+                                                    Cursor="Hand"
+                                                    ToolTip="Arrastra al panel o haz clic para agregar"
                                                     Style="{StaticResource BotonSecundario}" Margin="0,0,8,8" />
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -388,13 +378,9 @@
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                             <Style.Triggers>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding SelectorSeccionesVisible}" Value="True" />
-                                                        <Condition Binding="{Binding HayModulosParaAgregar}" Value="False" />
-                                                    </MultiDataTrigger.Conditions>
+                                                <DataTrigger Binding="{Binding HayModulosParaAgregar}" Value="False">
                                                     <Setter Property="Visibility" Value="Visible" />
-                                                </MultiDataTrigger>
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </TextBlock.Style>
@@ -402,7 +388,20 @@
                             </Grid>
                         </Border>
 
-                        <ItemsControl Grid.Row="2" ItemsSource="{Binding WidgetsInicio}" Margin="0,16,0,0"
+                        <Border Grid.Row="2"
+                                x:Name="ZonaDestinoWidgets"
+                                Margin="0,16,0,0"
+                                MinHeight="120"
+                                AllowDrop="True"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="2"
+                                CornerRadius="20"
+                                PreviewDragOver="AlArrastrarModuloSobrePanel"
+                                PreviewDragLeave="AlSalirArrastreModulo"
+                                PreviewDrop="AlSoltarModuloEnPanel">
+                            <Grid>
+                        <ItemsControl ItemsSource="{Binding WidgetsInicio}"
                                       x:Name="TableroWidgets" AllowDrop="True"
                                       DragOver="AlArrastrarTarjetaSobreTablero"
                                       DragLeave="AlSalirArrastreTarjeta"
@@ -498,7 +497,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <StackPanel Grid.Row="2" HorizontalAlignment="Center" Margin="0,26,0,10">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,26,0,10">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -514,9 +513,25 @@
                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <TextBlock Text="El panel está vacío" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,12,0,0" />
-                            <TextBlock Text="Arrastra un módulo del menú lateral hacia aquí o pulsa ＋ Agregar sección."
+                            <TextBlock Text="Arrastra aquí una opción de la bandeja superior o haz clic para agregarla."
                                        FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" HorizontalAlignment="Center" Margin="0,5,0,0" />
                         </StackPanel>
+                                <Border x:Name="AvisoDestinoWidgets"
+                                        Visibility="Collapsed"
+                                        IsHitTestVisible="False"
+                                        Background="{StaticResource BrochaAcentoSuave}"
+                                        CornerRadius="14"
+                                        Padding="14,9"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Margin="0,10,0,0">
+                                    <TextBlock Text="Suelta aquí para agregar la sección"
+                                               Foreground="{StaticResource BrochaAcento}"
+                                               FontSize="11"
+                                               FontWeight="SemiBold" />
+                                </Border>
+                            </Grid>
+                        </Border>
                     </Grid>
                 </Border>
 
@@ -783,28 +798,5 @@
             </Grid>
         </ScrollViewer>
 
-        <Border Grid.Column="2"
-                x:Name="OverlaySoltarSeccion"
-                Visibility="Collapsed"
-                AllowDrop="True"
-                Drop="AlSoltarModuloEnPanel"
-                DragOver="AlArrastrarSobrePanel"
-                DragLeave="AlSalirArrastrePanel"
-                Background="#66E7E8E5">
-            <Border BorderBrush="{StaticResource BrochaAcento}" BorderThickness="2"
-                    CornerRadius="26" Background="{StaticResource BrochaSuperficie}"
-                    Padding="30,26" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <StackPanel>
-                    <Border Width="54" Height="54" CornerRadius="18" Background="{StaticResource BrochaAcentoSuave}" HorizontalAlignment="Center">
-                        <TextBlock Text="＋" FontSize="22" Foreground="{StaticResource BrochaAcento}"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <TextBlock Text="Suelta para añadir la sección al panel"
-                               FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,12,0,0" />
-                    <TextBlock Text="Se agregará como una tarjeta del inicio; puedes quitarla después con ✕."
-                               FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" HorizontalAlignment="Center" Margin="0,5,0,0" />
-                </StackPanel>
-            </Border>
-        </Border>
     </Grid>
 </Window>
