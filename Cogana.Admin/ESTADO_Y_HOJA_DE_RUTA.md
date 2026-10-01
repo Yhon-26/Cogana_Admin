@@ -87,14 +87,14 @@ Recorrido completo con sesión real de propietario contra la base de datos de pr
 | Pedidos | Lista, detalle completo e intervención mediante cambios de estado permitidos. | Verificación funcional con pedidos reales, especialmente entrega y pagos. |
 | Clientes | Consulta y detalle de perfil, direcciones, preferencias e historial. | Las modificaciones de información personal no están habilitadas. |
 | Promociones | Consulta, alta, edición, estado y asignación de productos. | Validar cálculo y vigencia con casos comerciales reales. |
-| Reportes | Periodos de 7 y 30 días, mes actual o rango personalizado; ventas, pedidos, productos, pagos, stock y vencimientos; exportación CSV. | Validar resultados y criterios contables con pedidos reales de la tienda. |
+| Reportes | Periodos de 7 y 30 días, mes actual o rango personalizado; tablero visual de ventas, estados, productos, pagos y stock; tablas detalladas y exportación CSV. | Validar resultados y criterios contables con pedidos reales de la tienda. |
 | Usuarios | Directorio del personal, alta con contraseña inicial, edición de nombre/teléfono, roles y suspensión/reactivación. Las operaciones sensibles están limitadas al propietario y auditadas en Supabase. | Verificar el primer ingreso y todos los cambios con cuentas reales controladas. |
 | Configuración | Consulta y edición de datos comerciales, contacto, atención, pagos, preparación, horario semanal y fechas especiales. | Verificar los cambios con datos operativos reales y confirmar cómo se mostrarán las excepciones en la aplicación móvil. |
 
 ## Siguientes bloques recomendados
 
 1. ~~**Revisión funcional autenticada**~~ **Completada el 30/09/2026** (ver sección "Revisión funcional autenticada"). Queda pendiente verificar el primer ingreso real del usuario invitado de prueba y el comportamiento tras una hora de sesión abierta (renovación de token).
-2. **Instalador y publicación:** la versión 1.10.1 fue compilada en Release y empaquetada con Velopack; se generaron Setup, paquete completo, delta y portátil en `Releases`. El arranque del ejecutable publicado fue correcto. Las versiones recientes se publican en GitHub Releases automáticamente. Pendiente: probar la instalación en un equipo limpio y decidir si se requiere firma de código.
+2. **Instalador y publicación:** la versión 1.10.5 está compilada en Release y empaquetada con Velopack; se generaron Setup, paquete completo, actualización delta desde 1.10.4 y portátil en `Releases`. Las versiones recientes se publican en GitHub Releases para que la aplicación instalada las detecte. Pendiente: publicar v1.10.5, probar la instalación en un equipo limpio y decidir si se requiere firma de código.
 3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos). La revisión funcional cubrió la mecánica de los formularios; estas validaciones de negocio siguen abiertas.
 4. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
 
