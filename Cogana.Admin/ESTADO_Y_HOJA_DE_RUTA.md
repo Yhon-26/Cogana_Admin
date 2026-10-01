@@ -94,7 +94,7 @@ Recorrido completo con sesión real de propietario contra la base de datos de pr
 ## Siguientes bloques recomendados
 
 1. ~~**Revisión funcional autenticada**~~ **Completada el 30/09/2026** (ver sección "Revisión funcional autenticada"). Queda pendiente verificar el primer ingreso real del usuario invitado de prueba y el comportamiento tras una hora de sesión abierta (renovación de token).
-2. **Instalador y publicación:** la versión 1.10.5 está compilada en Release y empaquetada con Velopack; se generaron Setup, paquete completo, actualización delta desde 1.10.4 y portátil en `Releases`. Las versiones recientes se publican en GitHub Releases para que la aplicación instalada las detecte. Pendiente: publicar v1.10.5, probar la instalación en un equipo limpio y decidir si se requiere firma de código.
+2. **Instalador y publicación:** la versión 1.10.5 está compilada en Release, empaquetada con Velopack y publicada en GitHub Releases; incluye Setup, paquete completo, actualización delta desde 1.10.4 y portátil. La aplicación instalada puede detectarla desde **Buscar actualizaciones**. Pendiente: probar la instalación en un equipo limpio y decidir si se requiere firma de código.
 3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos). La revisión funcional cubrió la mecánica de los formularios; estas validaciones de negocio siguen abiertas.
 4. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
 
