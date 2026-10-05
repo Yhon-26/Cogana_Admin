@@ -52,6 +52,28 @@ public partial class VentanaInicioSesion : Window
     {
         Loaded -= AlCargarVentana;
         CampoCorreo.Focus();
+        if (DataContext is InicioSesionViewModel viewModel)
+            viewModel.CambioContrasenaRequerido += AlRequerirCambioContrasena;
+    }
+
+    private Task AlRequerirCambioContrasena()
+    {
+        VolverALogin();
+        if (DataContext is InicioSesionViewModel viewModel)
+        {
+            new VentanaRecuperacionContrasena(viewModel.ServicioAutenticacion, viewModel.Correo, true)
+                { Owner = this }.ShowDialog();
+            CampoContrasena.Clear();
+        }
+        return Task.CompletedTask;
+    }
+
+    private void AlRecuperarContrasena(object sender, RoutedEventArgs e)
+    {
+        if (_cargando || DataContext is not InicioSesionViewModel viewModel) return;
+        new VentanaRecuperacionContrasena(viewModel.ServicioAutenticacion, viewModel.Correo)
+            { Owner = this }.ShowDialog();
+        CampoContrasena.Clear();
     }
 
     // ============================ FLUJO DE ACCESO ============================

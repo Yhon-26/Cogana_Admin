@@ -3,7 +3,8 @@ namespace Cogana.Admin.Aplicacion.Modelos;
 public sealed record ResultadoInicioSesion(
     bool EsExitoso,
     string Mensaje,
-    SesionUsuario? Sesion = null)
+    SesionUsuario? Sesion = null,
+    bool RequiereCambioContrasena = false)
 {
     public static ResultadoInicioSesion Correcto(SesionUsuario sesion) =>
         new(true, "Acceso correcto.", sesion);

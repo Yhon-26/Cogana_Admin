@@ -94,7 +94,7 @@
                                              Background="Transparent" BorderThickness="0"
                                              FontSize="13" VerticalContentAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="Debe tener al menos 10 caracteres. Si la cuenta ya existe, su contraseña actual se conserva."
+                            <TextBlock Text="Debe tener al menos 10 caracteres. Las cuentas nuevas deben cambiarla antes de abrir el panel. Si la cuenta ya existe, su contraseña actual se conserva."
                                        FontSize="10" Foreground="{StaticResource BrochaTextoSuave}"
                                        TextWrapping="Wrap" Margin="2,7,0,0" />
                         </StackPanel>

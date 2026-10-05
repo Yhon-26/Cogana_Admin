@@ -178,27 +178,59 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
                 proveedor.EstaActivo);
     }
 
-    public Task<ResultadoOperacion> CrearProductoAsync(
+    public async Task<ResultadoCreacionProducto> CrearProductoAsync(
         Guid tiendaId,
         NuevoProducto producto,
-        CancellationToken cancellationToken = default) =>
-        InsertarAsync(
-            "/rest/v1/products",
-            new
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var solicitud = new HttpRequestMessage(HttpMethod.Post, "/rest/v1/products")
             {
-                store_id = tiendaId,
-                category_id = producto.CategoriaId,
-                sku = LimpiarOpcional(producto.Sku),
-                name = producto.Nombre.Trim(),
-                brand = LimpiarOpcional(producto.Marca),
-                description = LimpiarOpcional(producto.Descripcion),
-                base_unit = producto.UnidadBase,
-                tracks_expiration = producto.ControlaVencimiento,
-                minimum_stock_quantity = producto.StockMinimo,
-                is_active = true
-            },
-            "Producto registrado correctamente.",
-            cancellationToken);
+                Content = JsonContent.Create(new
+                {
+                    store_id = tiendaId,
+                    category_id = producto.CategoriaId,
+                    sku = LimpiarOpcional(producto.Sku),
+                    name = producto.Nombre.Trim(),
+                    brand = LimpiarOpcional(producto.Marca),
+                    description = LimpiarOpcional(producto.Descripcion),
+                    base_unit = producto.UnidadBase,
+                    tracks_expiration = producto.ControlaVencimiento,
+                    minimum_stock_quantity = producto.StockMinimo,
+                    is_active = true
+                })
+            };
+            solicitud.Headers.TryAddWithoutValidation("Prefer", "return=representation");
+            using var respuesta = await cliente.EnviarAsync(solicitud, cancellationToken);
+            if (!respuesta.IsSuccessStatusCode)
+            {
+                return new ResultadoCreacionProducto(
+                    false, await LeerErrorAsync(respuesta, cancellationToken), null);
+            }
+
+            var creados = await respuesta.Content.ReadFromJsonAsync<List<ProductoCreado>>(
+                cancellationToken: cancellationToken);
+            return new ResultadoCreacionProducto(
+                    true, "Producto registrado correctamente.",
+                    creados?.FirstOrDefault()?.Id);
+        }
+        catch (OperationCanceledException)
+        {
+            return new ResultadoCreacionProducto(false, "La operación fue cancelada.", null);
+        }
+        catch (HttpRequestException)
+        {
+            return new ResultadoCreacionProducto(
+                false, "No fue posible guardar la información en Supabase.", null);
+        }
+    }
+
+    private sealed class ProductoCreado
+    {
+        [JsonPropertyName("id")]
+        public Guid Id { get; init; }
+    }
 
     public async Task<ResultadoOperacion> ActualizarProductoAsync(
         Guid tiendaId,

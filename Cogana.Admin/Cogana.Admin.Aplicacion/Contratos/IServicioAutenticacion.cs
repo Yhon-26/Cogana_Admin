@@ -10,4 +10,9 @@ public interface IServicioAutenticacion
         CancellationToken cancellationToken = default);
 
     Task CerrarSesionAsync(CancellationToken cancellationToken = default);
+
+    Task<ResultadoOperacionAcceso> SolicitarRecuperacionAsync(string correo, CancellationToken cancellationToken = default);
+    Task<ResultadoOperacionAcceso> VerificarRecuperacionAsync(string correo, string enlaceOCodigo, CancellationToken cancellationToken = default);
+    Task<ResultadoOperacionAcceso> CambiarContrasenaAsync(string contrasena, CancellationToken cancellationToken = default);
+    void CancelarCambioContrasena();
 }

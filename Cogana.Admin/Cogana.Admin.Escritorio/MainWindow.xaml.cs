@@ -21,6 +21,7 @@ public partial class MainWindow : Window
     public IServicioUsuariosAdministrativos? ServicioUsuarios { get; init; }
     public IServicioConfiguracionTienda? ServicioConfiguracion { get; init; }
     public IServicioReportesAdministrativos? ServicioReportes { get; init; }
+    public IServicioImagenesProducto? ServicioImagenes { get; init; }
     public Guid TiendaId { get; init; }
 
     public MainWindow()
@@ -91,7 +92,7 @@ public partial class MainWindow : Window
                 : new Vistas.VentanaNuevoRegistro(
                     ServicioCatalogo,
                     TiendaId,
-                    viewModel.ModuloSeleccionado.Nombre);
+                    viewModel.ModuloSeleccionado.Nombre, ServicioImagenes);
 
         if (ventana is null)
         {
@@ -463,7 +464,7 @@ public partial class MainWindow : Window
                 ? new Vistas.VentanaEditarProducto(
                     ServicioCatalogo,
                     TiendaId,
-                    fila.Id)
+                    fila.Id, ServicioImagenes)
                 : new Vistas.VentanaEditarCatalogo(
                     ServicioCatalogo,
                     TiendaId,

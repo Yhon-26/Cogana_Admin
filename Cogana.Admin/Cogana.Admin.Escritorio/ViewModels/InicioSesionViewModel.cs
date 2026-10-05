@@ -17,6 +17,8 @@ public sealed class InicioSesionViewModel : BaseViewModel
     }
 
     public event Action<SesionUsuario>? SesionIniciada;
+    public event Func<Task>? CambioContrasenaRequerido;
+    public IServicioAutenticacion ServicioAutenticacion => _servicioAutenticacion;
 
     public string Correo
     {
@@ -60,6 +62,14 @@ public sealed class InicioSesionViewModel : BaseViewModel
             var resultado = await _servicioAutenticacion.IniciarSesionAsync(
                 Correo,
                 contrasena);
+
+            if (resultado.RequiereCambioContrasena)
+            {
+                Mensaje = resultado.Mensaje;
+                if (CambioContrasenaRequerido is not null) await CambioContrasenaRequerido();
+                Mensaje = "Vuelve a iniciar sesión para continuar.";
+                return;
+            }
 
             if (!resultado.EsExitoso || resultado.Sesion is null)
             {

@@ -1,22 +1,30 @@
 using System.Net.Http;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Cogana.Admin.Aplicacion.Contratos;
 using Cogana.Admin.Aplicacion.Modelos;
+using Microsoft.Win32;
 
 namespace Cogana.Admin.Escritorio.Vistas;
 
 public partial class VentanaEditarProducto : Window
 {
     private readonly IServicioCatalogoAdministrativo _servicio;
+    private readonly IServicioImagenesProducto? _imagenes;
     private readonly Guid _tiendaId;
     private readonly Guid _productoId;
+    private string? _rutaImagen;
+    private bool _imagenModificada;
 
     public VentanaEditarProducto(
         IServicioCatalogoAdministrativo servicio,
         Guid tiendaId,
-        Guid productoId)
+        Guid productoId,
+        IServicioImagenesProducto? servicioImagenes = null)
     {
         _servicio = servicio;
+        _imagenes = servicioImagenes;
         _tiendaId = tiendaId;
         _productoId = productoId;
         InitializeComponent();
@@ -45,6 +53,15 @@ public partial class VentanaEditarProducto : Window
             Mostrar(producto);
             BotonGuardar.IsEnabled = true;
             MensajeFormulario.Text = string.Empty;
+
+            if (_imagenes is not null)
+            {
+                var rutaImagen = await _imagenes.ObtenerRutaAsync(_tiendaId, _productoId);
+                if (!string.IsNullOrWhiteSpace(rutaImagen))
+                {
+                    MostrarVistaPrevia(_imagenes.UrlPublica(rutaImagen)!);
+                }
+            }
         }
         catch (HttpRequestException)
         {
@@ -105,10 +122,76 @@ public partial class VentanaEditarProducto : Window
                 long.Parse(ProductoStockMinimo.Text)));
 
         MensajeFormulario.Text = resultado.Mensaje;
+
+        if (resultado.EsExitoso && _imagenModificada && _imagenes is not null && !string.IsNullOrWhiteSpace(_rutaImagen))
+        {
+            MensajeFormulario.Text = "Subiendo imagen del producto...";
+            var subida = await _imagenes.SubirAsync(_tiendaId, _productoId, _rutaImagen);
+            if (!subida.EsExitoso)
+            {
+                MensajeFormulario.Text = "El producto se guardó, pero la imagen no pudo subirse: " + subida.Mensaje;
+                BotonGuardar.IsEnabled = true;
+                return;
+            }
+
+            MensajeFormulario.Text = "Producto e imagen actualizados correctamente.";
+            _imagenModificada = false;
+        }
+
         BotonGuardar.IsEnabled = true;
         if (resultado.EsExitoso)
         {
             DialogResult = true;
+        }
+    }
+
+    private void AlElegirImagen(object sender, RoutedEventArgs e)
+    {
+        var dialogo = new OpenFileDialog
+        {
+            Title = "Elegir imagen del producto",
+            Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.webp",
+            CheckFileExists = true
+        };
+
+        if (dialogo.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        MostrarVistaPrevia(dialogo.FileName);
+        _rutaImagen = dialogo.FileName;
+        _imagenModificada = true;
+        BotonQuitarImagen.Visibility = Visibility.Visible;
+        MensajeFormulario.Text = string.Empty;
+    }
+
+    private void AlQuitarImagen(object sender, RoutedEventArgs e)
+    {
+        _rutaImagen = null;
+        _imagenModificada = false;
+        VistaPreviaImagen.Source = null;
+        VistaPreviaImagen.Visibility = Visibility.Collapsed;
+        TextoImagenProducto.Visibility = Visibility.Visible;
+        BotonQuitarImagen.Visibility = Visibility.Collapsed;
+    }
+
+    private void MostrarVistaPrevia(string fuente)
+    {
+        try
+        {
+            var imagen = new BitmapImage();
+            imagen.BeginInit();
+            imagen.CacheOption = BitmapCacheOption.OnLoad;
+            imagen.UriSource = new Uri(fuente, UriKind.Absolute);
+            imagen.EndInit();
+            VistaPreviaImagen.Source = imagen;
+            VistaPreviaImagen.Visibility = Visibility.Visible;
+            TextoImagenProducto.Visibility = Visibility.Collapsed;
+        }
+        catch (Exception)
+        {
+            MensajeFormulario.Text = "La imagen no pudo mostrarse.";
         }
     }
 

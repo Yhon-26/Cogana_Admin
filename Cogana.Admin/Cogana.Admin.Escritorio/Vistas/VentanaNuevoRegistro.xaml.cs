@@ -1,24 +1,33 @@
+using System.IO;
 using System.Net.Http;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Cogana.Admin.Aplicacion.Contratos;
 using Cogana.Admin.Aplicacion.Modelos;
+using Microsoft.Win32;
 
 namespace Cogana.Admin.Escritorio.Vistas;
 
 public partial class VentanaNuevoRegistro : Window
 {
     private readonly IServicioCatalogoAdministrativo _servicio;
+    private readonly IServicioImagenesProducto? _imagenes;
     private readonly Guid _tiendaId;
     private readonly string _modulo;
     private readonly Guid _operacionId = Guid.NewGuid();
+    private string? _rutaImagen;
 
     public VentanaNuevoRegistro(
         IServicioCatalogoAdministrativo servicio,
         Guid tiendaId,
-        string modulo)
+        string modulo,
+        IServicioImagenesProducto? servicioImagenes = null)
     {
         _servicio = servicio;
+        _imagenes = servicioImagenes;
         _tiendaId = tiendaId;
         _modulo = modulo;
         InitializeComponent();
@@ -123,6 +132,23 @@ public partial class VentanaNuevoRegistro : Window
         try
         {
             var resultado = await GuardarAsync();
+            if (resultado.EsExitoso &&
+                _ultimoProductoCreadoId is Guid nuevoId &&
+                _rutaImagen is not null &&
+                _imagenes is not null)
+            {
+                MensajeFormulario.Text = "Subiendo imagen del producto...";
+                var subida = await _imagenes.SubirAsync(_tiendaId, nuevoId, _rutaImagen);
+                MensajeFormulario.Text = subida.EsExitoso
+                    ? "Producto e imagen registrados correctamente."
+                    : $"El producto se creó, pero la imagen no pudo subirse: {subida.Mensaje}";
+                if (!subida.EsExitoso)
+                {
+                    BotonGuardar.IsEnabled = true;
+                    return;
+                }
+            }
+
             MensajeFormulario.Text = resultado.Mensaje;
             if (resultado.EsExitoso)
             {
@@ -135,63 +161,127 @@ public partial class VentanaNuevoRegistro : Window
         }
     }
 
-    private Task<ResultadoOperacion> GuardarAsync() => _modulo switch
+    private void AlElegirImagen(object sender, RoutedEventArgs e)
     {
-        "Productos" => _servicio.CrearProductoAsync(
-            _tiendaId,
-            new NuevoProducto(
-                ProductoNombre.Text,
-                ProductoSku.Text,
-                ProductoMarca.Text,
-                ProductoDescripcion.Text,
-                ProductoCategoria.SelectedValue as Guid?,
-                ProductoUnidad.SelectedValue?.ToString() ?? "kg",
-                ProductoVencimiento.IsChecked == true,
-                long.TryParse(ProductoStockMinimo.Text, out var minimo) ? minimo : 0)),
-        "Categorías" => _servicio.CrearCategoriaAsync(
-            _tiendaId,
-            new NuevaCategoria(
-                CategoriaNombre.Text,
-                int.TryParse(CategoriaOrden.Text, out var orden) ? orden : 0)),
-        "Proveedores" => _servicio.CrearProveedorAsync(
-            _tiendaId,
-            new NuevoProveedor(
-                ProveedorNombre.Text,
-                ProveedorRuc.Text,
-                ProveedorTelefono.Text)),
-        "Presentaciones" => _servicio.CrearPresentacionAsync(
-            _tiendaId,
-            new NuevaPresentacion(
-                (Guid)(PresentacionProducto.SelectedValue ?? Guid.Empty),
-                PresentacionNombre.Text,
-                PresentacionSku.Text,
-                PresentacionTipo.SelectedValue?.ToString() ?? "bulk",
-                long.TryParse(PresentacionCantidad.Text, out var cantidad) ? cantidad : 1,
-                ImporteEnCentimos(PresentacionPrecio.Text),
-                PresentacionSellada.IsChecked == true)),
-        "Promociones" => _servicio.CrearPromocionAsync(
-            _tiendaId,
-            new NuevaPromocion(
-                PromocionNombre.Text,
-                PromocionDescripcion.Text,
-                PromocionTipo.SelectedValue?.ToString() ?? "percentage",
-                ValorPromocion(),
-                CrearFecha(PromocionInicio.SelectedDate ?? DateTime.Today),
-                CrearFecha(PromocionFin.SelectedDate ?? DateTime.Today.AddDays(30)).AddDays(1).AddTicks(-1))),
-        "Inventario y lotes" => _servicio.RegistrarLoteAsync(
-            _tiendaId,
-            new NuevoLote(
-                _operacionId,
-                (Guid)(LoteProducto.SelectedValue ?? Guid.Empty),
-                LoteProveedor.SelectedValue as Guid?,
-                LoteCodigo.Text,
-                LoteVencimiento.SelectedDate is DateTime vencimiento
-                    ? DateOnly.FromDateTime(vencimiento)
-                    : null,
-                long.TryParse(LoteCantidad.Text, out var cantidadLote) ? cantidadLote : 0,
-                LoteNotas.Text)),
-        _ => Task.FromResult(ResultadoOperacion.Fallida("Módulo no disponible."))
-    };
+        var dialogo = new OpenFileDialog
+        {
+            Title = "Elegir imagen del producto",
+            Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.webp",
+            CheckFileExists = true
+        };
+
+        if (dialogo.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        MostrarVistaPrevia(dialogo.FileName);
+        _rutaImagen = dialogo.FileName;
+        BotonQuitarImagen.Visibility = Visibility.Visible;
+        MensajeFormulario.Text = string.Empty;
+    }
+
+    private void AlQuitarImagen(object sender, RoutedEventArgs e)
+    {
+        _rutaImagen = null;
+        VistaPreviaImagen.Source = null;
+        VistaPreviaImagen.Visibility = Visibility.Collapsed;
+        TextoImagenProducto.Visibility = Visibility.Visible;
+        BotonQuitarImagen.Visibility = Visibility.Collapsed;
+    }
+
+    private void MostrarVistaPrevia(string ruta)
+    {
+        try
+        {
+            var imagen = new BitmapImage();
+            imagen.BeginInit();
+            imagen.CacheOption = BitmapCacheOption.OnLoad;
+            imagen.UriSource = new Uri(ruta, UriKind.Absolute);
+            imagen.EndInit();
+            VistaPreviaImagen.Source = imagen;
+            VistaPreviaImagen.Visibility = Visibility.Visible;
+            TextoImagenProducto.Visibility = Visibility.Collapsed;
+        }
+        catch (Exception)
+        {
+            MensajeFormulario.Text = "El archivo no es una imagen válida.";
+        }
+    }
+
+    private Guid? _ultimoProductoCreadoId;
+
+    private async Task<ResultadoOperacion> GuardarAsync()
+    {
+        switch (_modulo)
+        {
+            case "Productos":
+            {
+                var creacion = await _servicio.CrearProductoAsync(
+                    _tiendaId,
+                    new NuevoProducto(
+                        ProductoNombre.Text,
+                        ProductoSku.Text,
+                        ProductoMarca.Text,
+                        ProductoDescripcion.Text,
+                        ProductoCategoria.SelectedValue as Guid?,
+                        ProductoUnidad.SelectedValue?.ToString() ?? "kg",
+                        ProductoVencimiento.IsChecked == true,
+                        long.TryParse(ProductoStockMinimo.Text, out var minimo) ? minimo : 0));
+                _ultimoProductoCreadoId = creacion.ProductoId;
+                return creacion;
+            }
+            case "Categorías":
+                return await _servicio.CrearCategoriaAsync(
+                    _tiendaId,
+                    new NuevaCategoria(
+                        CategoriaNombre.Text,
+                        int.TryParse(CategoriaOrden.Text, out var orden) ? orden : 0));
+            case "Proveedores":
+                return await _servicio.CrearProveedorAsync(
+                    _tiendaId,
+                    new NuevoProveedor(
+                        ProveedorNombre.Text,
+                        ProveedorRuc.Text,
+                        ProveedorTelefono.Text));
+            case "Presentaciones":
+                return await _servicio.CrearPresentacionAsync(
+                    _tiendaId,
+                    new NuevaPresentacion(
+                        (Guid)(PresentacionProducto.SelectedValue ?? Guid.Empty),
+                        PresentacionNombre.Text,
+                        PresentacionSku.Text,
+                        PresentacionTipo.SelectedValue?.ToString() ?? "bulk",
+                        long.TryParse(PresentacionCantidad.Text, out var cantidad) ? cantidad : 1,
+                        ImporteEnCentimos(PresentacionPrecio.Text),
+                        PresentacionSellada.IsChecked == true));
+            case "Promociones":
+                return await _servicio.CrearPromocionAsync(
+                    _tiendaId,
+                    new NuevaPromocion(
+                        PromocionNombre.Text,
+                        PromocionDescripcion.Text,
+                        PromocionTipo.SelectedValue?.ToString() ?? "percentage",
+                        ValorPromocion(),
+                        CrearFecha(PromocionInicio.SelectedDate ?? DateTime.Today),
+                        CrearFecha(PromocionFin.SelectedDate ?? DateTime.Today.AddDays(30)).AddDays(1).AddTicks(-1)));
+            case "Inventario y lotes":
+                return await _servicio.RegistrarLoteAsync(
+                    _tiendaId,
+                    new NuevoLote(
+                        _operacionId,
+                        (Guid)(LoteProducto.SelectedValue ?? Guid.Empty),
+                        LoteProveedor.SelectedValue as Guid?,
+                        LoteCodigo.Text,
+                        LoteVencimiento.SelectedDate is DateTime vencimiento
+                            ? DateOnly.FromDateTime(vencimiento)
+                            : null,
+                        long.TryParse(LoteCantidad.Text, out var cantidadLote) ? cantidadLote : 0,
+                        LoteNotas.Text));
+            default:
+                return ResultadoOperacion.Fallida("Módulo no disponible.");
+        }
+    }
 
     private string? Validar()
     {

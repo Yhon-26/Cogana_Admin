@@ -28,6 +28,8 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 ## Ya está construido
 
 - Inicio de sesión con Supabase Auth y comprobación de membresía activa `owner` o `admin` para la tienda.
+- Recuperación desde el login: solicitud por correo, verificación del enlace original o código en Windows y establecimiento de contraseña nueva. La sesión de recuperación nunca abre directamente el panel.
+- Cambio obligatorio de contraseña temporal antes de abrir el panel para cuentas nuevas creadas por `admin-users` v4. Usa una marca protegida en `app_metadata`; las cuentas existentes y las políticas del móvil conservan su contrato. El bloqueo del servidor cubre la administración de personal; no constituye una restricción global de RLS en otros endpoints o versiones antiguas.
 - Pantalla principal con conexión, indicadores del negocio y pedidos recientes.
 - Consulta de productos, categorías, presentaciones, inventario/lotes, proveedores, pedidos, clientes y promociones.
 - Alta y edición de productos, categorías, presentaciones, proveedores, promociones y lotes de inventario.
@@ -92,6 +94,35 @@ Recorrido completo con sesión real de propietario contra la base de datos de pr
 | Configuración | Consulta y edición de datos comerciales, contacto, atención, pagos, preparación, horario semanal y fechas especiales. | Verificar los cambios con datos operativos reales y confirmar cómo se mostrarán las excepciones en la aplicación móvil. |
 
 ## Siguientes bloques recomendados
+
+### Bloque de acceso implementado localmente el 30/09/2026
+
+El enlace “¿Olvidaste tu contraseña?” ya es un botón accesible con un flujo de recuperación real.
+Se comprueban el proyecto y el tipo del enlace, la sesión de Auth y la membresía administrativa.
+El formulario admite el enlace original de Supabase sin abrir o el código si aparece en el correo;
+no depende de registrar un protocolo de Windows ni cambia las redirecciones del móvil.
+
+La función `admin-users` v4 está activa con `verify_jwt=true`. Marca solo las cuentas nuevas
+creadas con contraseña inicial y ofrece una operación protegida para cambiarla y retirar la marca.
+Las cuentas anteriores no se marcan retroactivamente porque no existe un registro fiable del
+carácter temporal de su contraseña. El README describe el contrato y su alcance exacto.
+
+Validación: Debug y Release compilan con cero errores y advertencias; 27 comprobaciones locales
+del servicio/ViewModel y 12 de la función real con Auth/BD simulados pasaron. Se abrió la compilación
+Release y se comprobó visualmente el botón en el login. Supabase aceptó una solicitud real de
+recuperación con HTTP 200 y confirmó `recovery_sent_at` reciente para la cuenta elegida por el usuario.
+El usuario confirmó que recibió el correo. Al abrir el enlace en el navegador, la redirección mostró
+`localhost` sin una página disponible; el formulario permite copiar y verificar el enlace original
+dentro de Windows, sin abrirlo. Se reforzaron las instrucciones para usar el correo más reciente y
+copiar el vínculo con clic derecho. El guardado de la contraseña, el nuevo ingreso y el primer ingreso de una
+cuenta temporal siguen pendientes de la interacción privada del usuario. No se generó ni publicó
+una versión nueva de escritorio; la versión pública sigue siendo la indicada en el cierre anterior (1.10.5).
+
+Pendiente adicional: si se requiere que el cambio temporal sea obligatorio también desde clientes
+antiguos o cualquier endpoint administrativo, diseñar y verificar un bloqueo en el backend compartido
+sin impedir las operaciones de cliente del móvil. Este bloque no altera RLS.
+
+### Otros bloques
 
 1. ~~**Revisión funcional autenticada**~~ **Completada el 30/09/2026** (ver sección "Revisión funcional autenticada"). Queda pendiente verificar el primer ingreso real del usuario invitado de prueba y el comportamiento tras una hora de sesión abierta (renovación de token).
 2. **Instalador y publicación:** la versión 1.10.5 está compilada en Release, empaquetada con Velopack y publicada en GitHub Releases; incluye Setup, paquete completo, actualización delta desde 1.10.4 y portátil. La aplicación instalada puede detectarla desde **Buscar actualizaciones**. Pendiente: probar la instalación en un equipo limpio y decidir si se requiere firma de código.

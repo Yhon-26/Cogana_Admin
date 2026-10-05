@@ -29,6 +29,28 @@
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,25,0,18">
                     <StackPanel>
                         <StackPanel x:Name="SeccionProducto" Visibility="Collapsed">
+                            <StackPanel x:Name="SeccionImagenProducto" Margin="0,0,0,16">
+                                <Border Height="150" CornerRadius="14" Background="#F0F1EF"
+                                        BorderBrush="{StaticResource BrochaBorde}" BorderThickness="1">
+                                    <Grid>
+                                        <TextBlock x:Name="TextoImagenProducto"
+                                                   Text="Sin imagen. La app móvil mostrará una foto referencial hasta que subas una."
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   FontSize="11" Foreground="{StaticResource BrochaTextoSuave}"
+                                                   TextWrapping="Wrap" TextAlignment="Center" Margin="26,0"/>
+                                        <Image x:Name="VistaPreviaImagen" Stretch="Uniform" Margin="6" Visibility="Collapsed"/>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
+                                    <Button Content="Elegir imagen…" Click="AlElegirImagen" Style="{StaticResource BotonSecundario}"/>
+                                    <Button x:Name="BotonQuitarImagen" Content="Quitar" Click="AlQuitarImagen"
+                                            Style="{StaticResource BotonSecundario}" Margin="8,0,0,0" Visibility="Collapsed"/>
+                                    <TextBlock Text="JPG o PNG (máx. 5 MB). Se muestra en la app móvil."
+                                               FontSize="10" Foreground="{StaticResource BrochaTextoSuave}"
+                                               VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+
                             <TextBlock Text="Nombre del producto *" FontSize="11" FontWeight="SemiBold" />
                             <TextBox x:Name="ProductoNombre" Style="{StaticResource CampoFormulario}" />
                             <Grid Margin="0,15,0,0">

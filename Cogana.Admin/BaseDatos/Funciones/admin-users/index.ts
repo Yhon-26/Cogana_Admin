@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 type RequestBody = {
-  action?: "list" | "invite" | "update";
+  action?: "list" | "invite" | "update" | "change-password";
   store_id?: string;
   user_id?: string;
   email?: string;
@@ -15,6 +15,7 @@ type RequestBody = {
   role?: "owner" | "admin" | "driver";
   is_active?: boolean;
   temporary_password?: string;
+  new_password?: string;
 };
 
 const roles = new Set(["owner", "admin", "driver"]);
@@ -76,6 +77,30 @@ Deno.serve(async (request: Request) => {
     if (!actorMembership?.is_active || !["owner", "admin"].includes(actorMembership.role)) {
       return respond({ error: "Esta cuenta no tiene acceso al directorio de personal." }, 403);
     }
+    // Contrato de Auth del escritorio: solo el servidor puede retirar esta marca.
+    const cambioPendiente = authData.user.app_metadata?.cogana_admin_cambio_contrasena_pendiente === true;
+    if (body.action === "change-password") {
+      if (!cambioPendiente) return respond({ error: "No hay un cambio inicial pendiente." }, 409);
+      if (typeof body.new_password !== "string" || body.new_password.trim().length === 0 || body.new_password.length < 10) {
+        return respond({ error: "La contraseña debe tener al menos 10 caracteres." }, 400);
+      }
+      // Usa Auth con el JWT del propio usuario para respetar sus reglas de contraseña y reautenticación.
+      const clavePublica = Deno.env.get("SUPABASE_ANON_KEY");
+      if (!clavePublica) return respond({ error: "Servicio sin configurar." }, 500);
+      const respuesta = await fetch(`${url}/auth/v1/user`, {
+        method: "PUT",
+        headers: { apikey: clavePublica, Authorization: authorization, "Content-Type": "application/json" },
+        body: JSON.stringify({ password: body.new_password }),
+      });
+      if (!respuesta.ok) return respond({ error: "Auth rechazó la nueva contraseña. Usa una contraseña diferente y segura o verifica de nuevo tu acceso." }, 400);
+      // Si falla retirar la marca, se conserva el bloqueo y nunca se habilita el panel por error.
+      const { error: marcaError } = await admin.auth.admin.updateUserById(authData.user.id, {
+        app_metadata: { ...authData.user.app_metadata, cogana_admin_cambio_contrasena_pendiente: false },
+      });
+      if (marcaError) return respond({ error: "La contraseña cambió, pero el acceso sigue pendiente. Inicia sesión nuevamente para completar el cambio." }, 503);
+      return respond({ message: "Contraseña inicial actualizada." });
+    }
+    if (cambioPendiente) return respond({ error: "Cambia tu contraseña inicial antes de administrar personal." }, 403);
     if (body.action !== "list" && actorMembership.role !== "owner") {
       return respond({ error: "Solo un propietario activo puede administrar accesos." }, 403);
     }
@@ -142,6 +167,7 @@ Deno.serve(async (request: Request) => {
           email,
           password: body.temporary_password,
           email_confirm: true,
+          app_metadata: { cogana_admin_cambio_contrasena_pendiente: true },
           user_metadata: { full_name: body.full_name.trim(), phone: body.phone ?? null },
         });
         if (createError) throw createError;

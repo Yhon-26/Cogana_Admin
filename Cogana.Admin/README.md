@@ -98,3 +98,54 @@ El escritorio inicia en `VentanaInicioSesion`. El acceso requiere:
 
 El token se conserva solamente en memoria mientras la aplicación está abierta.
 Las cuentas de cliente, anónimas o con rol `driver` no pueden abrir el panel.
+
+## Recuperación y contraseña inicial (30/09/2026)
+
+En el login, **¿Olvidaste tu contraseña?** abre el formulario de recuperación:
+
+1. Introduce el correo y solicita el mensaje. La respuesta no revela si existe una cuenta.
+2. Copia el enlace original del botón del correo **sin abrirlo** y pégalo en el formulario. También se admite un código si la plantilla del correo lo muestra.
+3. Verifica la recuperación, introduce y confirma una contraseña nueva de al menos 10 caracteres.
+4. Vuelve al login e ingresa con la contraseña nueva. La contraseña de Supabase Auth es compartida con el móvil; el cambio también afecta a ese acceso.
+
+El escritorio intercambia el hash o código con `POST /auth/v1/verify`, siempre con tipo `recovery`.
+Solo acepta enlaces HTTPS del proyecto configurado, con ruta `/auth/v1/verify` y tipo `recovery`;
+no navega a enlaces suministrados ni importa tokens de acceso pegados. Un enlace abierto previamente,
+consumido por un filtro de correo o vencido exige solicitar otro. No se han cambiado las redirecciones,
+el Site URL, las plantillas ni el SMTP compartidos. Las plantillas personalizadas con otra ruta y los
+enlaces reescritos por un proveedor de correo todavía no se admiten: debe usarse el enlace original
+de Supabase o el código mostrado en el mensaje. El envío efectivo y la entrega dependen de Auth/SMTP.
+
+La sesión de recuperación solo permite establecer la contraseña después de comprobar una membresía
+administrativa activa; no abre el panel. Al terminar se solicita el cierre global de sesiones de Auth
+y se borran los tokens locales. Los JWT ya emitidos pueden seguir siendo válidos hasta expirar.
+Cancelar el formulario elimina la sesión local pendiente, sin modificar contraseñas ni revocar
+otras sesiones. El formulario conserva enlaces y contraseñas solo en memoria y los oculta en pantalla.
+
+La Edge Function `admin-users`, desplegada como versión 4 con verificación JWT habilitada, incorpora
+el contrato `app_metadata.cogana_admin_cambio_contrasena_pendiente`:
+
+- Solo las **cuentas nuevas** creadas mediante contraseña temporal reciben la marca `true`.
+- El escritorio exige cambiarla antes de abrir el panel; cancelar nunca abre una sesión administrativa.
+- La acción autenticada `change-password` recibe `store_id` y `new_password`. Valida la membresía
+  activa `owner`/`admin`, actualiza la contraseña a través de Auth con el JWT del usuario y solo
+  después retira la marca mediante la API administrativa del servidor. Conserva los otros metadatos.
+- Si Auth rechaza la contraseña o falla retirar la marca, el cambio pendiente no habilita el panel.
+- Las cuentas existentes vinculadas a una tienda conservan contraseña y metadatos. No se marca
+  retroactivamente a las cuentas creadas por las versiones anteriores.
+- La función bloquea el directorio y la administración de personal mientras existe un cambio pendiente.
+  Este bloqueo no es una restricción global de RLS: versiones antiguas y otros endpoints conservan
+  sus permisos existentes. No se modificaron las políticas compartidas ni el proyecto móvil.
+- `user_metadata` no autoriza retirar la marca. No se añadieron columnas a la base de datos ni
+  credenciales privilegiadas al cliente.
+
+Comprobaciones locales del contrato, con servicios simulados y sin enviar correos:
+
+```powershell
+dotnet run --project Pruebas\Acceso\Acceso.csproj
+node Pruebas\Acceso\funcion-acceso.mjs
+```
+
+El segundo comando requiere Node 22.22 o posterior y utiliza su transformación de TypeScript
+para ejecutar el código real de la función con dependencias simuladas. No sustituye la validación
+de un primer ingreso real, del correo recibido ni de una sesión abierta más de una hora.

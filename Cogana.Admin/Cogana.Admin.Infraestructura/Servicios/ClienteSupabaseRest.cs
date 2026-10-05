@@ -12,10 +12,10 @@ public sealed class ClienteSupabaseRest : IDisposable
     private readonly SemaphoreSlim _renovando = new(1, 1);
     private string? _tokenRenovacion;
 
-    public ClienteSupabaseRest(ConfiguracionSupabase configuracion)
+    public ClienteSupabaseRest(ConfiguracionSupabase configuracion, HttpMessageHandler? manejador = null)
     {
         _configuracion = configuracion;
-        _httpClient = new HttpClient();
+        _httpClient = manejador is null ? new HttpClient() : new HttpClient(manejador);
 
         if (_configuracion.Url is not null)
         {
@@ -29,6 +29,7 @@ public sealed class ClienteSupabaseRest : IDisposable
     }
 
     public bool EstaConfigurado => _configuracion.EstaCompleta;
+    public Uri? UrlProyecto => _configuracion.Url;
 
     public void EstablecerTokenAcceso(string tokenAcceso)
     {

@@ -435,10 +435,10 @@
                             </Border>
                         </Grid>
 
-                        <TextBlock HorizontalAlignment="Right" Margin="2,4,2,20" Cursor="Hand"
-                                   ToolTip="Contacta al administrador de la tienda">
-                            <Run Text="¿Olvidaste tu contraseña?" FontSize="12" Foreground="#A64ADE80"/>
-                        </TextBlock>
+                        <Button HorizontalAlignment="Right" Margin="2,4,2,20" Cursor="Hand"
+                                Click="AlRecuperarContrasena" Background="Transparent" BorderThickness="0"
+                                Foreground="#A64ADE80" FontSize="12" Padding="0,4"
+                                Content="¿Olvidaste tu contraseña?"/>
 
                         <TextBlock x:Name="Mensaje" Text="{Binding Mensaje}" FontSize="12"
                                    Foreground="#FF8A80" TextWrapping="Wrap"

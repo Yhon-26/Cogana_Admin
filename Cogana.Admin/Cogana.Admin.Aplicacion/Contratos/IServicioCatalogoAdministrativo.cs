@@ -36,7 +36,7 @@ public interface IServicioCatalogoAdministrativo
         Guid proveedorId,
         CancellationToken cancellationToken = default);
 
-    Task<ResultadoOperacion> CrearProductoAsync(
+    Task<ResultadoCreacionProducto> CrearProductoAsync(
         Guid tiendaId,
         NuevoProducto producto,
         CancellationToken cancellationToken = default);
