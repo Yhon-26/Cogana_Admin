@@ -5,6 +5,12 @@
 
 Esta guía resume el estado conocido del software de escritorio. El código fuente es la referencia para el comportamiento actual; las funciones indicadas como pendientes todavía no deben considerarse disponibles.
 
+## Publicación vigente (11/10/2026)
+
+La versión **1.11.1** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.1), desde el código `3014c95`. Incluye la perspectiva y mejoras del flujo visual del login. Se verificaron los seis archivos públicos: instalador, portátil, paquete completo, delta desde 1.11.0 y ambos manifiestos de actualización. Los paquetes coinciden con las huellas locales y el canal público ofrece 1.11.1. Validación previa: 64 comprobaciones locales aprobadas y compilaciones Debug/Release correctas; el acceso se probó con servicios simulados. La instalación y actualización efectiva en otro equipo no forman parte de esta comprobación.
+
+Por indicación del usuario, cada mejora terminada debe verificarse y publicarse con una nueva versión para actualizar la aplicación instalada. Esta autorización reemplaza la espera anterior de confirmación por publicación.
+
 ## Qué es este software
 
 Cogana Admin es una aplicación administrativa para Windows, construida con C# y WPF. Su objetivo es gestionar la tienda desde una interfaz de escritorio y consultar/actualizar los datos del mismo proyecto Supabase que utiliza la aplicación móvil.
