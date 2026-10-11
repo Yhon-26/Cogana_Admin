@@ -38,11 +38,24 @@ public sealed class LienzoParticulas : FrameworkElement
 
     public LienzoParticulas()
     {
-        CompositionTarget.Rendering += AlRenderizar;
+        AddVisualChild(_lienzo);
+        Loaded += (_, _) => ActualizarSuscripcion();
+        Unloaded += (_, _) => CompositionTarget.Rendering -= AlRenderizar;
     }
 
     /// <summary>Activa o desactiva la simulación y el dibujo.</summary>
-    public bool Animando { get; set; }
+    private bool _animando;
+    public bool Animando
+    {
+        get => _animando;
+        set { _animando = value; ActualizarSuscripcion(); }
+    }
+
+    private void ActualizarSuscripcion()
+    {
+        CompositionTarget.Rendering -= AlRenderizar;
+        if (_animando && IsLoaded) CompositionTarget.Rendering += AlRenderizar;
+    }
 
     protected override int VisualChildrenCount => 1;
 

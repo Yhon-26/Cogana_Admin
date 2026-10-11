@@ -38,6 +38,10 @@
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="FondoBoton" Property="Opacity" Value="0.45"/>
                             </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="FondoBoton" Property="BorderBrush" Value="#4ADE80"/>
+                                <Setter TargetName="FondoBoton" Property="BorderThickness" Value="2"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -149,16 +153,7 @@
         </Storyboard>
     </Window.Resources>
 
-    <Window.Triggers>
-        <EventTrigger RoutedEvent="Window.Loaded">
-            <BeginStoryboard Storyboard="{StaticResource AnimacionAurora}" />
-            <BeginStoryboard Storyboard="{StaticResource AnimacionBrilloTarjeta}" />
-            <BeginStoryboard Storyboard="{StaticResource AnimacionEntrada}" />
-            <BeginStoryboard Storyboard="{StaticResource AnimacionVida}" />
-        </EventTrigger>
-    </Window.Triggers>
-
-    <Grid Background="#06090C" MouseMove="AlMoverMouse" MouseLeave="AlSalirMouse">
+    <Grid x:Name="RaizLogin" Background="#06090C" MouseMove="AlMoverMouse" MouseLeave="AlSalirMouse">
 
         <!-- Capa 1: aurora viva -->
         <Grid IsHitTestVisible="False">
@@ -239,11 +234,14 @@
             </Ellipse.RenderTransform>
         </Ellipse>
 
-        <!-- FASE LOGIN: la tarjeta se inclina hacia el mouse (rotación + sesgo + parallax) -->
+        <!-- La perspectiva proyecta el plano de la tarjeta y conserva la interacción WPF. -->
         <Grid x:Name="PantallaLogin">
+            <Grid x:Name="SuperficiePerspectiva" Width="472" HorizontalAlignment="Center"
+                  VerticalAlignment="Center" Background="Transparent">
             <Border x:Name="TarjetaAcceso"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
                     Width="424"
+                    Margin="24"
                     Background="#0BFFFFFF"
                     BorderThickness="1"
                     CornerRadius="26"
@@ -252,9 +250,7 @@
                     RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
                     <TransformGroup>
-                        <RotateTransform x:Name="TarjetaRotacion"/>
                         <ScaleTransform x:Name="TarjetaEscala"/>
-                        <SkewTransform x:Name="TarjetaSesgo"/>
                         <TranslateTransform x:Name="TarjetaT"/>
                     </TransformGroup>
                 </Border.RenderTransform>
@@ -453,9 +449,13 @@
 
                         <TextBlock Text="Sistema protegido · COGANA 2026" FontSize="11"
                                    Foreground="#38FFFFFF" HorizontalAlignment="Center" Margin="0,18,0,0"/>
+                        <CheckBox x:Name="ReducirMovimiento" Content="Reducir movimiento"
+                                  Foreground="#A6FFFFFF" FontSize="11" HorizontalAlignment="Center" Margin="0,12,0,0"
+                                  Checked="AlCambiarMovimiento" Unchecked="AlCambiarMovimiento"/>
                     </StackPanel>
                 </Grid>
             </Border>
+            </Grid>
         </Grid>
 
         <!-- FASE CARGA -->
@@ -543,21 +543,12 @@
                     </Ellipse>
                 </Grid>
 
-                <Border x:Name="PistaProgreso" Width="290" Height="3" CornerRadius="4" Background="#12FFFFFF">
-                    <Border x:Name="BarraProgresoRelleno" Height="3" CornerRadius="4"
-                            HorizontalAlignment="Left" Width="0">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#4ADE80" Offset="0"/>
-                                <GradientStop Color="#22D3EE" Offset="0.5"/>
-                                <GradientStop Color="#818CF8" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
-                </Border>
+                <ProgressBar x:Name="IndicadorAcceso" Width="290" Height="3" IsIndeterminate="True"
+                             Foreground="#4ADE80" Background="#12FFFFFF" BorderThickness="0"
+                             AutomationProperties.Name="Verificando acceso administrativo"/>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,8">
-                    <TextBlock x:Name="TextoPorcentaje" Text="000%" FontFamily="Consolas" FontSize="11"
+                    <TextBlock x:Name="TextoEstadoAcceso" Text="CONEXIÓN SEGURA" FontSize="11"
                                Foreground="#47FFFFFF" Margin="0,0,10,0" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Ellipse Width="4" Height="4" Fill="#BF4ADE80" Margin="2,0" RenderTransformOrigin="0.5,0.5">
@@ -573,7 +564,8 @@
                 </StackPanel>
 
                 <TextBlock x:Name="TextoPaso" Text="Verificando credenciales..." FontSize="13"
-                           Foreground="#80FFFFFF" HorizontalAlignment="Center"/>
+                           Foreground="#B3FFFFFF" HorizontalAlignment="Center"
+                           AutomationProperties.LiveSetting="Polite"/>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,46,0,0" Opacity="0.16">
                     <Border Width="20" Height="20" CornerRadius="6" Background="White">

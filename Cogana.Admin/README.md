@@ -10,6 +10,10 @@ se conectan al mismo proyecto Supabase y respetan el mismo modelo de datos y RLS
 
 ## Estructura
 
+El login incluye perspectiva suave de la tarjeta, foco visible por teclado y una opción **Reducir movimiento**. El indicador de acceso espera la respuesta del servicio; no estima porcentajes. Las animaciones se pausan con la ventana inactiva o minimizada.
+
+Para comprobar geometría, renderizado, interacción y estados de acceso sin conectar con Supabase: `dotnet run --project Pruebas/Login/Login.csproj -c Release`. El modo `-- --visual` abre una tarjeta de prueba interactiva. El shader precompilado está embebido en el escritorio; `Cogana.Admin.Escritorio/Recursos/Compilar-Perspectiva.ps1` permite regenerarlo desde el archivo HLSL en Windows.
+
 - `Cogana.Admin.Dominio`: entidades y reglas centrales.
 - `Cogana.Admin.Aplicacion`: contratos y casos de uso.
 - `Cogana.Admin.Infraestructura`: conexión con Supabase y servicios externos.
@@ -37,6 +41,8 @@ Después de establecer ambas variables, inicia `Cogana.Admin.Escritorio` y usa
 el botón **Verificar conexión**.
 
 ## Instalador y actualizaciones
+
+Cada mejora terminada de este proyecto debe verificarse, incrementar su versión y publicarse en el canal de GitHub para que la aplicación instalada pueda actualizarse. Esta continuidad de publicación fue autorizada por el usuario el 11/10/2026.
 
 La app se distribuye e instala con [Velopack](https://velopack.io) y se actualiza
 desde la propia interfaz con el botón **Buscar actualizaciones** (tarjeta

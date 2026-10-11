@@ -59,18 +59,18 @@ public partial class App : Application
         _servicioPanelInicio = new ServicioPanelInicioArchivo();
         var servicioAutenticacion = new ServicioAutenticacionSupabase(_clienteSupabase);
         var viewModel = new InicioSesionViewModel(servicioAutenticacion);
-        viewModel.SesionIniciada += AbrirPanelPrincipal;
 
         _ventanaInicioSesion = new VentanaInicioSesion
         {
             DataContext = viewModel
         };
+        _ventanaInicioSesion.AccesoConfirmado += AbrirPanelPrincipal;
 
         MainWindow = _ventanaInicioSesion;
         _ventanaInicioSesion.Show();
     }
 
-    private async void AbrirPanelPrincipal(SesionUsuario sesion)
+    private void AbrirPanelPrincipal(SesionUsuario sesion)
     {
         if (_servicioEstado is null ||
             _servicioResumenInicio is null ||
@@ -115,8 +115,7 @@ public partial class App : Application
 
         if (_ventanaInicioSesion is not null)
         {
-            // Deja ver el "Bienvenido al sistema" de la pantalla de carga antes de cerrar.
-            await Task.Delay(1200);
+            // La ventana de acceso ya completó la confirmación antes de abrir el panel.
             _ventanaInicioSesion.Close();
             _ventanaInicioSesion = null;
         }

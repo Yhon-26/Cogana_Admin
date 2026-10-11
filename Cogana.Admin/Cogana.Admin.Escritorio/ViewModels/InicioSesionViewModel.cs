@@ -40,29 +40,13 @@ public sealed class InicioSesionViewModel : BaseViewModel
 
     public async Task IniciarSesionAsync(string contrasena)
     {
-        Mensaje = string.Empty;
-
-        if (!CorreoEsValido(Correo))
-        {
-            Mensaje = "Ingresa un correo electrónico válido.";
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(contrasena))
-        {
-            Mensaje = "Ingresa tu contraseña.";
-            return;
-        }
-
+        if (EstaProcesando || !ValidarAcceso(contrasena)) return;
         EstaProcesando = true;
         Mensaje = "Verificando acceso...";
 
         try
         {
-            var resultado = await _servicioAutenticacion.IniciarSesionAsync(
-                Correo,
-                contrasena);
-
+            var resultado = await _servicioAutenticacion.IniciarSesionAsync(Correo, contrasena);
             if (resultado.RequiereCambioContrasena)
             {
                 Mensaje = resultado.Mensaje;
@@ -70,20 +54,34 @@ public sealed class InicioSesionViewModel : BaseViewModel
                 Mensaje = "Vuelve a iniciar sesión para continuar.";
                 return;
             }
-
             if (!resultado.EsExitoso || resultado.Sesion is null)
             {
                 Mensaje = resultado.Mensaje;
                 return;
             }
-
             Mensaje = "Acceso correcto.";
             SesionIniciada?.Invoke(resultado.Sesion);
         }
-        finally
+        finally { EstaProcesando = false; }
+    }
+
+    public bool ValidarAcceso(string contrasena)
+    {
+        Mensaje = string.Empty;
+
+        if (!CorreoEsValido(Correo))
         {
-            EstaProcesando = false;
+            Mensaje = "Ingresa un correo electrónico válido.";
+            return false;
         }
+
+        if (string.IsNullOrWhiteSpace(contrasena))
+        {
+            Mensaje = "Ingresa tu contraseña.";
+            return false;
+        }
+
+        return true;
     }
 
     private static bool CorreoEsValido(string correo)

@@ -1,7 +1,7 @@
 # Cogana Admin: estado y hoja de ruta
 
 **Ubicación del proyecto:** `D:\Cogana_Admin\Cogana.Admin`  
-**Actualizado:** 30 de septiembre de 2026
+**Actualizado:** 11 de octubre de 2026
 
 Esta guía resume el estado conocido del software de escritorio. El código fuente es la referencia para el comportamiento actual; las funciones indicadas como pendientes todavía no deben considerarse disponibles.
 
@@ -44,7 +44,7 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 - Interfaz propia del escritorio, separada de los estilos de la aplicación móvil.
 - Panel de inicio configurable: las secciones disponibles permanecen en una bandeja dentro de Inicio y pueden agregarse con un clic o arrastrándolas al área de tarjetas, sin abrir otro módulo ni cubrir la pantalla. Las tarjetas se quitan con un clic, se reordenan desde su cabecera y la disposición se guarda por equipo (archivo local JSON).
 - Login inmersivo: fondo aurora animado con rejilla y foco de luz que sigue el mouse, tarjeta glass con anillo de luz giratorio, campos con etiqueta flotante e íconos, estado EN LÍNEA, animación de entrada e inclinación de la tarjeta siguiendo el mouse.
-- Pantalla de carga del acceso: red de 150 partículas conectadas, anillos expansivos, orbe con halo giratorio, barra de progreso con porcentaje y pasos ("Verificando credenciales...", "Bienvenido al sistema").
+- Pantalla de carga del acceso: partículas, anillos y orbe; indicador indeterminado mientras se espera la respuesta real y confirmación solo después de una sesión válida. Sin porcentajes ni pasos ficticios.
 - Nitidez en pantallas escaladas: manifiesto PerMonitorV2, UseLayoutRounding y modo de texto Display.
 - Control de versiones con git; publicación automática a GitHub Releases (`Publicar-Instalador.ps1 -Github`) como canal de actualizaciones de la app (variable COGANA_GITHUB_REPO), con el bucket de Supabase como respaldo.
 - Administración segura de personal: directorio con nombre, correo, rol, estado y último acceso; alta con correo y contraseña inicial; edición de perfil, rol y acceso; protección del último propietario y auditoría de cambios mediante la Edge Function `admin-users`.
@@ -127,9 +127,11 @@ sin impedir las operaciones de cliente del móvil. Este bloque no altera RLS.
 1. ~~**Revisión funcional autenticada**~~ **Completada el 30/09/2026** (ver sección "Revisión funcional autenticada"). Queda pendiente verificar el primer ingreso real del usuario invitado de prueba y el comportamiento tras una hora de sesión abierta (renovación de token).
 2. **Instalador y publicación:** la versión 1.10.5 está compilada en Release, empaquetada con Velopack y publicada en GitHub Releases; incluye Setup, paquete completo, actualización delta desde 1.10.4 y portátil. La aplicación instalada puede detectarla desde **Buscar actualizaciones**. Pendiente: probar la instalación en un equipo limpio y decidir si se requiere firma de código.
 3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos). La revisión funcional cubrió la mecánica de los formularios; estas validaciones de negocio siguen abiertas.
-4. **Login en 3D (opcional):** el diseño de referencia gira la tarjeta con perspectiva real; se pospuso por una limitación del equipo actual. El plan completo está en el memo técnico "Login en 3D" más abajo.
+4. **Perspectiva del login:** implementada localmente el 11/10/2026. La proyección de un plano rotado usa un shader WPF, mantiene campos nativos mediante `EffectMapping` y vuelve al plano al interactuar con el formulario. Incluye suavizado, opción de reducir movimiento, preferencia inicial de Windows y pausa al desactivar/minimizar. Verificación: 37 comprobaciones locales de geometría, renderizado, ciclo de ventana y estados de acceso con servicio simulado; interacción visual comprobada en Windows. La prueba no autentica cuentas reales ni publica una versión.
 
-## Memo técnico: login en 3D (bloque pospuesto)
+## Memo histórico: alternativa Viewport3D (28/09/2026)
+
+**Sustituido el 11/10/2026:** la implementación actual usa `EfectoPerspectivaTarjeta` y `TransformacionPerspectiva`, con shader `ps_2_0` embebido. El contenido se proyecta con perspectiva real sin requerir `Viewport3D`; la inversa conserva el mapeo de entrada. El shader renderizó correctamente en este equipo. Si el shader no está soportado, el formulario conserva su plano normal. El código y plan siguientes describen la investigación anterior, no la implementación vigente.
 
 El diseño de referencia (proyecto React de Figma Make) inclina la tarjeta del login con perspectiva real — el equivalente de CSS `rotateX/rotateY`. Se implementó en WPF y se desactivó el 28/09/2026 por una limitación del equipo de desarrollo, no del software.
 

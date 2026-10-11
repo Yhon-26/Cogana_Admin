@@ -4,68 +4,81 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using System.Diagnostics;
+using System.ComponentModel;
+using Cogana.Admin.Aplicacion.Modelos;
+using Cogana.Admin.Escritorio.Controles;
 using Cogana.Admin.Escritorio.ViewModels;
 
 namespace Cogana.Admin.Escritorio.Vistas;
 
 public partial class VentanaInicioSesion : Window
 {
-    /// <summary>Pasos que muestra la pantalla de carga, igual que el diseño de referencia.</summary>
-    private static readonly (double Hasta, string Texto)[] PasosCarga =
-    [
-        (20, "Verificando credenciales..."),
-        (42, "Autenticando sesión..."),
-        (60, "Conectando al servidor..."),
-        (78, "Cargando permisos..."),
-        (93, "Preparando el panel..."),
-        (100, "Bienvenido al sistema")
-    ];
-
     private static readonly Brush BrochaBotonNormal = new LinearGradientBrush(
         Color.FromRgb(0xFF, 0xFF, 0xFF), Color.FromRgb(0xE6, 0xE6, 0xE6), 0);
 
     private static readonly Brush BrochaBotonActivo = new LinearGradientBrush(
         Color.FromRgb(0x22, 0xC5, 0x5E), Color.FromRgb(0x16, 0xA3, 0x4A), 45);
 
-    private readonly Random _azar = new();
-    private DispatcherTimer? _temporizadorProgreso;
-    private double _progreso;
     private bool _cargando;
-    private bool _autenticacionTerminada;
-    private bool _sesionIniciada;
+    private bool _cerrada;
+    private bool _renderizando;
+    private bool _movimientoReducido;
+    private bool _preferenciaManualMovimiento;
+    private bool _ajustandoPreferencia;
+    private double _giroX, _giroY, _objetivoX, _objetivoY;
+    private long _ultimoFotograma, _escrituraHasta;
+    private readonly EfectoPerspectivaTarjeta? _perspectiva;
+    private InicioSesionViewModel? _viewModel;
+    private SesionUsuario? _sesionConfirmada;
+    public event Action<SesionUsuario>? AccesoConfirmado;
 
     public VentanaInicioSesion()
     {
         InitializeComponent();
         Loaded += AlCargarVentana;
+        if (RenderCapability.IsPixelShaderVersionSupported(2, 0)) _perspectiva = new EfectoPerspectivaTarjeta();
+        PreviewKeyDown += AlUsarTeclado;
+        Activated += (_, _) => { if (IsLoaded) ActualizarMovimiento(); };
+        Deactivated += (_, _) => { if (IsLoaded) ActualizarMovimiento(); };
+        StateChanged += (_, _) => { if (IsLoaded) ActualizarMovimiento(); };
 
         BotonInicioSesion.Background = BrochaBotonNormal;
         BotonInicioSesion.Foreground = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A));
 
-        if (DataContext is InicioSesionViewModel viewModel)
-        {
-            viewModel.SesionIniciada += _ => _sesionIniciada = true;
-        }
     }
 
     private void AlCargarVentana(object sender, RoutedEventArgs e)
     {
         Loaded -= AlCargarVentana;
         CampoCorreo.Focus();
-        if (DataContext is InicioSesionViewModel viewModel)
-            viewModel.CambioContrasenaRequerido += AlRequerirCambioContrasena;
+        _viewModel = DataContext as InicioSesionViewModel;
+        if (_viewModel is not null)
+        {
+            _viewModel.CambioContrasenaRequerido += AlRequerirCambioContrasena;
+            _viewModel.SesionIniciada += AlConfirmarSesion;
+        }
+        _ajustandoPreferencia = true;
+        ReducirMovimiento.IsChecked = !SystemParameters.ClientAreaAnimation;
+        _ajustandoPreferencia = false;
+        SystemParameters.StaticPropertyChanged += AlCambiarPreferenciasSistema;
+        ActualizarMovimiento();
+        if (!_movimientoReducido) (Resources["AnimacionEntrada"] as Storyboard)?.Begin(this, true);
+        else TarjetaAcceso.Opacity = 1;
     }
 
-    private Task AlRequerirCambioContrasena()
+    private void AlConfirmarSesion(SesionUsuario sesion) => _sesionConfirmada = sesion;
+
+    private async Task AlRequerirCambioContrasena()
     {
-        VolverALogin();
+        await VolverALoginAsync();
+        if (_cerrada) return;
         if (DataContext is InicioSesionViewModel viewModel)
         {
             new VentanaRecuperacionContrasena(viewModel.ServicioAutenticacion, viewModel.Correo, true)
                 { Owner = this }.ShowDialog();
             CampoContrasena.Clear();
         }
-        return Task.CompletedTask;
     }
 
     private void AlRecuperarContrasena(object sender, RoutedEventArgs e)
@@ -84,10 +97,10 @@ public partial class VentanaInicioSesion : Window
         {
             return;
         }
+        if (!viewModel.ValidarAcceso(CampoContrasena.Password)) return;
 
         _cargando = true;
-        _autenticacionTerminada = false;
-        _sesionIniciada = false;
+        _sesionConfirmada = null;
         BotonInicioSesion.Content = "Accediendo...";
         BotonInicioSesion.Background = BrochaBotonActivo;
         BotonInicioSesion.Foreground = new SolidColorBrush(Colors.White);
@@ -97,10 +110,21 @@ public partial class VentanaInicioSesion : Window
         try
         {
             await viewModel.IniciarSesionAsync(CampoContrasena.Password);
+            if (_cerrada) return;
+            if (_sesionConfirmada is not null)
+            {
+                IndicadorAcceso.IsIndeterminate = false;
+                IndicadorAcceso.Value = 100;
+                TextoEstadoAcceso.Text = "ACCESO CONFIRMADO";
+                TextoPaso.Text = "Bienvenido al sistema";
+                await Task.Delay(_movimientoReducido ? 0 : 350);
+                if (!_cerrada) AccesoConfirmado?.Invoke(_sesionConfirmada);
+            }
+            else if (_cargando) await VolverALoginAsync();
         }
         finally
         {
-            _autenticacionTerminada = true;
+            CampoContrasena.Clear();
         }
     }
 
@@ -119,90 +143,40 @@ public partial class VentanaInicioSesion : Window
     private void MostrarPantallaDeCarga()
     {
         PantallaCarga.Visibility = Visibility.Visible;
-        Lienzo.Animando = true;
-        AnimarOpacidad(PantallaCarga, 1, TimeSpan.FromMilliseconds(450));
-
-        AnimarOpacidad(TarjetaAcceso, 0, TimeSpan.FromMilliseconds(450));
+        TextoEstadoAcceso.Text = "CONEXIÓN SEGURA";
+        TextoPaso.Text = "Verificando tu acceso administrativo...";
+        IndicadorAcceso.IsIndeterminate = !_movimientoReducido;
+        IndicadorAcceso.Value = 0;
+        RestablecerPerspectiva();
+        ActualizarMovimiento();
+        AnimarOpacidad(PantallaCarga, 1, TimeSpan.FromMilliseconds(220));
+        AnimarOpacidad(TarjetaAcceso, 0, TimeSpan.FromMilliseconds(180));
         PantallaLogin.IsHitTestVisible = false;
 
-        ContenidoCargaT.BeginAnimation(TranslateTransform.YProperty,
+        if (!_movimientoReducido) ContenidoCargaT.BeginAnimation(TranslateTransform.YProperty,
             new DoubleAnimation(24, 0, TimeSpan.FromMilliseconds(600))
             {
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
             });
-        (Resources["DecoracionCarga"] as Storyboard)?.Begin(this, true);
         AnimarOpacidad(ContenidoCarga, 1, TimeSpan.FromMilliseconds(600));
-
-        _progreso = 0;
-        _temporizadorProgreso = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(35) };
-        _temporizadorProgreso.Tick += AlAvanzarProgreso;
-        _temporizadorProgreso.Start();
     }
 
-    private void AlAvanzarProgreso(object? sender, EventArgs e)
+    private async Task VolverALoginAsync()
     {
-        _progreso += _azar.NextDouble() * 1.8 + 0.4;
-        if (_autenticacionTerminada)
-        {
-            _progreso += 2.4;
-        }
-
-        if (!_autenticacionTerminada && _progreso > 92)
-        {
-            _progreso = 92;
-        }
-
-        if (_progreso >= 100)
-        {
-            _progreso = 100;
-            _temporizadorProgreso?.Stop();
-            _temporizadorProgreso = null;
-            CompletarCarga();
-        }
-
-        TextoPorcentaje.Text = $"{(int)_progreso:000}%";
-        BarraProgresoRelleno.Width = PistaProgreso.ActualWidth * _progreso / 100;
-        TextoPaso.Text = PasosCarga.First(paso => _progreso <= paso.Hasta).Texto;
-    }
-
-    private async void CompletarCarga()
-    {
-        TextoPaso.Text = "Bienvenido al sistema";
-
-        if (_sesionIniciada)
-        {
-            // La ventana se cierra sola: App abre el panel tras una pequeña pausa.
-            return;
-        }
-
-        await Task.Delay(650);
-        VolverALogin();
-    }
-
-    private void VolverALogin()
-    {
-        _temporizadorProgreso?.Stop();
-        _temporizadorProgreso = null;
         Lienzo.Animando = false;
         (Resources["DecoracionCarga"] as Storyboard)?.Remove(this);
-
-        AnimarOpacidad(PantallaCarga, 0, TimeSpan.FromMilliseconds(400));
-
-        var regreso = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(400) };
-        regreso.Tick += (_, _) =>
-        {
-            regreso.Stop();
-            PantallaCarga.Visibility = Visibility.Collapsed;
-        };
-        regreso.Start();
-
+        AnimarOpacidad(PantallaCarga, 0, TimeSpan.FromMilliseconds(180));
+        AnimarOpacidad(TarjetaAcceso, 1, TimeSpan.FromMilliseconds(220));
+        await Task.Delay(_movimientoReducido ? 0 : 220);
+        if (_cerrada) return;
+        PantallaCarga.Visibility = Visibility.Collapsed;
         PantallaLogin.IsHitTestVisible = true;
-        AnimarOpacidad(TarjetaAcceso, 1, TimeSpan.FromMilliseconds(450));
-
         BotonInicioSesion.Content = "ENTRAR AL PANEL";
         BotonInicioSesion.Background = BrochaBotonNormal;
         BotonInicioSesion.Foreground = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A));
         _cargando = false;
+        ActualizarMovimiento();
+        CampoContrasena.Focus();
     }
 
     /// <summary>Muestra la pantalla de carga sin iniciar sesión (verificación visual).</summary>
@@ -244,7 +218,7 @@ public partial class VentanaInicioSesion : Window
         }
     }
 
-    private static void AnimarCampo(
+    private void AnimarCampo(
         TextBlock etiqueta,
         Border fondo,
         UIElement brillo,
@@ -257,7 +231,7 @@ public partial class VentanaInicioSesion : Window
         bool tieneTexto)
     {
         var activo = enfocado || tieneTexto;
-        var transicion = TimeSpan.FromMilliseconds(240);
+        var transicion = TimeSpan.FromMilliseconds(_movimientoReducido ? 0 : 240);
 
         etiqueta.Text = activo ? textoActivo : textoNormal;
         var margen = activo
@@ -295,7 +269,7 @@ public partial class VentanaInicioSesion : Window
 
         var anchoLinea = enfocado ? Math.Max(anchoCampo * 0.88, 0) : 0;
         linea.BeginAnimation(WidthProperty, new DoubleAnimation(anchoLinea,
-            TimeSpan.FromMilliseconds(350))
+            TimeSpan.FromMilliseconds(_movimientoReducido ? 0 : 350))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         });
@@ -305,60 +279,138 @@ public partial class VentanaInicioSesion : Window
 
     private void AlMoverMouse(object sender, MouseEventArgs e)
     {
-        if (sender is not Grid raiz)
-        {
-            return;
-        }
-
-        var posicion = e.GetPosition(raiz);
-        FocoMouseT.X = posicion.X - raiz.ActualWidth / 2;
-        FocoMouseT.Y = posicion.Y - raiz.ActualHeight / 2;
-
-        // Inclinación de la tarjeta hacia la posición del mouse:
-        // rotación + sesgo + escala + parallax (pseudo-3D sin pipeline 3D)
-        if (PantallaLogin.IsHitTestVisible)
-        {
-            var relativoX = posicion.X / raiz.ActualWidth - 0.5;
-            var relativoY = posicion.Y / raiz.ActualHeight - 0.5;
-
-            // Libera las animaciones retenidas para poder fijar valores directos
-            TarjetaSesgo.BeginAnimation(SkewTransform.AngleXProperty, null);
-            TarjetaSesgo.BeginAnimation(SkewTransform.AngleYProperty, null);
-            TarjetaRotacion.BeginAnimation(RotateTransform.AngleProperty, null);
-            TarjetaEscala.BeginAnimation(ScaleTransform.ScaleXProperty, null);
-            TarjetaEscala.BeginAnimation(ScaleTransform.ScaleYProperty, null);
-            TarjetaT.BeginAnimation(TranslateTransform.XProperty, null);
-            TarjetaT.BeginAnimation(TranslateTransform.YProperty, null);
-
-            TarjetaSesgo.AngleX = relativoX * -5;
-            TarjetaSesgo.AngleY = relativoY * 4;
-            TarjetaRotacion.Angle = relativoX * -2.5;
-            var alejamiento = Math.Min(Math.Abs(relativoX) + Math.Abs(relativoY), 1);
-            TarjetaEscala.ScaleX = 1 - alejamiento * 0.03;
-            TarjetaEscala.ScaleY = 1 - alejamiento * 0.03;
-            TarjetaT.X = relativoX * -14;
-            TarjetaT.Y = relativoY * -12;
-        }
+        if (_movimientoReducido || _cargando || !IsActive || RaizLogin.ActualWidth <= 0 || RaizLogin.ActualHeight <= 0) return;
+        var posicion = e.GetPosition(RaizLogin);
+        FocoMouseT.X = posicion.X - RaizLogin.ActualWidth / 2;
+        FocoMouseT.Y = posicion.Y - RaizLogin.ActualHeight / 2;
+        // Al entrar en los campos, la tarjeta vuelve al plano para que escribir y seleccionar sea estable.
+        var interactuando = TarjetaAcceso.IsMouseOver || Stopwatch.GetTimestamp() < _escrituraHasta;
+        _objetivoY = interactuando ? 0 : Math.Clamp(posicion.X / RaizLogin.ActualWidth - 0.5, -0.5, 0.5) * 14;
+        _objetivoX = interactuando ? 0 : -Math.Clamp(posicion.Y / RaizLogin.ActualHeight - 0.5, -0.5, 0.5) * 10;
+        IniciarSeguimiento();
     }
 
     private void AlSalirMouse(object sender, MouseEventArgs e)
     {
-        const int duracion = 400;
-        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+        _objetivoX = _objetivoY = 0;
+        IniciarSeguimiento();
+    }
 
-        TarjetaSesgo.BeginAnimation(SkewTransform.AngleXProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
-        TarjetaSesgo.BeginAnimation(SkewTransform.AngleYProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
-        TarjetaRotacion.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
-        TarjetaEscala.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(1, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
-        TarjetaEscala.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
-        TarjetaT.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
-        TarjetaT.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(0, TimeSpan.FromMilliseconds(duracion)) { EasingFunction = easing });
+    private void AlUsarTeclado(object sender, KeyEventArgs e)
+    {
+        _escrituraHasta = Stopwatch.GetTimestamp() + Stopwatch.Frequency;
+        _objetivoX = _objetivoY = 0;
+        IniciarSeguimiento();
+    }
+
+    private void IniciarSeguimiento()
+    {
+        if (_renderizando || _movimientoReducido || _perspectiva is null || _cerrada || !IsActive) return;
+        _ultimoFotograma = Stopwatch.GetTimestamp();
+        CompositionTarget.Rendering += AlRenderizarMovimiento;
+        _renderizando = true;
+    }
+
+    private void AlRenderizarMovimiento(object? sender, EventArgs e)
+    {
+        var ahora = Stopwatch.GetTimestamp();
+        var segundos = Math.Clamp((ahora - _ultimoFotograma) / (double)Stopwatch.Frequency, 0, 0.05);
+        _ultimoFotograma = ahora;
+        var suavizado = 1 - Math.Exp(-segundos / 0.12);
+        _giroX += (_objetivoX - _giroX) * suavizado;
+        _giroY += (_objetivoY - _giroY) * suavizado;
+        if (SuperficiePerspectiva.ActualWidth > 0 && SuperficiePerspectiva.ActualHeight > 0 && _perspectiva is not null)
+        {
+            _perspectiva.Proyeccion = TransformacionPerspectiva.Crear(SuperficiePerspectiva.ActualWidth,
+                SuperficiePerspectiva.ActualHeight, _giroX, _giroY);
+            SuperficiePerspectiva.Effect = Math.Abs(_giroX) + Math.Abs(_giroY) < 0.02 ? null : _perspectiva;
+        }
+        if (Math.Abs(_objetivoX - _giroX) + Math.Abs(_objetivoY - _giroY) < 0.01) DetenerSeguimiento();
+    }
+
+    private void DetenerSeguimiento()
+    {
+        CompositionTarget.Rendering -= AlRenderizarMovimiento;
+        _renderizando = false;
+    }
+
+    private void RestablecerPerspectiva()
+    {
+        DetenerSeguimiento();
+        _giroX = _giroY = _objetivoX = _objetivoY = 0;
+        SuperficiePerspectiva.Effect = null;
+    }
+
+    private void AlCambiarMovimiento(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || _ajustandoPreferencia) return;
+        _preferenciaManualMovimiento = true;
+        ActualizarMovimiento();
+    }
+    private void AlCambiarPreferenciasSistema(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SystemParameters.ClientAreaAnimation))
+            Dispatcher.InvokeAsync(() =>
+            {
+                if (_cerrada || _preferenciaManualMovimiento) return;
+                _ajustandoPreferencia = true;
+                ReducirMovimiento.IsChecked = !SystemParameters.ClientAreaAnimation;
+                _ajustandoPreferencia = false;
+                ActualizarMovimiento();
+            });
+    }
+
+    private void ActualizarMovimiento()
+    {
+        _movimientoReducido = ReducirMovimiento.IsChecked == true;
+        var animar = !_movimientoReducido && IsActive && WindowState != WindowState.Minimized;
+        foreach (var clave in new[] { "AnimacionAurora", "AnimacionBrilloTarjeta", "AnimacionVida" })
+        {
+            var historia = (Storyboard)Resources[clave];
+            if (animar && !_cargando) historia.Begin(this, true);
+            else historia.Remove(this);
+        }
+        var carga = (Storyboard)Resources["DecoracionCarga"];
+        if (animar && _cargando) carga.Begin(this, true);
+        else carga.Remove(this);
+        Lienzo.Animando = animar && _cargando;
+        IndicadorAcceso.IsIndeterminate = animar && _cargando && _sesionConfirmada is null;
+        if (!animar)
+        {
+            RestablecerPerspectiva();
+            (Resources["AnimacionEntrada"] as Storyboard)?.Remove(this);
+            TarjetaAcceso.Opacity = _cargando ? 0 : 1;
+            TarjetaT.Y = 0;
+            TarjetaEscala.ScaleX = TarjetaEscala.ScaleY = 1;
+        }
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _cerrada = true;
+        DetenerSeguimiento();
+        Lienzo.Animando = false;
+        SystemParameters.StaticPropertyChanged -= AlCambiarPreferenciasSistema;
+        if (_viewModel is not null)
+        {
+            _viewModel.SesionIniciada -= AlConfirmarSesion;
+            _viewModel.CambioContrasenaRequerido -= AlRequerirCambioContrasena;
+        }
+        foreach (var clave in new[] { "AnimacionAurora", "AnimacionBrilloTarjeta", "AnimacionVida", "AnimacionEntrada", "DecoracionCarga" })
+            (Resources[clave] as Storyboard)?.Remove(this);
+        base.OnClosed(e);
     }
 
     // ============================ UTILIDADES ============================
 
-    private static void AnimarOpacidad(UIElement elemento, double hasta, TimeSpan duracion)
+    private void AnimarOpacidad(UIElement elemento, double hasta, TimeSpan duracion)
     {
+        if (_movimientoReducido)
+        {
+            elemento.BeginAnimation(OpacityProperty, null);
+            elemento.Opacity = hasta;
+            return;
+        }
         elemento.BeginAnimation(OpacityProperty, new DoubleAnimation(hasta, duracion)
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
