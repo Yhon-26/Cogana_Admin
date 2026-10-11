@@ -215,11 +215,13 @@ public sealed class ServicioAutenticacionSupabase(ClienteSupabaseRest cliente)
     {
         try
         {
-            using var solicitud = new HttpRequestMessage(HttpMethod.Post, "/auth/v1/logout");
+            using var solicitud = new HttpRequestMessage(HttpMethod.Post, "/auth/v1/logout?scope=local");
             using var respuesta = await cliente.EnviarAsync(solicitud, cancellationToken);
         }
         finally
         {
+            _sesionCambio = null;
+            _cambioInicial = false;
             cliente.LimpiarTokenAcceso();
         }
     }

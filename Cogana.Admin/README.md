@@ -23,6 +23,14 @@ Para comprobar geometría, renderizado, interacción y estados de acceso sin con
 - `Cogana.Admin.Infraestructura`: conexión con Supabase y servicios externos.
 - `Cogana.Admin.Escritorio`: interfaz WPF y ViewModels.
 
+## Panel de inicio y sesión
+
+El menú izquierdo permite abrir un módulo con un clic o arrastrarlo al Inicio para agregar su tarjeta. Al comenzar el arrastre desde otro módulo aparece el Inicio; cancelar devuelve la selección anterior. No hay una bandeja duplicada de selecciones. Las tarjetas conservan su orden guardado, se reordenan desde la cabecera y se quitan con ✕; agregar un módulo existente no crea duplicados.
+
+**Cerrar sesión**, debajo de la cuenta, elimina el acceso local y solicita el cierre de la sesión de este escritorio con alcance `local`. Vuelve al login sin cerrar la aplicación, con servicios nuevos. Conserva Recordar cuenta si el usuario lo eligió, pero no inicia sesión automáticamente. Un fallo de conexión también elimina los tokens locales. El ciclo real de ventanas, la salida normal, el fallo de red y la renovación pendiente se verifican con servicios de prueba; no equivale a comprobar una cuenta de producción.
+
+Para una ventana aislada del panel: `dotnet run --project Pruebas/Login/Login.csproj -c Release -- --panel-visual`. No carga datos ni modifica la disposición real del usuario.
+
 ## Configuración local
 
 La aplicación lee dos variables de entorno:

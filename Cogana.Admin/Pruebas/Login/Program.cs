@@ -42,7 +42,7 @@ internal static class Program
         var derecha = (lateral.Transform(new Point(1, 1)) - lateral.Transform(new Point(1, 0))).Length;
         Verificar(Math.Abs(izquierda - derecha) > 0.03, "Perspectiva real: los lados cercanos y lejanos tienen distinta longitud");
 
-        var aplicacion = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+        var aplicacion = new Cogana.Admin.Escritorio.App { ShutdownMode = ShutdownMode.OnExplicitShutdown };
         // Carga únicamente los recursos; nunca ejecuta App.OnStartup ni crea clientes reales de Supabase.
         XNamespace espacio = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
         var documento = XDocument.Load(System.IO.Path.Combine(AppContext.BaseDirectory, "RecursosAplicacion.xaml"));
@@ -103,6 +103,7 @@ internal static class Program
             ProbarAlmacenWindows(Verificar);
             ProbarEstadosAcceso(Verificar);
             ProbarRecuperacion(Verificar);
+            PruebasPanel.Probar(Verificar, args.Contains("--panel-visual"));
             Console.WriteLine($"{cantidad} verificaciones totales correctas, sin conexión a Supabase.");
         }
     }

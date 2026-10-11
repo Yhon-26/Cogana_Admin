@@ -152,12 +152,54 @@ public partial class MainWindow : Window
 
     private const string FormatoArrastreModulo = "modulo-cogana";
     private Point? _inicioArrastreModulo;
+    private ListBoxItem? _opcionPresionada;
+
+    public Func<Task>? CerrarSesionSolicitado { get; set; }
+    private bool _cerrandoSesion;
+    private async void AlCerrarSesion(object sender, RoutedEventArgs e)
+    {
+        if (_cerrandoSesion || CerrarSesionSolicitado is null) return;
+        _cerrandoSesion = true;
+        IsEnabled = false;
+        BotonCerrarSesion.Content = "Cerrando sesión…";
+        try { await CerrarSesionSolicitado(); }
+        finally
+        {
+            _cerrandoSesion = false;
+            IsEnabled = true;
+            BotonCerrarSesion.Content = "Cerrar sesión";
+        }
+    }
+
+    private void AlSoltarOpcionMenu(object sender, MouseButtonEventArgs e)
+    {
+        if (_opcionPresionada is not { } opcion) return;
+        _opcionPresionada = null;
+        _inicioArrastreModulo = null;
+        opcion.ReleaseMouseCapture();
+        var posicion = e.GetPosition(opcion);
+        if (posicion.X >= 0 && posicion.Y >= 0 && posicion.X <= opcion.ActualWidth && posicion.Y <= opcion.ActualHeight)
+        {
+            opcion.IsSelected = true;
+            opcion.Focus();
+        }
+        e.Handled = true;
+    }
+
+    private void AlPerderCapturaMenu(object sender, MouseEventArgs e)
+    {
+        _opcionPresionada = null;
+        _inicioArrastreModulo = null;
+    }
 
     private void AlPresionarOpcionPanel(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left)
         {
             _inicioArrastreModulo = e.GetPosition(this);
+            _opcionPresionada = sender as ListBoxItem;
+            _opcionPresionada?.CaptureMouse();
+            e.Handled = true;
         }
     }
 
@@ -165,7 +207,7 @@ public partial class MainWindow : Window
     {
         if (e.LeftButton != MouseButtonState.Pressed ||
             _inicioArrastreModulo is not Point inicio ||
-            sender is not Button { Tag: string nombreModulo } boton)
+            sender is not ListBoxItem { DataContext: ModuloAdministrativo modulo } opcion)
         {
             _inicioArrastreModulo = null;
             return;
@@ -178,14 +220,22 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (modulo.Nombre == "Inicio") return;
         _inicioArrastreModulo = null;
+        _opcionPresionada = null;
+        opcion.ReleaseMouseCapture();
+        if (DataContext is not VentanaPrincipalViewModel viewModel) return;
+        var anterior = viewModel.ModuloSeleccionado;
+        viewModel.ModuloSeleccionado = viewModel.Modulos[0];
+        UpdateLayout();
 
         try
         {
-            DragDrop.DoDragDrop(
-                boton,
-                new DataObject(FormatoArrastreModulo, nombreModulo),
+            var resultado = DragDrop.DoDragDrop(
+                opcion,
+                new DataObject(FormatoArrastreModulo, modulo.Nombre),
                 DragDropEffects.Copy);
+            if (resultado == DragDropEffects.None) viewModel.ModuloSeleccionado = anterior;
         }
         finally
         {
@@ -201,8 +251,8 @@ public partial class MainWindow : Window
         }
 
         e.Effects = DragDropEffects.Copy;
-        ZonaDestinoWidgets.Background = new SolidColorBrush(Color.FromArgb(18, 75, 126, 112));
-        ZonaDestinoWidgets.BorderBrush = (Brush)FindResource("BrochaAcento");
+        ZonaDestinoWidgets.Background = new SolidColorBrush(Color.FromArgb(12, 0, 0, 0));
+        ZonaDestinoWidgets.BorderBrush = (Brush)FindResource("BrochaNegro");
         AvisoDestinoWidgets.Visibility = Visibility.Visible;
         e.Handled = true;
     }
@@ -240,15 +290,6 @@ public partial class MainWindow : Window
         ZonaDestinoWidgets.Background = Brushes.Transparent;
         ZonaDestinoWidgets.BorderBrush = Brushes.Transparent;
         AvisoDestinoWidgets.Visibility = Visibility.Collapsed;
-    }
-
-    private void AlAgregarDesdeSelector(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button { Tag: string nombreModulo } &&
-            DataContext is VentanaPrincipalViewModel viewModel)
-        {
-            viewModel.AgregarWidgetPorNombre(nombreModulo);
-        }
     }
 
     private void AlQuitarWidget(object sender, RoutedEventArgs e)

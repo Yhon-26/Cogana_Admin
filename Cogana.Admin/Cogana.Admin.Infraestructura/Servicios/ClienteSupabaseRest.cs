@@ -11,6 +11,7 @@ public sealed class ClienteSupabaseRest : IDisposable
     private readonly HttpClient _httpClient;
     private readonly SemaphoreSlim _renovando = new(1, 1);
     private string? _tokenRenovacion;
+    private long _versionSesion;
 
     public ClienteSupabaseRest(ConfiguracionSupabase configuracion, HttpMessageHandler? manejador = null)
     {
@@ -40,12 +41,14 @@ public sealed class ClienteSupabaseRest : IDisposable
     /// <summary>Guarda el par de tokens para poder renovar la sesión al expirar.</summary>
     public void EstablecerSesion(string tokenAcceso, string tokenRenovacion)
     {
+        Interlocked.Increment(ref _versionSesion);
         _tokenRenovacion = string.IsNullOrWhiteSpace(tokenRenovacion) ? null : tokenRenovacion;
         EstablecerTokenAcceso(tokenAcceso);
     }
 
     public void LimpiarTokenAcceso()
     {
+        Interlocked.Increment(ref _versionSesion);
         _tokenRenovacion = null;
         _httpClient.DefaultRequestHeaders.Authorization = null;
     }
@@ -92,6 +95,8 @@ public sealed class ClienteSupabaseRest : IDisposable
         await _renovando.WaitAsync(cancellationToken);
         try
         {
+            var version = Interlocked.Read(ref _versionSesion);
+            if (string.IsNullOrWhiteSpace(_tokenRenovacion)) return false;
             using var solicitud = new HttpRequestMessage(
                 HttpMethod.Post, "/auth/v1/token?grant_type=refresh_token");
             solicitud.Content = JsonContent.Create(new { refresh_token = _tokenRenovacion });
@@ -103,7 +108,7 @@ public sealed class ClienteSupabaseRest : IDisposable
 
             var sesion = await respuesta.Content
                 .ReadFromJsonAsync<RespuestaRenovacion>(cancellationToken: cancellationToken);
-            if (string.IsNullOrWhiteSpace(sesion?.TokenAcceso))
+            if (version != Interlocked.Read(ref _versionSesion) || string.IsNullOrWhiteSpace(sesion?.TokenAcceso))
             {
                 return false;
             }
@@ -146,7 +151,7 @@ public sealed class ClienteSupabaseRest : IDisposable
 
     public void Dispose()
     {
-        _renovando.Dispose();
+        LimpiarTokenAcceso();
         _httpClient.Dispose();
     }
 

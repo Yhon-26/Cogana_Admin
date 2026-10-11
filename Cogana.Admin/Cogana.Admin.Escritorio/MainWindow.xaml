@@ -168,6 +168,12 @@
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="AlPresionarOpcionPanel" />
+                            <EventSetter Event="PreviewMouseMove" Handler="AlMoverOpcionPanel" />
+                            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="AlSoltarOpcionMenu" />
+                            <EventSetter Event="LostMouseCapture" Handler="AlPerderCapturaMenu" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="ToolTip" Value="Haz clic para abrir. Arrastra al Inicio para agregar una tarjeta." />
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             <Setter Property="Padding" Value="0" />
                             <Setter Property="Margin" Value="0,2" />
@@ -218,7 +224,8 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <Border Grid.Row="3" Background="White" CornerRadius="18" Padding="14" Margin="0,14,0,0">
+                <StackPanel Grid.Row="3">
+                <Border Background="White" CornerRadius="18" Padding="14" Margin="0,14,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="38" />
@@ -234,6 +241,10 @@
                         </StackPanel>
                     </Grid>
                 </Border>
+                    <Button x:Name="BotonCerrarSesion" Content="Cerrar sesión" Click="AlCerrarSesion"
+                            Style="{StaticResource BotonSecundario}" Margin="0,8,0,0"
+                            HorizontalContentAlignment="Center" ToolTip="Cerrar esta sesión y volver al acceso" />
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -340,54 +351,11 @@
 
                         <Grid>
                             <StackPanel>
-                                <TextBlock Text="Secciones del panel" FontSize="19" FontWeight="SemiBold" />
-                                <TextBlock Text="Arrastra una opción de la bandeja al panel o haz clic para agregarla. Reordena las tarjetas desde su cabecera y quítalas con ✕."
+                                <TextBlock Text="Tu panel" FontSize="19" FontWeight="SemiBold" />
+                                <TextBlock Text="Arrastra un módulo del menú izquierdo para agregarlo aquí. Reordena las tarjetas desde su cabecera y quítalas con ✕."
                                            FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" Margin="0,5,0,0" TextWrapping="Wrap" />
                             </StackPanel>
                         </Grid>
-
-                        <Border Grid.Row="1"
-                                Background="{StaticResource BrochaSuperficie}"
-                                BorderBrush="{StaticResource BrochaBorde}"
-                                BorderThickness="1"
-                                CornerRadius="16"
-                                Padding="14,12"
-                                Margin="0,14,0,0">
-                            <Grid>
-                                <ItemsControl ItemsSource="{Binding ModulosDisponiblesParaAgregar}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Button Content="{Binding Nombre}" Tag="{Binding Nombre}"
-                                                    Click="AlAgregarDesdeSelector"
-                                                    PreviewMouseLeftButtonDown="AlPresionarOpcionPanel"
-                                                    PreviewMouseMove="AlMoverOpcionPanel"
-                                                    Cursor="Hand"
-                                                    ToolTip="Arrastra al panel o haz clic para agregar"
-                                                    Style="{StaticResource BotonSecundario}" Margin="0,0,8,8" />
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <TextBlock Text="Todas las secciones disponibles ya están en el panel."
-                                           HorizontalAlignment="Center" FontSize="11"
-                                           Foreground="{StaticResource BrochaTextoSuave}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HayModulosParaAgregar}" Value="False">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                        </Border>
 
                         <Border Grid.Row="2"
                                 x:Name="ZonaDestinoWidgets"
@@ -552,7 +520,7 @@
                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <TextBlock Text="El panel está vacío" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,12,0,0" />
-                            <TextBlock Text="Arrastra aquí una opción de la bandeja superior o haz clic para agregarla."
+                            <TextBlock Text="Arrastra aquí un módulo del menú izquierdo."
                                        FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" HorizontalAlignment="Center" Margin="0,5,0,0" />
                         </StackPanel>
                                 <Border x:Name="AvisoDestinoWidgets"

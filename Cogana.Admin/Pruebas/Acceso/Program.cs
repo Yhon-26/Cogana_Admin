@@ -74,6 +74,30 @@ manejador.ErrorRedMembresia = true;
 ingreso = await servicio.IniciarSesionAsync("admin@example.test", "Segura1!");
 await cliente.ObtenerAsync("/comprobar");
 Comprobar(!ingreso.EsExitoso && manejador.Solicitudes.Last().Autorizacion is null, "Error de red al comprobar permisos elimina tokens");
+manejador.ErrorRedMembresia = false;
+await servicio.IniciarSesionAsync("admin@example.test", "Segura1!");
+await servicio.CerrarSesionAsync();
+Comprobar(manejador.UltimaSalida?.Query == "?scope=local", "Cerrar sesión limita el alcance a este dispositivo");
+await cliente.ObtenerAsync("/comprobar");
+Comprobar(manejador.Solicitudes.Last().Autorizacion is null, "Cerrar sesión elimina la autorización local");
+Comprobar((await servicio.IniciarSesionAsync("admin@example.test", "Segura1!")).Sesion is not null, "Permite otro ingreso después de cerrar sesión");
+manejador.FalloSalida = true;
+try { await servicio.CerrarSesionAsync(); } catch (HttpRequestException) { }
+await cliente.ObtenerAsync("/comprobar");
+Comprobar(manejador.Solicitudes.Last().Autorizacion is null, "Un fallo de red no conserva el acceso local");
+manejador.FalloSalida = false;
+await servicio.VerificarRecuperacionAsync("admin@example.test", enlace);
+await servicio.CerrarSesionAsync();
+Comprobar(!(await servicio.CambiarContrasenaAsync("NuevaClaveSegura1!")).EsExitoso, "Cerrar sesión elimina también el acceso de recuperación pendiente");
+cliente.EstablecerSesion("acceso-antiguo", "renovacion-antigua");
+manejador.BloquearRenovacion = true;
+var consultaPendiente = cliente.ObtenerAsync("/renovar-prueba");
+await manejador.RenovacionIniciada.Task;
+cliente.LimpiarTokenAcceso();
+manejador.ContinuarRenovacion.SetResult();
+using var respuestaPendiente = await consultaPendiente;
+await cliente.ObtenerAsync("/comprobar");
+Comprobar(manejador.Solicitudes.Last().Autorizacion is null, "Una renovación en curso no restaura una sesión cerrada");
 Console.WriteLine($"{total} comprobaciones correctas; ninguna usa producción ni envía correos.");
 
 sealed class ServidorSimulado : HttpMessageHandler
@@ -83,13 +107,29 @@ sealed class ServidorSimulado : HttpMessageHandler
     public bool MarcaEnUsuario { get; set; }
     public bool Expirado { get; set; }
     public bool MembresiaActiva { get; set; } = true;
+    public bool BloquearRenovacion { get; set; }
+    public TaskCompletionSource RenovacionIniciada { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    public TaskCompletionSource ContinuarRenovacion { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    public Uri? UltimaSalida { get; private set; }
+    public bool FalloSalida { get; set; }
     public bool FalloCambio { get; set; }
     public bool ErrorRedMembresia { get; set; }
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage solicitud, CancellationToken cancellationToken)
     {
         var ruta = solicitud.RequestUri!.AbsolutePath;
+        if (ruta == "/auth/v1/logout")
+        {
+            UltimaSalida = solicitud.RequestUri;
+            if (FalloSalida) throw new HttpRequestException("Fallo de salida simulado");
+        }
         var cuerpo = solicitud.Content is null ? "" : await solicitud.Content.ReadAsStringAsync(cancellationToken);
         Solicitudes.Add((solicitud.Method.Method, ruta, cuerpo, solicitud.Headers.Authorization?.Parameter));
+        if (ruta == "/renovar-prueba") return new(HttpStatusCode.Unauthorized);
+        if (BloquearRenovacion && ruta == "/auth/v1/token" && solicitud.RequestUri.Query.Contains("refresh_token"))
+        {
+            RenovacionIniciada.SetResult();
+            await ContinuarRenovacion.Task;
+        }
         object contenido = new { };
         var estado = HttpStatusCode.OK;
         if (ruta is "/auth/v1/token" or "/auth/v1/verify")

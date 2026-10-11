@@ -44,7 +44,6 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
     private InfoActualizacionDisponible? _actualizacionPendiente;
     private string _mensajeActualizacion = string.Empty;
     private string _textoBotonActualizacion = "Buscar actualizaciones";
-    private bool _selectorSeccionesVisible;
 
     public VentanaPrincipalViewModel(
         IServicioEstadoBackend servicioEstadoBackend,
@@ -108,23 +107,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         : _sesion.Correo[..Math.Min(2, _sesion.Correo.Length)].ToUpperInvariant();
     public string VersionActual => _servicioActualizaciones.VersionActual;
     public bool TieneWidgetsInicio => WidgetsInicio.Count > 0;
-    public bool HayModulosParaAgregar => ModulosDisponiblesParaAgregar.Count > 0;
-
-    public List<ModuloAdministrativo> ModulosDisponiblesParaAgregar =>
-        Modulos
-            .Where(modulo => modulo.Nombre != "Inicio" &&
-                             WidgetsInicio.All(widget => widget.Nombre != modulo.Nombre))
-            .ToList();
-
-    public bool SelectorSeccionesVisible
-    {
-        get => _selectorSeccionesVisible;
-        set => Establecer(ref _selectorSeccionesVisible, value);
-    }
-
-    public void AlternarSelectorSecciones() => SelectorSeccionesVisible = !SelectorSeccionesVisible;
-
-    /// <summary>Añade un módulo como sección del panel (desde arrastre o selector).</summary>
+    /// <summary>Añade un módulo como sección del panel desde el menú izquierdo.</summary>
     public void AgregarWidgetPorNombre(string nombreModulo)
     {
         if (string.IsNullOrWhiteSpace(nombreModulo) || nombreModulo == "Inicio")
@@ -146,10 +129,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         var widget = new WidgetInicioViewModel(modulo.Nombre, modulo.Inicial);
         widget.QuitarSolicitado += QuitarWidget;
         WidgetsInicio.Add(widget);
-        SelectorSeccionesVisible = false;
 
-        Notificar(nameof(ModulosDisponiblesParaAgregar));
-        Notificar(nameof(HayModulosParaAgregar));
         Notificar(nameof(TieneWidgetsInicio));
         GuardarWidgets();
 
@@ -161,8 +141,6 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         if (WidgetsInicio.Remove(widget))
         {
             widget.QuitarSolicitado -= QuitarWidget;
-            Notificar(nameof(ModulosDisponiblesParaAgregar));
-            Notificar(nameof(HayModulosParaAgregar));
             Notificar(nameof(TieneWidgetsInicio));
             GuardarWidgets();
         }

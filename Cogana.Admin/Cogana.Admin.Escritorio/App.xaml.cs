@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Net.Http;
 using Cogana.Admin.Aplicacion.Contratos;
 using Cogana.Admin.Aplicacion.Modelos;
 using Cogana.Admin.Escritorio.ViewModels;
@@ -27,6 +28,9 @@ public partial class App : Application
     private ServicioImagenesProducto? _servicioImagenes;
     private IServicioPanelInicio? _servicioPanelInicio;
     private VentanaInicioSesion? _ventanaInicioSesion;
+    private IServicioAutenticacion? _servicioAutenticacion;
+    private readonly List<ClienteSupabaseRest> _clientesAnteriores = [];
+    private ConfiguracionSupabase? _configuracionSupabase;
 
     [STAThread]
     private static void Main(string[] args)
@@ -41,8 +45,12 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        MostrarInicioSesion();
+    }
 
-        var configuracion = ConfiguracionSupabase.DesdeVariablesDeEntorno();
+    private void MostrarInicioSesion()
+    {
+        var configuracion = _configuracionSupabase ??= ConfiguracionSupabase.DesdeVariablesDeEntorno();
         _clienteSupabase = new ClienteSupabaseRest(configuracion);
         _servicioEstado = new ServicioEstadoBackend(_clienteSupabase);
         _servicioResumenInicio = new ServicioResumenInicioSupabase(_clienteSupabase);
@@ -58,8 +66,8 @@ public partial class App : Application
         _servicioActualizaciones = new ServicioActualizacionesVelopack();
         _servicioImagenes = new ServicioImagenesProducto(_clienteSupabase, configuracion);
         _servicioPanelInicio = new ServicioPanelInicioArchivo();
-        var servicioAutenticacion = new ServicioAutenticacionSupabase(_clienteSupabase);
-        var viewModel = new InicioSesionViewModel(servicioAutenticacion);
+        _servicioAutenticacion = new ServicioAutenticacionSupabase(_clienteSupabase);
+        var viewModel = new InicioSesionViewModel(_servicioAutenticacion);
 
         var cuentaRecordada = configuracion.Url is null ? null :
             new CuentaRecordadaWindows($"CoganaAdmin:Acceso:{configuracion.Url.GetLeftPart(UriPartial.Authority)}");
@@ -113,6 +121,29 @@ public partial class App : Application
             TiendaId = sesion.TiendaId
         };
 
+        panel.CerrarSesionSolicitado = async () =>
+        {
+            if (panel.OwnedWindows.Count > 0) return;
+            using var limite = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            try
+            {
+                if (_servicioAutenticacion is not null)
+                    await _servicioAutenticacion.CerrarSesionAsync(limite.Token);
+            }
+            catch (Exception error) when (error is HttpRequestException or OperationCanceledException)
+            {
+                // Sin conexión también se elimina el acceso local al panel.
+            }
+            if (_clienteSupabase is { } anterior)
+            {
+                anterior.LimpiarTokenAcceso();
+                // Deja finalizar las consultas en curso sin reutilizar su cliente en el login.
+                _clientesAnteriores.Add(anterior);
+            }
+            // Cada ingreso usa servicios nuevos; ninguna consulta anterior comparte su sesión.
+            MostrarInicioSesion();
+            panel.Close();
+        };
         MainWindow = panel;
         panel.Show();
 
@@ -127,6 +158,7 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _clienteSupabase?.Dispose();
+        foreach (var anterior in _clientesAnteriores) anterior.Dispose();
         base.OnExit(e);
     }
 }
