@@ -11,6 +11,7 @@ using Cogana.Admin.Aplicacion.Modelos;
 using Cogana.Admin.Escritorio.ViewModels;
 using Cogana.Admin.Escritorio.Vistas;
 using Cogana.Admin.Escritorio.Controles;
+using Cogana.Admin.Escritorio.Servicios;
 
 internal static class Program
 {
@@ -59,6 +60,10 @@ internal static class Program
         contenido.Children.Add(texto);
         contenido.Children.Add(boton);
         contenido.Children.Add(mensaje);
+        var estilos = new VentanaInicioSesion();
+        var enlacePrueba = new Button { Content = "¿Olvidaste tu contraseña?", FontSize = 12,
+            Style = (Style)estilos.Resources["EnlaceRecuperacion"], HorizontalAlignment = HorizontalAlignment.Center };
+        contenido.Children.Add(new Border { Background = Brushes.White, CornerRadius = new CornerRadius(8), Margin = new Thickness(24, 8, 24, 24), Child = enlacePrueba });
         superficie.Children.Add(new Border { Margin = new Thickness(24), Background = new SolidColorBrush(Color.FromRgb(20, 40, 34)),
             CornerRadius = new CornerRadius(26), BorderBrush = Brushes.MediumSeaGreen, BorderThickness = new Thickness(1), Child = contenido });
         var efecto = new EfectoPerspectivaTarjeta { Proyeccion = TransformacionPerspectiva.Crear(472, 540, 5, 7) };
@@ -95,6 +100,7 @@ internal static class Program
         else
         {
             ventana.Close();
+            ProbarAlmacenWindows(Verificar);
             ProbarEstadosAcceso(Verificar);
             Console.WriteLine($"{cantidad} verificaciones totales correctas, sin conexión a Supabase.");
         }
@@ -113,7 +119,8 @@ internal static class Program
     {
         var servicio = new AutenticacionSimulada();
         var vm = new InicioSesionViewModel(servicio) { Correo = "admin@example.test" };
-        var acceso = new VentanaInicioSesion { DataContext = vm };
+        var cuenta = new CuentaSimulada();
+        var acceso = new VentanaInicioSesion(cuenta) { DataContext = vm };
         var confirmaciones = 0;
         acceso.AccesoConfirmado += _ => confirmaciones++;
         acceso.Show();
@@ -122,9 +129,10 @@ internal static class Program
         var carga = (Grid)acceso.FindName("PantallaCarga");
         var paso = (TextBlock)acceso.FindName("TextoPaso");
         var indicador = (ProgressBar)acceso.FindName("IndicadorAcceso");
-        var movimiento = (CheckBox)acceso.FindName("ReducirMovimiento");
+        var recordar = (CheckBox)acceso.FindName("RecordarCuenta");
         var iniciar = typeof(VentanaInicioSesion).GetMethod("AlIniciarSesion", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        movimiento.IsChecked = true;
+        verificar(acceso.FindName("ReducirMovimiento") is null, "El login no muestra la opción de reducir movimiento");
+        verificar(!recordar.IsChecked.GetValueOrDefault(), "Recordar cuenta comienza desmarcado");
         acceso.Width = acceso.MinWidth;
         acceso.Height = acceso.MinHeight;
         acceso.UpdateLayout();
@@ -137,12 +145,13 @@ internal static class Program
         iniciar.Invoke(acceso, new object[] { acceso, new RoutedEventArgs() });
         Esperar(50);
         verificar(carga.Visibility == Visibility.Visible && confirmaciones == 0, "Una solicitud pendiente no abre el panel");
-        verificar(!indicador.IsIndeterminate && paso.Text.Contains("Verificando"), "Movimiento reducido mantiene un estado textual legible");
-        Capturar(acceso, "login-carga.png");
-        movimiento.IsChecked = false;
+        verificar(paso.Text.Contains("Verificando"), "La espera muestra un estado textual real");
+        recordar.IsChecked = true;
         acceso.Activate();
         Esperar(100);
-        verificar(indicador.IsIndeterminate == acceso.IsActive, "La elección explícita de movimiento permite progreso indeterminado sin porcentaje ficticio");
+        Esperar(300);
+        Capturar(acceso, "login-carga.png");
+        verificar(indicador.IsIndeterminate == acceso.IsActive, "El movimiento se activa sin un control adicional");
         acceso.WindowState = WindowState.Minimized;
         Esperar(80);
         verificar(!indicador.IsIndeterminate && !((LienzoParticulas)acceso.FindName("Lienzo")).Animando, "Minimizar pausa el indicador y las partículas");
@@ -157,6 +166,7 @@ internal static class Program
         verificar(carga.Visibility == Visibility.Collapsed && confirmaciones == 0, "Un error vuelve al formulario sin confirmar acceso");
         verificar(campo.Password.Length == 0 && vm.Mensaje.Contains("rechazadas"), "Borra la contraseña y conserva el mensaje de error");
         verificar(paso.Text != "Bienvenido al sistema", "El error nunca muestra bienvenida");
+        verificar(cuenta.Cuenta is null, "Un acceso rechazado nunca guarda la contraseña");
         vm.Correo = "invalido";
         campo.Password = "ClaveFicticiaDePrueba";
         iniciar.Invoke(acceso, new object[] { acceso, new RoutedEventArgs() });
@@ -169,13 +179,114 @@ internal static class Program
         Esperar(500);
         verificar(confirmaciones == 1 && paso.Text == "Bienvenido al sistema", "Solo una sesión válida completa la transición");
         verificar(!indicador.IsIndeterminate && indicador.Value == 100, "La confirmación termina el indicador sin medir tiempos inventados");
+        verificar(cuenta.Cuenta?.Correo == vm.Correo && cuenta.Cuenta.Contrasena == "ClaveFicticiaDePrueba", "Solo el acceso válido y elegido guarda la cuenta");
         acceso.Close();
+
+        var vmRestaurado = new InicioSesionViewModel(new AutenticacionSimulada());
+        var siguiente = new VentanaInicioSesion(cuenta) { DataContext = vmRestaurado };
+        var aperturas = 0;
+        siguiente.AccesoConfirmado += _ => aperturas++;
+        siguiente.Show();
+        Esperar(750);
+        var campoRestaurado = (PasswordBox)siguiente.FindName("CampoContrasena");
+        var opcionRestaurada = (CheckBox)siguiente.FindName("RecordarCuenta");
+        verificar(vmRestaurado.Correo == "admin@example.test" && campoRestaurado.Password == "ClaveFicticiaDePrueba" && opcionRestaurada.IsChecked == true, "El siguiente ingreso rellena correo y contraseña protegida");
+        verificar(aperturas == 0, "Recordar cuenta no inicia sesión ni omite comprobar permisos");
+        vmRestaurado.Correo = "otra@example.test";
+        Esperar(50);
+        verificar(campoRestaurado.Password.Length == 0, "Cambiar de correo elimina la contraseña de la cuenta anterior del formulario");
+        opcionRestaurada.IsChecked = false;
+        verificar(cuenta.Cuenta is null, "Desmarcar recordar elimina la credencial guardada");
+        siguiente.Close();
+
+        var vmSinRecuerdo = new InicioSesionViewModel(servicio) { Correo = "admin@example.test" };
+        var sinRecuerdo = new VentanaInicioSesion(cuenta) { DataContext = vmSinRecuerdo };
+        sinRecuerdo.Show();
+        Esperar(750);
+        ((PasswordBox)sinRecuerdo.FindName("CampoContrasena")).Password = "ClaveFicticiaDePrueba";
+        servicio.Respuesta = new();
+        iniciar.Invoke(sinRecuerdo, new object[] { sinRecuerdo, new RoutedEventArgs() });
+        servicio.Respuesta.SetResult(ResultadoInicioSesion.Correcto(new SesionUsuario(Guid.NewGuid(), vmSinRecuerdo.Correo,
+            "token-ficticio", "renovacion-ficticia", Guid.NewGuid(), "admin")));
+        Esperar(500);
+        verificar(cuenta.Cuenta is null, "Ingresar sin marcar recordar no persiste la contraseña");
+        sinRecuerdo.Close();
+
+        cuenta.Guardar("admin@example.test", "ClaveFicticiaDePrueba");
+        cuenta.RechazarEliminacion = true;
+        var errorAlOlvidar = new VentanaInicioSesion(cuenta) { DataContext = new InicioSesionViewModel(servicio) };
+        errorAlOlvidar.Show();
+        Esperar(750);
+        var opcionError = (CheckBox)errorAlOlvidar.FindName("RecordarCuenta");
+        opcionError.IsChecked = false;
+        verificar(opcionError.IsChecked == true && ((TextBlock)errorAlOlvidar.FindName("AvisoCuenta")).Text.Contains("eliminar"), "Si Windows rechaza eliminar, conserva la opción y muestra el problema");
+        errorAlOlvidar.Close();
+
+        cuenta.RechazarEliminacion = false;
+        cuenta.Olvidar();
+        cuenta.RechazarGuardado = true;
+        var vmErrorGuardado = new InicioSesionViewModel(servicio) { Correo = "admin@example.test" };
+        var errorAlGuardar = new VentanaInicioSesion(cuenta) { DataContext = vmErrorGuardado };
+        var accesosConErrorGuardado = 0;
+        errorAlGuardar.AccesoConfirmado += _ => accesosConErrorGuardado++;
+        errorAlGuardar.Show();
+        Esperar(750);
+        ((CheckBox)errorAlGuardar.FindName("RecordarCuenta")).IsChecked = true;
+        ((PasswordBox)errorAlGuardar.FindName("CampoContrasena")).Password = "ClaveFicticiaDePrueba";
+        servicio.Respuesta = new();
+        iniciar.Invoke(errorAlGuardar, new object[] { errorAlGuardar, new RoutedEventArgs() });
+        servicio.Respuesta.SetResult(ResultadoInicioSesion.Correcto(new SesionUsuario(Guid.NewGuid(), vmErrorGuardado.Correo,
+            "token-ficticio", "renovacion-ficticia", Guid.NewGuid(), "admin")));
+        Esperar(1700);
+        verificar(accesosConErrorGuardado == 1 && cuenta.Cuenta is null, "Una falla del almacén informa el problema y permite el acceso válido");
+        errorAlGuardar.Close();
+    }
+
+    private static void ProbarAlmacenWindows(Action<bool, string> verificar)
+    {
+        // Destino aislado: jamás consulta ni modifica la cuenta real del usuario.
+        var destino = "CoganaAdmin:Prueba:" + Guid.NewGuid();
+        var almacen = new CuentaRecordadaWindows(destino);
+        try
+        {
+            verificar(almacen.Leer() is null, "Una cuenta no guardada devuelve vacío");
+            almacen.Guardar("prueba@example.test", "ClaveFicticia-á漢🙂");
+            var leida = new CuentaRecordadaWindows(destino).Leer();
+            verificar(leida?.Correo == "prueba@example.test" && leida.Contrasena == "ClaveFicticia-á漢🙂", "Windows conserva la credencial Unicode entre instancias");
+            verificar(!leida!.ToString().Contains("ClaveFicticia"), "La representación de la cuenta no expone su contraseña");
+            almacen.Guardar("otra@example.test", "OtraClaveFicticia");
+            verificar(almacen.Leer()?.Correo == "otra@example.test", "Guardar otra cuenta reemplaza la anterior");
+            almacen.Olvidar();
+            verificar(almacen.Leer() is null, "Olvidar borra la credencial de Windows");
+            almacen.Olvidar();
+            verificar(almacen.Leer() is null, "Olvidar una cuenta ya eliminada es seguro");
+        }
+        finally { almacen.Olvidar(); }
+    }
+
+    private sealed class CuentaSimulada : ICuentaRecordada
+    {
+        public CuentaRecordada? Cuenta { get; private set; }
+        public bool RechazarEliminacion { get; set; }
+        public bool RechazarGuardado { get; set; }
+        public CuentaRecordada? Leer() => Cuenta;
+        public void Guardar(string correo, string contrasena)
+        {
+            if (RechazarGuardado) throw new System.ComponentModel.Win32Exception(5);
+            Cuenta = new(correo, contrasena);
+        }
+        public void Olvidar()
+        {
+            if (RechazarEliminacion) throw new System.ComponentModel.Win32Exception(5);
+            Cuenta = null;
+        }
     }
 
     private static void Capturar(Window ventana, string nombre)
     {
-        var imagen = new RenderTargetBitmap((int)ventana.ActualWidth, (int)ventana.ActualHeight, 96, 96, PixelFormats.Pbgra32);
-        imagen.Render(ventana);
+        var contenido = (FrameworkElement)ventana.Content;
+        var imagen = new RenderTargetBitmap((int)contenido.ActualWidth, (int)contenido.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+        imagen.Render(contenido);
         var png = new PngBitmapEncoder();
         png.Frames.Add(BitmapFrame.Create(imagen));
         using var archivo = System.IO.File.Create(System.IO.Path.Combine(AppContext.BaseDirectory, nombre));

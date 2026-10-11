@@ -16,11 +16,9 @@ public sealed class LienzoParticulas : FrameworkElement
 
     private static readonly Color[] PaletaColores =
     [
-        Color.FromRgb(0x4A, 0xDE, 0x80),
-        Color.FromRgb(0x22, 0xD3, 0xEE),
-        Color.FromRgb(0x81, 0x8C, 0xF8),
-        Color.FromRgb(0x34, 0xD3, 0x99),
-        Color.FromRgb(0x60, 0xA5, 0xFA)
+        Color.FromRgb(0x44, 0x44, 0x44),
+        Color.FromRgb(0x60, 0x60, 0x60),
+        Color.FromRgb(0x80, 0x80, 0x80)
     ];
 
     private sealed class Particula

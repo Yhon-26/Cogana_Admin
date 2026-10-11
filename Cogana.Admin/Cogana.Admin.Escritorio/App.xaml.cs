@@ -3,6 +3,7 @@ using Cogana.Admin.Aplicacion.Contratos;
 using Cogana.Admin.Aplicacion.Modelos;
 using Cogana.Admin.Escritorio.ViewModels;
 using Cogana.Admin.Escritorio.Vistas;
+using Cogana.Admin.Escritorio.Servicios;
 using Cogana.Admin.Infraestructura.Configuracion;
 using Cogana.Admin.Infraestructura.Servicios;
 using Velopack;
@@ -60,7 +61,9 @@ public partial class App : Application
         var servicioAutenticacion = new ServicioAutenticacionSupabase(_clienteSupabase);
         var viewModel = new InicioSesionViewModel(servicioAutenticacion);
 
-        _ventanaInicioSesion = new VentanaInicioSesion
+        var cuentaRecordada = configuracion.Url is null ? null :
+            new CuentaRecordadaWindows($"CoganaAdmin:Acceso:{configuracion.Url.GetLeftPart(UriPartial.Authority)}");
+        _ventanaInicioSesion = new VentanaInicioSesion(cuentaRecordada)
         {
             DataContext = viewModel
         };

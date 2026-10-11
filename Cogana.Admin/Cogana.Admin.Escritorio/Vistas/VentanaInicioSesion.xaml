@@ -9,15 +9,83 @@
         MinHeight="640"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
-        Background="#06090C"
-        Foreground="White">
+        Background="#F1F1F1"
+        Foreground="#161616">
 
     <Window.Resources>
+
+        <Style x:Key="NotaAcceso" TargetType="TextBlock">
+            <Style.Triggers>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="EnlaceRecuperacion" TargetType="Button">
+            <Setter Property="Foreground" Value="#444444"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="FocoEnlace" Background="Transparent" Padding="0,6" BorderBrush="#161616">
+                            <TextBlock x:Name="TextoEnlace" Text="{TemplateBinding Content}"
+                                       Foreground="{TemplateBinding Foreground}" FontSize="{TemplateBinding FontSize}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TextoEnlace" Property="TextDecorations" Value="Underline"/>
+                                <Setter Property="Foreground" Value="#161616"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="FocoEnlace" Property="BorderThickness" Value="0,0,0,1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="OpcionRecordar" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#555555"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="FocoOpcion" Padding="2,6" CornerRadius="4" BorderBrush="#777777">
+                            <StackPanel Orientation="Horizontal">
+                                <Border x:Name="Casilla" Width="16" Height="16" CornerRadius="4" Background="White" BorderBrush="#A0A0A0" BorderThickness="1" VerticalAlignment="Center">
+                                    <Path x:Name="Marca" Data="M3,8 L6,11 L12,4" Stroke="White" StrokeThickness="1.5" Visibility="Collapsed"/>
+                                </Border>
+                                <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Casilla" Property="Background" Value="#161616"/>
+                                <Setter TargetName="Casilla" Property="BorderBrush" Value="#161616"/>
+                                <Setter TargetName="Marca" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="FocoOpcion" Property="BorderThickness" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="FocoOpcion" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <!-- Botón de acceso con esquinas suaves (radio 14 como el diseño) -->
         <Style x:Key="BotonEntrar" TargetType="Button">
             <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="#0A0A0A"/>
+            <Setter Property="Foreground" Value="#161616"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Bold"/>
@@ -39,7 +107,7 @@
                                 <Setter TargetName="FondoBoton" Property="Opacity" Value="0.45"/>
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="FondoBoton" Property="BorderBrush" Value="#4ADE80"/>
+                                <Setter TargetName="FondoBoton" Property="BorderBrush" Value="#161616"/>
                                 <Setter TargetName="FondoBoton" Property="BorderThickness" Value="2"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -153,7 +221,7 @@
         </Storyboard>
     </Window.Resources>
 
-    <Grid x:Name="RaizLogin" Background="#06090C" MouseMove="AlMoverMouse" MouseLeave="AlSalirMouse">
+    <Grid x:Name="RaizLogin" Background="#F1F1F1" ClipToBounds="True" MouseMove="AlMoverMouse" MouseLeave="AlSalirMouse">
 
         <!-- Capa 1: aurora viva -->
         <Grid IsHitTestVisible="False">
@@ -161,9 +229,9 @@
                      HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.85">
                 <Ellipse.Fill>
                     <RadialGradientBrush>
-                        <GradientStop Color="#8C0F462D" Offset="0"/>
-                        <GradientStop Color="#460F462D" Offset="0.45"/>
-                        <GradientStop Color="#000F462D" Offset="1"/>
+                        <GradientStop Color="#14161616" Offset="0"/>
+                        <GradientStop Color="#08161616" Offset="0.45"/>
+                        <GradientStop Color="#00161616" Offset="1"/>
                     </RadialGradientBrush>
                 </Ellipse.Fill>
                 <Ellipse.RenderTransform>
@@ -175,9 +243,9 @@
                      HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0.8">
                 <Ellipse.Fill>
                     <RadialGradientBrush>
-                        <GradientStop Color="#73082841" Offset="0"/>
-                        <GradientStop Color="#39082841" Offset="0.45"/>
-                        <GradientStop Color="#00082841" Offset="1"/>
+                        <GradientStop Color="#73161616" Offset="0"/>
+                        <GradientStop Color="#39161616" Offset="0.45"/>
+                        <GradientStop Color="#00161616" Offset="1"/>
                     </RadialGradientBrush>
                 </Ellipse.Fill>
                 <Ellipse.RenderTransform>
@@ -189,9 +257,9 @@
                      HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0.75">
                 <Ellipse.Fill>
                     <RadialGradientBrush>
-                        <GradientStop Color="#521E1937" Offset="0"/>
-                        <GradientStop Color="#291E1937" Offset="0.5"/>
-                        <GradientStop Color="#001E1937" Offset="1"/>
+                        <GradientStop Color="#10161616" Offset="0"/>
+                        <GradientStop Color="#08161616" Offset="0.5"/>
+                        <GradientStop Color="#00161616" Offset="1"/>
                     </RadialGradientBrush>
                 </Ellipse.Fill>
                 <Ellipse.RenderTransform>
@@ -207,7 +275,7 @@
                     <DrawingBrush.Drawing>
                         <GeometryDrawing Geometry="M0,0 L48,0 48,48 0,48 Z">
                             <GeometryDrawing.Pen>
-                                <Pen Brush="#04FFFFFF" Thickness="1"/>
+                                <Pen Brush="#04161616" Thickness="1"/>
                             </GeometryDrawing.Pen>
                         </GeometryDrawing>
                     </DrawingBrush.Drawing>
@@ -215,8 +283,8 @@
             </Rectangle.Fill>
             <Rectangle.OpacityMask>
                 <RadialGradientBrush>
-                    <GradientStop Color="#FF000000" Offset="0.35"/>
-                    <GradientStop Color="#00000000" Offset="1"/>
+                    <GradientStop Color="#FF161616" Offset="0.35"/>
+                    <GradientStop Color="#00161616" Offset="1"/>
                 </RadialGradientBrush>
             </Rectangle.OpacityMask>
         </Rectangle>
@@ -225,8 +293,8 @@
         <Ellipse IsHitTestVisible="False" Width="960" Height="960" Opacity="0.9">
             <Ellipse.Fill>
                 <RadialGradientBrush>
-                    <GradientStop Color="#0F4ADE80" Offset="0"/>
-                    <GradientStop Color="#004ADE80" Offset="0.7"/>
+                    <GradientStop Color="#0F161616" Offset="0"/>
+                    <GradientStop Color="#00161616" Offset="0.7"/>
                 </RadialGradientBrush>
             </Ellipse.Fill>
             <Ellipse.RenderTransform>
@@ -242,7 +310,7 @@
                     HorizontalAlignment="Center" VerticalAlignment="Center"
                     Width="424"
                     Margin="24"
-                    Background="#0BFFFFFF"
+                    Background="#FCFFFFFF"
                     BorderThickness="1"
                     CornerRadius="26"
                     Opacity="0"
@@ -261,11 +329,11 @@
                         <LinearGradientBrush.RelativeTransform>
                             <RotateTransform x:Name="BrilloRotador" CenterX="0.5" CenterY="0.5"/>
                         </LinearGradientBrush.RelativeTransform>
-                        <GradientStop Color="#00FFFFFF" Offset="0"/>
-                        <GradientStop Color="#594ADE80" Offset="0.12"/>
-                        <GradientStop Color="#00FFFFFF" Offset="0.3"/>
-                        <GradientStop Color="#4D22D3EE" Offset="0.55"/>
-                        <GradientStop Color="#00FFFFFF" Offset="0.75"/>
+                        <GradientStop Color="#00161616" Offset="0"/>
+                        <GradientStop Color="#0F161616" Offset="0.12"/>
+                        <GradientStop Color="#00161616" Offset="0.3"/>
+                        <GradientStop Color="#4D161616" Offset="0.55"/>
+                        <GradientStop Color="#00161616" Offset="0.75"/>
                     </LinearGradientBrush>
                 </Border.BorderBrush>
 
@@ -276,8 +344,8 @@
                              HorizontalAlignment="Right" VerticalAlignment="Top" IsHitTestVisible="False">
                         <Ellipse.Fill>
                             <RadialGradientBrush>
-                                <GradientStop Color="#1A4ADE80" Offset="0"/>
-                                <GradientStop Color="#004ADE80" Offset="0.7"/>
+                                <GradientStop Color="#1A161616" Offset="0"/>
+                                <GradientStop Color="#00161616" Offset="0.7"/>
                             </RadialGradientBrush>
                         </Ellipse.Fill>
                         <Ellipse.RenderTransform>
@@ -289,9 +357,9 @@
                     <Border Height="1" Width="338" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-1,0,0">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#00FFFFFF" Offset="0"/>
-                                <GradientStop Color="#2EFFFFFF" Offset="0.5"/>
-                                <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                <GradientStop Color="#00161616" Offset="0"/>
+                                <GradientStop Color="#2E161616" Offset="0.5"/>
+                                <GradientStop Color="#00161616" Offset="1"/>
                             </LinearGradientBrush>
                         </Border.Background>
                     </Border>
@@ -302,11 +370,11 @@
                         <Grid Margin="0,0,0,28">
                             <StackPanel Orientation="Horizontal">
                                 <Border Width="44" Height="44" CornerRadius="13"
-                                        BorderBrush="#404ADE80" BorderThickness="1">
+                                        BorderBrush="#40161616" BorderThickness="1">
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#1C2620" Offset="0"/>
-                                            <GradientStop Color="#14201A" Offset="1"/>
+                                            <GradientStop Color="#161616" Offset="0"/>
+                                            <GradientStop Color="#292929" Offset="1"/>
                                         </LinearGradientBrush>
                                     </Border.Background>
                                     <TextBlock Text="C" Foreground="White" FontSize="19" FontWeight="Bold"
@@ -314,7 +382,7 @@
                                 </Border>
                                 <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                                     <TextBlock Text="COGANA" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="ADMINISTRACIÓN" FontSize="10" Foreground="#52FFFFFF" Margin="0,2,0,0"/>
+                                    <TextBlock Text="ADMINISTRACIÓN" FontSize="10" Foreground="#737373" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
@@ -327,33 +395,33 @@
                                             </RadialGradientBrush>
                                         </Ellipse.Fill>
                                     </Ellipse>
-                                    <Ellipse x:Name="PuntoLinea" Width="7" Height="7" Fill="#4ADE80"/>
+                                    <Ellipse x:Name="PuntoLinea" Width="7" Height="7" Fill="#238B45"/>
                                 </Grid>
                                 <TextBlock Text="EN LÍNEA" FontSize="10" FontWeight="SemiBold"
-                                           Foreground="#BF4ADE80" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                                           Foreground="#238B45" Margin="6,0,0,0" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
 
                         <TextBlock Text="Bienvenido de nuevo" FontSize="26" FontWeight="Bold" Margin="0,0,0,6"/>
                         <TextBlock Text="Ingresa tus credenciales para acceder al panel"
-                                   FontSize="13" Foreground="#59FFFFFF" Margin="0,0,0,24"/>
+                                   FontSize="13" Foreground="#666666" Margin="0,0,0,24"/>
 
                         <!-- Correo electrónico -->
                         <Grid Height="56" Margin="0,0,0,18">
                             <Border x:Name="BrilloCorreo" CornerRadius="18" Opacity="0" Margin="-8">
                                 <Border.Background>
                                     <RadialGradientBrush>
-                                        <GradientStop Color="#2E4ADE80" Offset="0"/>
-                                        <GradientStop Color="#004ADE80" Offset="1"/>
+                                        <GradientStop Color="#2E161616" Offset="0"/>
+                                        <GradientStop Color="#00161616" Offset="1"/>
                                     </RadialGradientBrush>
                                 </Border.Background>
                             </Border>
-                            <Border x:Name="FondoCorreo" CornerRadius="14" Background="#09FFFFFF"
-                                    BorderBrush="#17FFFFFF" BorderThickness="1">
+                            <Border x:Name="FondoCorreo" CornerRadius="14" Background="#09161616"
+                                    BorderBrush="#17161616" BorderThickness="1">
                                 <TextBox x:Name="CampoCorreo"
                                          Text="{Binding Correo, UpdateSourceTrigger=PropertyChanged}"
                                          Background="Transparent" BorderThickness="0"
-                                         Foreground="White" CaretBrush="#4ADE80"
+                                         Foreground="#161616" CaretBrush="#161616"
                                          FontSize="15" Margin="44,0,16,0" VerticalAlignment="Center"
                                          KeyDown="AlPresionarTeclaEnCampo"
                                          TextChanged="AlCambiarCampoTexto"
@@ -362,25 +430,25 @@
                                          ToolTip="Correo asociado a la cuenta administrativa"/>
                             </Border>
                             <Path x:Name="IconoCorreo" Data="M3,5 H21 A2,2 0 0 1 23,7 V17 A2,2 0 0 1 21,19 H3 A2,2 0 0 1 1,17 V7 A2,2 0 0 1 3,5 Z M23,7 12,13 1,7"
-                                  Stroke="#4DFFFFFF" StrokeThickness="1.8" StrokeLineJoin="Round"
+                                  Stroke="#4D161616" StrokeThickness="1.8" StrokeLineJoin="Round"
                                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   HorizontalAlignment="Left" VerticalAlignment="Center" Margin="15,0,0,0"
                                   Width="17" Height="17" Stretch="Uniform" IsHitTestVisible="False"/>
                             <TextBlock x:Name="EtiquetaCorreo" Text="Correo electrónico" FontSize="14"
-                                       Foreground="#61FFFFFF" IsHitTestVisible="False"
+                                       Foreground="#61161616" IsHitTestVisible="False"
                                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="46,18,0,0"/>
                             <Border x:Name="LineaCorreo" Height="1.5" Width="0" CornerRadius="2"
                                     VerticalAlignment="Bottom" HorizontalAlignment="Center" Opacity="0.9">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Color="#004ADE80" Offset="0"/>
-                                        <GradientStop Color="#B34ADE80" Offset="0.4"/>
-                                        <GradientStop Color="#B322D3EE" Offset="0.6"/>
-                                        <GradientStop Color="#004ADE80" Offset="1"/>
+                                        <GradientStop Color="#00161616" Offset="0"/>
+                                        <GradientStop Color="#B3161616" Offset="0.4"/>
+                                        <GradientStop Color="#B3161616" Offset="0.6"/>
+                                        <GradientStop Color="#00161616" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
                                 <Border.Effect>
-                                    <DropShadowEffect Color="#4ADE80" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
+                                    <DropShadowEffect Color="#161616" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
                                 </Border.Effect>
                             </Border>
                         </Grid>
@@ -390,16 +458,16 @@
                             <Border x:Name="BrilloContrasena" CornerRadius="18" Opacity="0" Margin="-8">
                                 <Border.Background>
                                     <RadialGradientBrush>
-                                        <GradientStop Color="#2E4ADE80" Offset="0"/>
-                                        <GradientStop Color="#004ADE80" Offset="1"/>
+                                        <GradientStop Color="#2E161616" Offset="0"/>
+                                        <GradientStop Color="#00161616" Offset="1"/>
                                     </RadialGradientBrush>
                                 </Border.Background>
                             </Border>
-                            <Border x:Name="FondoContrasena" CornerRadius="14" Background="#09FFFFFF"
-                                    BorderBrush="#17FFFFFF" BorderThickness="1">
+                            <Border x:Name="FondoContrasena" CornerRadius="14" Background="#09161616"
+                                    BorderBrush="#17161616" BorderThickness="1">
                                 <PasswordBox x:Name="CampoContrasena"
                                              Background="Transparent" BorderThickness="0"
-                                             Foreground="White" CaretBrush="#4ADE80"
+                                             Foreground="#161616" CaretBrush="#161616"
                                              FontSize="15" Margin="44,0,16,0" VerticalAlignment="Center"
                                              KeyDown="AlPresionarTeclaEnCampo"
                                              PasswordChanged="AlCambiarCampo"
@@ -408,36 +476,44 @@
                                              ToolTip="Contraseña de Supabase Auth"/>
                             </Border>
                             <Path x:Name="IconoContrasena" Data="M5,11 H19 A2,2 0 0 1 21,13 V19 A2,2 0 0 1 19,21 H5 A2,2 0 0 1 3,19 V13 A2,2 0 0 1 5,11 Z M8,11 V7 A5,5 0 0 1 18,7 V11"
-                                  Stroke="#4DFFFFFF" StrokeThickness="1.8" StrokeLineJoin="Round"
+                                  Stroke="#4D161616" StrokeThickness="1.8" StrokeLineJoin="Round"
                                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   HorizontalAlignment="Left" VerticalAlignment="Center" Margin="15,0,0,0"
                                   Width="17" Height="17" Stretch="Uniform" IsHitTestVisible="False"/>
                             <TextBlock x:Name="EtiquetaContrasena" Text="Contraseña" FontSize="14"
-                                       Foreground="#61FFFFFF" IsHitTestVisible="False"
+                                       Foreground="#61161616" IsHitTestVisible="False"
                                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="46,18,0,0"/>
                             <Border x:Name="LineaContrasena" Height="1.5" Width="0" CornerRadius="2"
                                     VerticalAlignment="Bottom" HorizontalAlignment="Center" Opacity="0.9">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Color="#004ADE80" Offset="0"/>
-                                        <GradientStop Color="#B34ADE80" Offset="0.4"/>
-                                        <GradientStop Color="#B322D3EE" Offset="0.6"/>
-                                        <GradientStop Color="#004ADE80" Offset="1"/>
+                                        <GradientStop Color="#00161616" Offset="0"/>
+                                        <GradientStop Color="#B3161616" Offset="0.4"/>
+                                        <GradientStop Color="#B3161616" Offset="0.6"/>
+                                        <GradientStop Color="#00161616" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
                                 <Border.Effect>
-                                    <DropShadowEffect Color="#4ADE80" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
+                                    <DropShadowEffect Color="#161616" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
                                 </Border.Effect>
                             </Border>
                         </Grid>
 
-                        <Button HorizontalAlignment="Right" Margin="2,4,2,20" Cursor="Hand"
-                                Click="AlRecuperarContrasena" Background="Transparent" BorderThickness="0"
-                                Foreground="#A64ADE80" FontSize="12" Padding="0,4"
-                                Content="¿Olvidaste tu contraseña?"/>
+                        <Grid Margin="0,2,0,18">
+                            <CheckBox x:Name="RecordarCuenta" Content="Recordar cuenta"
+                                      Style="{StaticResource OpcionRecordar}" HorizontalAlignment="Left"
+                                      Unchecked="AlDesmarcarRecordarCuenta"
+                                      ToolTip="Guarda correo y contraseña de forma protegida para este usuario de Windows en este equipo."/>
+                            <Button x:Name="BotonRecuperarContrasena" HorizontalAlignment="Right"
+                                    Style="{StaticResource EnlaceRecuperacion}" FontSize="12"
+                                    Click="AlRecuperarContrasena" Content="¿Olvidaste tu contraseña?"/>
+                        </Grid>
 
-                        <TextBlock x:Name="Mensaje" Text="{Binding Mensaje}" FontSize="12"
-                                   Foreground="#FF8A80" TextWrapping="Wrap"
+                        <TextBlock x:Name="AvisoCuenta" Text="" Style="{StaticResource NotaAcceso}" FontSize="11" Foreground="#666666" TextWrapping="Wrap" Margin="2,0,2,10"
+                                   AutomationProperties.LiveSetting="Polite"/>
+
+                        <TextBlock x:Name="Mensaje" Text="{Binding Mensaje}" Style="{StaticResource NotaAcceso}" FontSize="12"
+                                   Foreground="#161616" TextWrapping="Wrap"
                                    Margin="2,0,2,10"/>
 
                         <Button x:Name="BotonInicioSesion"
@@ -448,10 +524,7 @@
                                 Style="{StaticResource BotonEntrar}"/>
 
                         <TextBlock Text="Sistema protegido · COGANA 2026" FontSize="11"
-                                   Foreground="#38FFFFFF" HorizontalAlignment="Center" Margin="0,18,0,0"/>
-                        <CheckBox x:Name="ReducirMovimiento" Content="Reducir movimiento"
-                                  Foreground="#A6FFFFFF" FontSize="11" HorizontalAlignment="Center" Margin="0,12,0,0"
-                                  Checked="AlCambiarMovimiento" Unchecked="AlCambiarMovimiento"/>
+                                   Foreground="#737373" HorizontalAlignment="Center" Margin="0,18,0,0"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -468,19 +541,19 @@
                 </StackPanel.RenderTransform>
 
                 <Grid Width="150" Height="150" Margin="0,0,0,40">
-                    <Ellipse x:Name="Anillo1" Stroke="#1F4ADE80" StrokeThickness="1" Opacity="0.6"
+                    <Ellipse x:Name="Anillo1" Stroke="#1F161616" StrokeThickness="1" Opacity="0.6"
                              RenderTransformOrigin="0.5,0.5">
                         <Ellipse.RenderTransform>
                             <ScaleTransform x:Name="Anillo1E" ScaleX="0.85" ScaleY="0.85"/>
                         </Ellipse.RenderTransform>
                     </Ellipse>
-                    <Ellipse x:Name="Anillo2" Stroke="#144ADE80" StrokeThickness="1" Opacity="0.45"
+                    <Ellipse x:Name="Anillo2" Stroke="#14161616" StrokeThickness="1" Opacity="0.45"
                              RenderTransformOrigin="0.5,0.5">
                         <Ellipse.RenderTransform>
                             <ScaleTransform x:Name="Anillo2E" ScaleX="0.85" ScaleY="0.85"/>
                         </Ellipse.RenderTransform>
                     </Ellipse>
-                    <Ellipse x:Name="Anillo3" Stroke="#0A4ADE80" StrokeThickness="1" Opacity="0.3"
+                    <Ellipse x:Name="Anillo3" Stroke="#0A161616" StrokeThickness="1" Opacity="0.3"
                              RenderTransformOrigin="0.5,0.5">
                         <Ellipse.RenderTransform>
                             <ScaleTransform x:Name="Anillo3E" ScaleX="0.85" ScaleY="0.85"/>
@@ -492,8 +565,8 @@
                              RenderTransformOrigin="0.5,0.5">
                         <Ellipse.Stroke>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#804ADE80" Offset="0"/>
-                                <GradientStop Color="#8022D3EE" Offset="1"/>
+                                <GradientStop Color="#80161616" Offset="0"/>
+                                <GradientStop Color="#80161616" Offset="1"/>
                             </LinearGradientBrush>
                         </Ellipse.Stroke>
                         <Ellipse.RenderTransform>
@@ -507,18 +580,18 @@
                     <Ellipse x:Name="BrilloOrbe" Width="150" Height="150" Opacity="0.5">
                         <Ellipse.Fill>
                             <RadialGradientBrush>
-                                <GradientStop Color="#4D4ADE80" Offset="0"/>
-                                <GradientStop Color="#004ADE80" Offset="0.7"/>
+                                <GradientStop Color="#4D161616" Offset="0"/>
+                                <GradientStop Color="#00161616" Offset="0.7"/>
                             </RadialGradientBrush>
                         </Ellipse.Fill>
                     </Ellipse>
 
                     <Border Width="102" Height="102" CornerRadius="22" RenderTransformOrigin="0.5,0.5"
-                            BorderBrush="#4D4ADE80" BorderThickness="1">
+                            BorderBrush="#4D161616" BorderThickness="1">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#16211B" Offset="0"/>
-                                <GradientStop Color="#202A24" Offset="1"/>
+                                <GradientStop Color="#161616" Offset="0"/>
+                                <GradientStop Color="#292929" Offset="1"/>
                             </LinearGradientBrush>
                         </Border.Background>
                         <Border.RenderTransform>
@@ -533,8 +606,8 @@
                              RenderTransformOrigin="0.5,0.5">
                         <Ellipse.Stroke>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#004ADE80" Offset="0"/>
-                                <GradientStop Color="#FF22D3EE" Offset="1"/>
+                                <GradientStop Color="#00161616" Offset="0"/>
+                                <GradientStop Color="#FF161616" Offset="1"/>
                             </LinearGradientBrush>
                         </Ellipse.Stroke>
                         <Ellipse.RenderTransform>
@@ -544,27 +617,27 @@
                 </Grid>
 
                 <ProgressBar x:Name="IndicadorAcceso" Width="290" Height="3" IsIndeterminate="True"
-                             Foreground="#4ADE80" Background="#12FFFFFF" BorderThickness="0"
+                             Foreground="#161616" Background="#12161616" BorderThickness="0"
                              AutomationProperties.Name="Verificando acceso administrativo"/>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,8">
                     <TextBlock x:Name="TextoEstadoAcceso" Text="CONEXIÓN SEGURA" FontSize="11"
-                               Foreground="#47FFFFFF" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                               Foreground="#666666" Margin="0,0,10,0" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="4" Height="4" Fill="#BF4ADE80" Margin="2,0" RenderTransformOrigin="0.5,0.5">
+                        <Ellipse Width="4" Height="4" Fill="#BF161616" Margin="2,0" RenderTransformOrigin="0.5,0.5">
                             <Ellipse.RenderTransform><ScaleTransform x:Name="Punto1E"/></Ellipse.RenderTransform>
                         </Ellipse>
-                        <Ellipse Width="4" Height="4" Fill="#BF4ADE80" Margin="2,0" RenderTransformOrigin="0.5,0.5">
+                        <Ellipse Width="4" Height="4" Fill="#BF161616" Margin="2,0" RenderTransformOrigin="0.5,0.5">
                             <Ellipse.RenderTransform><ScaleTransform x:Name="Punto2E"/></Ellipse.RenderTransform>
                         </Ellipse>
-                        <Ellipse Width="4" Height="4" Fill="#BF4ADE80" Margin="2,0" RenderTransformOrigin="0.5,0.5">
+                        <Ellipse Width="4" Height="4" Fill="#BF161616" Margin="2,0" RenderTransformOrigin="0.5,0.5">
                             <Ellipse.RenderTransform><ScaleTransform x:Name="Punto3E"/></Ellipse.RenderTransform>
                         </Ellipse>
                     </StackPanel>
                 </StackPanel>
 
                 <TextBlock x:Name="TextoPaso" Text="Verificando credenciales..." FontSize="13"
-                           Foreground="#B3FFFFFF" HorizontalAlignment="Center"
+                           Foreground="#B3161616" HorizontalAlignment="Center"
                            AutomationProperties.LiveSetting="Polite"/>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,46,0,0" Opacity="0.16">

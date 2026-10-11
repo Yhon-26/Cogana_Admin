@@ -10,7 +10,9 @@ se conectan al mismo proyecto Supabase y respetan el mismo modelo de datos y RLS
 
 ## Estructura
 
-El login incluye perspectiva suave de la tarjeta, foco visible por teclado y una opción **Reducir movimiento**. El indicador de acceso espera la respuesta del servicio; no estima porcentajes. Las animaciones se pausan con la ventana inactiva o minimizada.
+El login usa una tarjeta blanca con controles negros y reserva el verde para **EN LÍNEA**. Conserva perspectiva suave y foco visible por teclado, sin un control adicional de movimiento. El enlace de recuperación se subraya al pasar el cursor, sin fondo del sistema. El indicador de acceso espera la respuesta del servicio; no estima porcentajes. Las animaciones se pausan con la ventana inactiva o minimizada.
+
+**Recordar cuenta** comienza desmarcado. Tras un acceso correcto guarda correo y contraseña en el administrador de credenciales de Windows para el usuario actual y este equipo, con un destino separado por proyecto Supabase. Al volver a abrir la aplicación rellena los campos; siempre requiere pulsar Entrar y comprobar acceso administrativo. Desmarcarlo elimina la credencial. Abrir recuperación o iniciar el cambio obligatorio elimina también la cuenta recordada. No escribe contraseñas en archivos del proyecto ni guarda tokens de sesión. Contrato nativo: [CREDENTIALW de Microsoft](https://learn.microsoft.com/windows/win32/api/wincred/ns-wincred-credentialw).
 
 Para comprobar geometría, renderizado, interacción y estados de acceso sin conectar con Supabase: `dotnet run --project Pruebas/Login/Login.csproj -c Release`. El modo `-- --visual` abre una tarjeta de prueba interactiva. El shader precompilado está embebido en el escritorio; `Cogana.Admin.Escritorio/Recursos/Compilar-Perspectiva.ps1` permite regenerarlo desde el archivo HLSL en Windows.
 

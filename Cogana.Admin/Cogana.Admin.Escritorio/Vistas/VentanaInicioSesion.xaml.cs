@@ -6,6 +6,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using System.Diagnostics;
 using System.ComponentModel;
+using Cogana.Admin.Escritorio.Servicios;
 using Cogana.Admin.Aplicacion.Modelos;
 using Cogana.Admin.Escritorio.Controles;
 using Cogana.Admin.Escritorio.ViewModels;
@@ -15,17 +16,17 @@ namespace Cogana.Admin.Escritorio.Vistas;
 public partial class VentanaInicioSesion : Window
 {
     private static readonly Brush BrochaBotonNormal = new LinearGradientBrush(
-        Color.FromRgb(0xFF, 0xFF, 0xFF), Color.FromRgb(0xE6, 0xE6, 0xE6), 0);
+        Color.FromRgb(0x16, 0x16, 0x16), Color.FromRgb(0x2B, 0x2B, 0x2B), 0);
 
     private static readonly Brush BrochaBotonActivo = new LinearGradientBrush(
-        Color.FromRgb(0x22, 0xC5, 0x5E), Color.FromRgb(0x16, 0xA3, 0x4A), 45);
+        Color.FromRgb(0x25, 0x25, 0x25), Color.FromRgb(0x16, 0x16, 0x16), 45);
 
     private bool _cargando;
     private bool _cerrada;
     private bool _renderizando;
-    private bool _movimientoReducido;
-    private bool _preferenciaManualMovimiento;
-    private bool _ajustandoPreferencia;
+    private readonly ICuentaRecordada? _cuentaRecordada;
+    private bool _restaurandoCuenta;
+    private string? _correoRestaurado;
     private double _giroX, _giroY, _objetivoX, _objetivoY;
     private long _ultimoFotograma, _escrituraHasta;
     private readonly EfectoPerspectivaTarjeta? _perspectiva;
@@ -33,8 +34,11 @@ public partial class VentanaInicioSesion : Window
     private SesionUsuario? _sesionConfirmada;
     public event Action<SesionUsuario>? AccesoConfirmado;
 
-    public VentanaInicioSesion()
+    public VentanaInicioSesion() : this(null) { }
+
+    public VentanaInicioSesion(ICuentaRecordada? cuentaRecordada)
     {
+        _cuentaRecordada = cuentaRecordada;
         InitializeComponent();
         Loaded += AlCargarVentana;
         if (RenderCapability.IsPixelShaderVersionSupported(2, 0)) _perspectiva = new EfectoPerspectivaTarjeta();
@@ -44,33 +48,31 @@ public partial class VentanaInicioSesion : Window
         StateChanged += (_, _) => { if (IsLoaded) ActualizarMovimiento(); };
 
         BotonInicioSesion.Background = BrochaBotonNormal;
-        BotonInicioSesion.Foreground = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A));
+        BotonInicioSesion.Foreground = Brushes.White;
 
     }
 
     private void AlCargarVentana(object sender, RoutedEventArgs e)
     {
         Loaded -= AlCargarVentana;
-        CampoCorreo.Focus();
         _viewModel = DataContext as InicioSesionViewModel;
         if (_viewModel is not null)
         {
             _viewModel.CambioContrasenaRequerido += AlRequerirCambioContrasena;
             _viewModel.SesionIniciada += AlConfirmarSesion;
         }
-        _ajustandoPreferencia = true;
-        ReducirMovimiento.IsChecked = !SystemParameters.ClientAreaAnimation;
-        _ajustandoPreferencia = false;
-        SystemParameters.StaticPropertyChanged += AlCambiarPreferenciasSistema;
+        RestaurarCuenta();
+        if (CampoContrasena.Password.Length > 0) BotonInicioSesion.Focus();
+        else CampoCorreo.Focus();
         ActualizarMovimiento();
-        if (!_movimientoReducido) (Resources["AnimacionEntrada"] as Storyboard)?.Begin(this, true);
-        else TarjetaAcceso.Opacity = 1;
+        (Resources["AnimacionEntrada"] as Storyboard)?.Begin(this, true);
     }
 
     private void AlConfirmarSesion(SesionUsuario sesion) => _sesionConfirmada = sesion;
 
     private async Task AlRequerirCambioContrasena()
     {
+        OlvidarCuenta();
         await VolverALoginAsync();
         if (_cerrada) return;
         if (DataContext is InicioSesionViewModel viewModel)
@@ -84,6 +86,7 @@ public partial class VentanaInicioSesion : Window
     private void AlRecuperarContrasena(object sender, RoutedEventArgs e)
     {
         if (_cargando || DataContext is not InicioSesionViewModel viewModel) return;
+        OlvidarCuenta();
         new VentanaRecuperacionContrasena(viewModel.ServicioAutenticacion, viewModel.Correo)
             { Owner = this }.ShowDialog();
         CampoContrasena.Clear();
@@ -98,6 +101,7 @@ public partial class VentanaInicioSesion : Window
             return;
         }
         if (!viewModel.ValidarAcceso(CampoContrasena.Password)) return;
+        var contrasenaIntento = CampoContrasena.Password;
 
         _cargando = true;
         _sesionConfirmada = null;
@@ -109,7 +113,7 @@ public partial class VentanaInicioSesion : Window
 
         try
         {
-            await viewModel.IniciarSesionAsync(CampoContrasena.Password);
+            await viewModel.IniciarSesionAsync(contrasenaIntento);
             if (_cerrada) return;
             if (_sesionConfirmada is not null)
             {
@@ -117,7 +121,9 @@ public partial class VentanaInicioSesion : Window
                 IndicadorAcceso.Value = 100;
                 TextoEstadoAcceso.Text = "ACCESO CONFIRMADO";
                 TextoPaso.Text = "Bienvenido al sistema";
-                await Task.Delay(_movimientoReducido ? 0 : 350);
+                var recordada = GuardarCuentaConfirmada(_sesionConfirmada.Correo, contrasenaIntento);
+                if (!recordada) TextoPaso.Text = "Acceso correcto. Windows no pudo recordar la cuenta.";
+                await Task.Delay(recordada ? 350 : 1500);
                 if (!_cerrada) AccesoConfirmado?.Invoke(_sesionConfirmada);
             }
             else if (_cargando) await VolverALoginAsync();
@@ -145,7 +151,7 @@ public partial class VentanaInicioSesion : Window
         PantallaCarga.Visibility = Visibility.Visible;
         TextoEstadoAcceso.Text = "CONEXIÓN SEGURA";
         TextoPaso.Text = "Verificando tu acceso administrativo...";
-        IndicadorAcceso.IsIndeterminate = !_movimientoReducido;
+        IndicadorAcceso.IsIndeterminate = true;
         IndicadorAcceso.Value = 0;
         RestablecerPerspectiva();
         ActualizarMovimiento();
@@ -153,7 +159,7 @@ public partial class VentanaInicioSesion : Window
         AnimarOpacidad(TarjetaAcceso, 0, TimeSpan.FromMilliseconds(180));
         PantallaLogin.IsHitTestVisible = false;
 
-        if (!_movimientoReducido) ContenidoCargaT.BeginAnimation(TranslateTransform.YProperty,
+        ContenidoCargaT.BeginAnimation(TranslateTransform.YProperty,
             new DoubleAnimation(24, 0, TimeSpan.FromMilliseconds(600))
             {
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
@@ -167,13 +173,13 @@ public partial class VentanaInicioSesion : Window
         (Resources["DecoracionCarga"] as Storyboard)?.Remove(this);
         AnimarOpacidad(PantallaCarga, 0, TimeSpan.FromMilliseconds(180));
         AnimarOpacidad(TarjetaAcceso, 1, TimeSpan.FromMilliseconds(220));
-        await Task.Delay(_movimientoReducido ? 0 : 220);
+        await Task.Delay(220);
         if (_cerrada) return;
         PantallaCarga.Visibility = Visibility.Collapsed;
         PantallaLogin.IsHitTestVisible = true;
         BotonInicioSesion.Content = "ENTRAR AL PANEL";
         BotonInicioSesion.Background = BrochaBotonNormal;
-        BotonInicioSesion.Foreground = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A));
+        BotonInicioSesion.Foreground = Brushes.White;
         _cargando = false;
         ActualizarMovimiento();
         CampoContrasena.Focus();
@@ -194,7 +200,67 @@ public partial class VentanaInicioSesion : Window
     private void AlEnfocarCampo(object sender, RoutedEventArgs e) => ActualizarCampo(sender);
     private void AlDesenfocarCampo(object sender, RoutedEventArgs e) => ActualizarCampo(sender);
     private void AlCambiarCampo(object sender, RoutedEventArgs e) => ActualizarCampo(sender);
-    private void AlCambiarCampoTexto(object sender, TextChangedEventArgs e) => ActualizarCampo(sender);
+    private void AlCambiarCampoTexto(object sender, TextChangedEventArgs e)
+    {
+        if (!_restaurandoCuenta && _correoRestaurado is not null &&
+            !string.Equals(CampoCorreo.Text.Trim(), _correoRestaurado, StringComparison.OrdinalIgnoreCase))
+        {
+            _correoRestaurado = null;
+            CampoContrasena.Clear();
+        }
+        ActualizarCampo(sender);
+    }
+
+    private void RestaurarCuenta()
+    {
+        RecordarCuenta.IsEnabled = _cuentaRecordada is not null;
+        if (_cuentaRecordada is null || _viewModel is null) return;
+        _restaurandoCuenta = true;
+        try
+        {
+            var cuenta = _cuentaRecordada.Leer();
+            if (cuenta is null) return;
+            _correoRestaurado = cuenta.Correo;
+            _viewModel.Correo = cuenta.Correo;
+            CampoContrasena.Password = cuenta.Contrasena;
+            RecordarCuenta.IsChecked = true;
+        }
+        catch (Win32Exception) { AvisoCuenta.Text = "Windows no pudo cargar la cuenta recordada."; }
+        finally { _restaurandoCuenta = false; }
+    }
+
+    private bool GuardarCuentaConfirmada(string correo, string contrasena)
+    {
+        if (_cuentaRecordada is null || RecordarCuenta.IsChecked != true) return true;
+        try { _cuentaRecordada.Guardar(correo, contrasena); return true; }
+        catch (Exception error) when (error is Win32Exception or ArgumentException) { return false; }
+    }
+
+    private void AlDesmarcarRecordarCuenta(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || _restaurandoCuenta) return;
+        OlvidarCuenta();
+    }
+
+    private void OlvidarCuenta()
+    {
+        try
+        {
+            _cuentaRecordada?.Olvidar();
+            _correoRestaurado = null;
+            _restaurandoCuenta = true;
+            RecordarCuenta.IsChecked = false;
+            _restaurandoCuenta = false;
+            AvisoCuenta.Text = string.Empty;
+        }
+        catch (Win32Exception)
+        {
+            _restaurandoCuenta = true;
+            RecordarCuenta.IsChecked = true;
+            _restaurandoCuenta = false;
+            AvisoCuenta.Text = "Windows no pudo eliminar la cuenta recordada. Inténtalo de nuevo.";
+        }
+    }
 
     private void ActualizarCampo(object sender)
     {
@@ -231,7 +297,7 @@ public partial class VentanaInicioSesion : Window
         bool tieneTexto)
     {
         var activo = enfocado || tieneTexto;
-        var transicion = TimeSpan.FromMilliseconds(_movimientoReducido ? 0 : 240);
+        var transicion = TimeSpan.FromMilliseconds(240);
 
         etiqueta.Text = activo ? textoActivo : textoNormal;
         var margen = activo
@@ -248,28 +314,28 @@ public partial class VentanaInicioSesion : Window
         etiqueta.FontWeight = activo ? FontWeights.SemiBold : FontWeights.Normal;
 
         var color = enfocado
-            ? Color.FromArgb(0xF2, 0x4A, 0xDE, 0x80)
+            ? Color.FromRgb(0x16, 0x16, 0x16)
             : activo
-                ? Color.FromArgb(0x73, 0xFF, 0xFF, 0xFF)
-                : Color.FromArgb(0x61, 0xFF, 0xFF, 0xFF);
+                ? Color.FromRgb(0x55, 0x55, 0x55)
+                : Color.FromRgb(0x70, 0x70, 0x70);
         etiqueta.Foreground = new SolidColorBrush(color);
 
         icono.Stroke = new SolidColorBrush(enfocado
-            ? Color.FromArgb(0xE6, 0x4A, 0xDE, 0x80)
-            : Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF));
+            ? Color.FromRgb(0x25, 0x25, 0x25)
+            : Color.FromRgb(0x80, 0x80, 0x80));
 
         fondo.BorderBrush = new SolidColorBrush(enfocado
-            ? Color.FromArgb(0x59, 0x4A, 0xDE, 0x80)
-            : Color.FromArgb(0x17, 0xFF, 0xFF, 0xFF));
+            ? Color.FromRgb(0x77, 0x77, 0x77)
+            : Color.FromRgb(0xDD, 0xDD, 0xDD));
         fondo.Background = new SolidColorBrush(enfocado
-            ? Color.FromArgb(0x12, 0xFF, 0xFF, 0xFF)
-            : Color.FromArgb(0x09, 0xFF, 0xFF, 0xFF));
+            ? Color.FromRgb(0xFF, 0xFF, 0xFF)
+            : Color.FromRgb(0xF7, 0xF7, 0xF7));
 
         brillo.BeginAnimation(OpacityProperty, new DoubleAnimation(enfocado ? 1 : 0, transicion));
 
         var anchoLinea = enfocado ? Math.Max(anchoCampo * 0.88, 0) : 0;
         linea.BeginAnimation(WidthProperty, new DoubleAnimation(anchoLinea,
-            TimeSpan.FromMilliseconds(_movimientoReducido ? 0 : 350))
+            TimeSpan.FromMilliseconds(350))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         });
@@ -279,7 +345,7 @@ public partial class VentanaInicioSesion : Window
 
     private void AlMoverMouse(object sender, MouseEventArgs e)
     {
-        if (_movimientoReducido || _cargando || !IsActive || RaizLogin.ActualWidth <= 0 || RaizLogin.ActualHeight <= 0) return;
+        if (_cargando || !IsActive || RaizLogin.ActualWidth <= 0 || RaizLogin.ActualHeight <= 0) return;
         var posicion = e.GetPosition(RaizLogin);
         FocoMouseT.X = posicion.X - RaizLogin.ActualWidth / 2;
         FocoMouseT.Y = posicion.Y - RaizLogin.ActualHeight / 2;
@@ -305,7 +371,7 @@ public partial class VentanaInicioSesion : Window
 
     private void IniciarSeguimiento()
     {
-        if (_renderizando || _movimientoReducido || _perspectiva is null || _cerrada || !IsActive) return;
+        if (_renderizando || _perspectiva is null || _cerrada || !IsActive) return;
         _ultimoFotograma = Stopwatch.GetTimestamp();
         CompositionTarget.Rendering += AlRenderizarMovimiento;
         _renderizando = true;
@@ -341,29 +407,9 @@ public partial class VentanaInicioSesion : Window
         SuperficiePerspectiva.Effect = null;
     }
 
-    private void AlCambiarMovimiento(object sender, RoutedEventArgs e)
-    {
-        if (!IsLoaded || _ajustandoPreferencia) return;
-        _preferenciaManualMovimiento = true;
-        ActualizarMovimiento();
-    }
-    private void AlCambiarPreferenciasSistema(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(SystemParameters.ClientAreaAnimation))
-            Dispatcher.InvokeAsync(() =>
-            {
-                if (_cerrada || _preferenciaManualMovimiento) return;
-                _ajustandoPreferencia = true;
-                ReducirMovimiento.IsChecked = !SystemParameters.ClientAreaAnimation;
-                _ajustandoPreferencia = false;
-                ActualizarMovimiento();
-            });
-    }
-
     private void ActualizarMovimiento()
     {
-        _movimientoReducido = ReducirMovimiento.IsChecked == true;
-        var animar = !_movimientoReducido && IsActive && WindowState != WindowState.Minimized;
+        var animar = IsActive && WindowState != WindowState.Minimized;
         foreach (var clave in new[] { "AnimacionAurora", "AnimacionBrilloTarjeta", "AnimacionVida" })
         {
             var historia = (Storyboard)Resources[clave];
@@ -390,7 +436,6 @@ public partial class VentanaInicioSesion : Window
         _cerrada = true;
         DetenerSeguimiento();
         Lienzo.Animando = false;
-        SystemParameters.StaticPropertyChanged -= AlCambiarPreferenciasSistema;
         if (_viewModel is not null)
         {
             _viewModel.SesionIniciada -= AlConfirmarSesion;
@@ -405,12 +450,6 @@ public partial class VentanaInicioSesion : Window
 
     private void AnimarOpacidad(UIElement elemento, double hasta, TimeSpan duracion)
     {
-        if (_movimientoReducido)
-        {
-            elemento.BeginAnimation(OpacityProperty, null);
-            elemento.Opacity = hasta;
-            return;
-        }
         elemento.BeginAnimation(OpacityProperty, new DoubleAnimation(hasta, duracion)
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
