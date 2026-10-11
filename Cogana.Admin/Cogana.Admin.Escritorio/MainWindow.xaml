@@ -60,11 +60,8 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Border Width="44" Height="44" CornerRadius="15" Background="White">
-                    <TextBlock Text="C" Foreground="{StaticResource BrochaNegro}"
-                               FontSize="22" FontWeight="Black"
-                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
+                <Image Source="{StaticResource IconoCogana}" RenderOptions.BitmapScalingMode="HighQuality" Width="44" Height="44" Stretch="Uniform"
+                       AutomationProperties.Name="Cogana" />
 
                 <StackPanel Grid.Row="1" VerticalAlignment="Center">
                     <Button Tag="Inicio" Content="⌂" FontSize="21" Click="AlAbrirModulo" ToolTip="Inicio">
@@ -150,10 +147,12 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel>
-                    <TextBlock Text="✦  COGANA" FontSize="20" FontWeight="Bold" />
-                    <TextBlock Text="Administración" Foreground="{StaticResource BrochaTextoSuave}"
-                               FontSize="12" Margin="25,3,0,0" />
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource LogoCogana}" RenderOptions.BitmapScalingMode="HighQuality" Width="64" Height="64" Stretch="Uniform" AutomationProperties.Name="Logo de Cogana" />
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="COGANA" FontSize="18" FontWeight="Bold" />
+                        <TextBlock Text="Administración" Foreground="{StaticResource BrochaTextoSuave}" FontSize="12" Margin="0,3,0,0" />
+                    </StackPanel>
                 </StackPanel>
 
                 <Border Grid.Row="1" Height="1" Background="{StaticResource BrochaBorde}" Margin="0,20,0,13" />

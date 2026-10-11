@@ -31,6 +31,10 @@ El menú izquierdo permite abrir un módulo con un clic o arrastrarlo al Inicio 
 
 Para una ventana aislada del panel: `dotnet run --project Pruebas/Login/Login.csproj -c Release -- --panel-visual`. No carga datos ni modifica la disposición real del usuario.
 
+## Marca del escritorio
+
+El logo monocromático aprobado se muestra en el login, recuperación y cabecera del menú. El símbolo compacto aparece en el carril oscuro, estados del acceso y ventanas. El ejecutable y el instalador incluyen el mismo ícono de Windows con nueve tamaños y transparencia. Los recursos están embebidos; su procedencia, prompts y usos están documentados en `Cogana.Admin.Escritorio/Recursos/Marca/README.md`.
+
 ## Configuración local
 
 La aplicación lee dos variables de entorno:

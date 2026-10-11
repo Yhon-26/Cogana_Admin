@@ -71,6 +71,7 @@ $argumentosVpk = @(
     '--packVersion', $Version,
     '--packDir', $carpetaPublicacion,
     '--mainExe', 'Cogana.Admin.Escritorio.exe',
+    '--icon', (Join-Path $raiz 'Cogana.Admin.Escritorio\Recursos\Marca\Cogana.ico'),
     '--runtime', 'win-x64'
 )
 

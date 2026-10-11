@@ -369,17 +369,8 @@
                         <!-- Logo y estado -->
                         <Grid Margin="0,0,0,28">
                             <StackPanel Orientation="Horizontal">
-                                <Border Width="44" Height="44" CornerRadius="13"
-                                        BorderBrush="#40161616" BorderThickness="1">
-                                    <Border.Background>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#161616" Offset="0"/>
-                                            <GradientStop Color="#292929" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Border.Background>
-                                    <TextBlock Text="C" Foreground="White" FontSize="19" FontWeight="Bold"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                <Image Source="{StaticResource LogoCogana}" Width="64" Height="64" Stretch="Uniform"
+                                       AutomationProperties.Name="Logo de Cogana" RenderOptions.BitmapScalingMode="HighQuality" />
                                 <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                                     <TextBlock Text="COGANA" FontSize="16" FontWeight="Bold"/>
                                     <TextBlock Text="ADMINISTRACIÓN" FontSize="10" Foreground="#737373" Margin="0,2,0,0"/>
@@ -597,8 +588,8 @@
                         <Border.RenderTransform>
                             <ScaleTransform x:Name="OrbE"/>
                         </Border.RenderTransform>
-                        <TextBlock Text="C" FontSize="34" FontWeight="Bold" Foreground="White"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Image Source="{StaticResource IconoCogana}" RenderOptions.BitmapScalingMode="HighQuality" Width="88" Height="88" Stretch="Uniform"
+                               AutomationProperties.Name="Cogana" />
                     </Border>
 
                     <Ellipse Width="170" Height="170" StrokeThickness="1.5" Margin="-10"
@@ -642,8 +633,7 @@
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,46,0,0" Opacity="0.16">
                     <Border Width="20" Height="20" CornerRadius="6" Background="White">
-                        <TextBlock Text="C" Foreground="Black" FontSize="11" FontWeight="Bold"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Image Source="{StaticResource IconoCogana}" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Uniform" AutomationProperties.Name="Cogana" />
                     </Border>
                     <TextBlock Text="COGANA" FontSize="11" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>

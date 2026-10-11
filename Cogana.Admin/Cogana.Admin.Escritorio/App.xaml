@@ -2,6 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
+        <BitmapImage x:Key="LogoCogana" UriSource="pack://application:,,,/Cogana.Admin.Escritorio;component/Recursos/Marca/CoganaLogo.png" />
+        <BitmapImage x:Key="IconoCogana" UriSource="pack://application:,,,/Cogana.Admin.Escritorio;component/Recursos/Marca/CoganaIcono.png" />
 
         <BooleanToVisibilityConverter x:Key="BoolAVisibilidad" />
 
@@ -94,6 +96,7 @@
         <SolidColorBrush x:Key="BrochaInfoSuave" Color="{StaticResource ColorInfoSuave}" />
 
         <Style TargetType="Window">
+            <Setter Property="Icon" Value="pack://application:,,,/Cogana.Admin.Escritorio;component/Recursos/Marca/Cogana.ico" />
             <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
             <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
             <!-- Nitidez: alinear diseño y glifos a los píxeles físicos del monitor -->

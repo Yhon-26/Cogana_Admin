@@ -10,6 +10,8 @@
     <ApplicationDefinition Remove="App.xaml" />
     <Page Include="App.xaml" />
     <Resource Include="Recursos\PerspectivaTarjeta.ps" />
+    <Resource Include="Recursos\Marca\*.png" />
+    <Resource Include="Recursos\Marca\Cogana.ico" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -19,8 +21,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Recursos\Marca\Cogana.ico</ApplicationIcon>
     <StartupObject>Cogana.Admin.Escritorio.App</StartupObject>
-    <Version>1.11.4</Version>
+    <Version>1.11.5</Version>
   </PropertyGroup>
 
 </Project>
