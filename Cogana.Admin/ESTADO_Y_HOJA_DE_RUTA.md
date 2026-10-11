@@ -35,6 +35,7 @@ La configuración técnica y de inicio de sesión también está en el [README.m
 
 - Inicio de sesión con Supabase Auth y comprobación de membresía activa `owner` o `admin` para la tienda.
 - Recuperación desde el login: solicitud por correo, verificación del enlace original o código en Windows y establecimiento de contraseña nueva. La sesión de recuperación nunca abre directamente el panel.
+- Recuperación por pasos con diseño blanco y negro: envío, verificación y contraseña; entrada directa con un correo ya recibido, cuenta regresiva para reenviar, validación de longitud y coincidencia, estados de espera y confirmación final. Las acciones principales permanecen visibles en el pie y el contenido se desplaza en ventanas pequeñas. El cambio inicial obligatorio abre directamente el paso de contraseña. Verificación de la interfaz con servicio simulado; no equivale a completar una recuperación real.
 - Cambio obligatorio de contraseña temporal antes de abrir el panel para cuentas nuevas creadas por `admin-users` v4. Usa una marca protegida en `app_metadata`; las cuentas existentes y las políticas del móvil conservan su contrato. El bloqueo del servidor cubre la administración de personal; no constituye una restricción global de RLS en otros endpoints o versiones antiguas.
 - Pantalla principal con conexión, indicadores del negocio y pedidos recientes.
 - Consulta de productos, categorías, presentaciones, inventario/lotes, proveedores, pedidos, clientes y promociones.

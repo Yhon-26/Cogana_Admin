@@ -102,6 +102,7 @@ internal static class Program
             ventana.Close();
             ProbarAlmacenWindows(Verificar);
             ProbarEstadosAcceso(Verificar);
+            ProbarRecuperacion(Verificar);
             Console.WriteLine($"{cantidad} verificaciones totales correctas, sin conexión a Supabase.");
         }
     }
@@ -280,6 +281,100 @@ internal static class Program
             if (RechazarEliminacion) throw new System.ComponentModel.Win32Exception(5);
             Cuenta = null;
         }
+    }
+
+    private static void ProbarRecuperacion(Action<bool, string> verificar)
+    {
+        var servicio = new RecuperacionSimulada();
+        var ventana = new VentanaRecuperacionContrasena(servicio, "admin@example.test");
+        void Pulsar(string metodo) => typeof(VentanaRecuperacionContrasena).GetMethod(metodo, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(ventana, new object[] { ventana, new RoutedEventArgs() });
+        T Campo<T>(string nombre) where T : class => (T)ventana.FindName(nombre);
+        ventana.Show();
+        Esperar(200);
+        verificar(Campo<StackPanel>("PasoCorreo").Visibility == Visibility.Visible && Campo<StackPanel>("PasoRecuperacion").Visibility == Visibility.Collapsed, "Recuperación comienza con una sola acción: solicitar el correo");
+        Capturar(ventana, "recuperacion-correo.png");
+        ventana.Height = ventana.MinHeight;
+        ventana.Width = ventana.MinWidth;
+        ventana.UpdateLayout();
+        Capturar(ventana, "recuperacion-minimo.png");
+        verificar(Campo<Button>("Volver").IsVisible, "El botón para volver permanece visible en el tamaño mínimo");
+        ventana.Width = 600;
+        ventana.Height = 840;
+        Campo<TextBox>("Correo").Text = "";
+        Pulsar("AlSolicitar");
+        verificar(servicio.Envios == 0 && Campo<TextBlock>("Mensaje").Text.Contains("válido"), "El correo vacío se valida sin fallar ni enviar solicitudes");
+        Campo<TextBox>("Correo").Text = "admin@example.test";
+        Pulsar("AlSolicitar");
+        verificar(!Campo<Button>("Solicitar").IsEnabled && Campo<ProgressBar>("Progreso").Visibility == Visibility.Visible, "Enviar muestra espera y bloquea solicitudes duplicadas");
+        Pulsar("AlSolicitar");
+        verificar(servicio.Envios == 1, "La recuperación no envía dos correos durante la misma espera");
+        servicio.Envio.SetResult(new(true, "Si existe una cuenta, recibirás el correo."));
+        Esperar(220);
+        verificar(Campo<StackPanel>("PasoRecuperacion").Visibility == Visibility.Visible && !Campo<Button>("Reenviar").IsEnabled, "El envío confirmado muestra verificación y cuenta regresiva de reenvío");
+        Capturar(ventana, "recuperacion-enlace.png");
+        Pulsar("AlVerificar");
+        verificar(servicio.Verificaciones == 0, "Un enlace vacío no llega al servicio");
+        Campo<PasswordBox>("EnlaceOCodigo").Password = "enlace-ficticio";
+        Pulsar("AlVerificar");
+        servicio.Verificacion.SetResult(new(false, "El enlace venció. Solicita uno nuevo."));
+        Esperar(100);
+        verificar(Campo<StackPanel>("PasoRecuperacion").Visibility == Visibility.Visible && Campo<PasswordBox>("EnlaceOCodigo").Password.Length == 0, "Un enlace vencido conserva el paso y limpia el secreto");
+        servicio.Verificacion = new();
+        Campo<PasswordBox>("EnlaceOCodigo").Password = "otro-enlace-ficticio";
+        Pulsar("AlVerificar");
+        servicio.Verificacion.SetResult(new(true, "Acceso verificado."));
+        Esperar(220);
+        verificar(Campo<StackPanel>("PasoContrasena").Visibility == Visibility.Visible && Campo<StackPanel>("PasoRecuperacion").Visibility == Visibility.Collapsed, "Solo un enlace verificado permite crear la contraseña");
+        Capturar(ventana, "recuperacion-contrasena.png");
+        Campo<PasswordBox>("NuevaContrasena").Password = "corta";
+        Campo<PasswordBox>("Confirmacion").Password = "corta";
+        Pulsar("AlGuardar");
+        verificar(servicio.Cambios == 0 && Campo<TextBlock>("Mensaje").Text.Contains("10"), "Una contraseña corta se valida antes de guardar");
+        Campo<PasswordBox>("NuevaContrasena").Password = "ClaveFicticiaNueva";
+        Pulsar("AlGuardar");
+        verificar(servicio.Cambios == 0 && Campo<TextBlock>("Mensaje").Text.Contains("coinciden"), "Una confirmación diferente no cambia la contraseña");
+        Campo<PasswordBox>("Confirmacion").Password = "ClaveFicticiaNueva";
+        verificar(Campo<TextBlock>("ReglaConfirmacion").Text.Contains("✓"), "La coincidencia se muestra mientras se escribe");
+        Pulsar("AlGuardar");
+        servicio.Cambio.SetResult(new(false, "No se pudo guardar la contraseña."));
+        Esperar(100);
+        verificar(Campo<StackPanel>("PasoCompletado").Visibility == Visibility.Collapsed && Campo<StackPanel>("PasoContrasena").Visibility == Visibility.Visible, "Un guardado rechazado nunca muestra éxito");
+        servicio.Cambio = new();
+        Campo<PasswordBox>("NuevaContrasena").Password = "ClaveFicticiaNueva";
+        Campo<PasswordBox>("Confirmacion").Password = "ClaveFicticiaNueva";
+        Pulsar("AlGuardar");
+        servicio.Cambio.SetResult(new(true, "Contraseña guardada."));
+        Esperar(220);
+        verificar(Campo<StackPanel>("PasoCompletado").Visibility == Visibility.Visible && Campo<PasswordBox>("NuevaContrasena").Password.Length == 0 && Campo<PasswordBox>("Confirmacion").Password.Length == 0, "El guardado confirmado muestra el cierre y elimina las contraseñas de los campos");
+        Capturar(ventana, "recuperacion-completada.png");
+        ventana.Close();
+        verificar(servicio.Cancelaciones == 1, "Cerrar limpia la sesión de recuperación");
+
+        var accesoDirecto = new VentanaRecuperacionContrasena(servicio, "admin@example.test");
+        accesoDirecto.Show();
+        typeof(VentanaRecuperacionContrasena).GetMethod("AlTengoEnlace", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(accesoDirecto, new object[] { accesoDirecto, new RoutedEventArgs() });
+        verificar(((StackPanel)accesoDirecto.FindName("PasoRecuperacion")).Visibility == Visibility.Visible && servicio.Envios == 1, "Un correo ya recibido permite verificar sin solicitar otro");
+        accesoDirecto.Close();
+        var inicial = new VentanaRecuperacionContrasena(servicio, "admin@example.test", true);
+        inicial.Show();
+        Esperar(220);
+        verificar(((StackPanel)inicial.FindName("PasoContrasena")).Visibility == Visibility.Visible && ((Grid)inicial.FindName("IndicadorPasos")).Visibility == Visibility.Collapsed, "La contraseña temporal abre directamente el cambio obligatorio");
+        Capturar(inicial, "recuperacion-inicial.png");
+        inicial.Close();
+    }
+
+    private sealed class RecuperacionSimulada : IServicioAutenticacion
+    {
+        public TaskCompletionSource<ResultadoOperacionAcceso> Envio { get; set; } = new();
+        public TaskCompletionSource<ResultadoOperacionAcceso> Verificacion { get; set; } = new();
+        public TaskCompletionSource<ResultadoOperacionAcceso> Cambio { get; set; } = new();
+        public int Envios, Verificaciones, Cambios, Cancelaciones;
+        public Task<ResultadoInicioSesion> IniciarSesionAsync(string correo, string contrasena, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task CerrarSesionAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public void CancelarCambioContrasena() => Cancelaciones++;
+        public Task<ResultadoOperacionAcceso> SolicitarRecuperacionAsync(string correo, CancellationToken cancellationToken = default) { Envios++; return Envio.Task; }
+        public Task<ResultadoOperacionAcceso> VerificarRecuperacionAsync(string correo, string enlaceOCodigo, CancellationToken cancellationToken = default) { Verificaciones++; return Verificacion.Task; }
+        public Task<ResultadoOperacionAcceso> CambiarContrasenaAsync(string contrasena, CancellationToken cancellationToken = default) { Cambios++; return Cambio.Task; }
     }
 
     private static void Capturar(Window ventana, string nombre)

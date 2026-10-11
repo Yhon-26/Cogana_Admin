@@ -10,6 +10,8 @@ se conectan al mismo proyecto Supabase y respetan el mismo modelo de datos y RLS
 
 ## Estructura
 
+La recuperación mantiene el mismo diseño blanco y negro y guía tres pasos: correo, verificación y nueva contraseña. Los botones principales permanecen visibles; el contenido se desplaza si falta espacio. Incluye reenvío con cuenta regresiva de 60 segundos, entrada directa si ya existe un enlace, validación de longitud y coincidencia, y confirmación final solo tras un guardado correcto. El cambio de contraseña temporal abre directamente el paso de contraseña. La recuperación sigue verificándose dentro de Windows con el enlace original, sin abrirlo en el navegador.
+
 El login usa una tarjeta blanca con controles negros y reserva el verde para **EN LÍNEA**. Conserva perspectiva suave y foco visible por teclado, sin un control adicional de movimiento. El enlace de recuperación se subraya al pasar el cursor, sin fondo del sistema. El indicador de acceso espera la respuesta del servicio; no estima porcentajes. Las animaciones se pausan con la ventana inactiva o minimizada.
 
 **Recordar cuenta** comienza desmarcado. Tras un acceso correcto guarda correo y contraseña en el administrador de credenciales de Windows para el usuario actual y este equipo, con un destino separado por proyecto Supabase. Al volver a abrir la aplicación rellena los campos; siempre requiere pulsar Entrar y comprobar acceso administrativo. Desmarcarlo elimina la credencial. Abrir recuperación o iniciar el cambio obligatorio elimina también la cuenta recordada. No escribe contraseñas en archivos del proyecto ni guarda tokens de sesión. Contrato nativo: [CREDENTIALW de Microsoft](https://learn.microsoft.com/windows/win32/api/wincred/ns-wincred-credentialw).
