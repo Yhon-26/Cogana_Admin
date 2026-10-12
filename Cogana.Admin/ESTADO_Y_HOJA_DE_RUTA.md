@@ -7,7 +7,7 @@ Esta guía resume el estado conocido del software de escritorio. El código fuen
 
 ## Publicación vigente (11/10/2026)
 
-La versión **1.11.6** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.6), desde el código `df5b5c7`. Unifica la navegación en un menú lateral plegable, adapta las tarjetas al ancho disponible, compacta cabecera e indicadores y fija la conexión/actualizaciones en el borde inferior. El panel vacío ofrece Restaurar panel inicial y respeta la disposición vacía guardada al reabrir. Conserva marca, arrastre, navegación por clic, orden de tarjetas y Cerrar sesión. Se verificaron los seis archivos públicos y ambos manifiestos; el canal ofrece 1.11.6 y delta desde 1.11.5. Validación: 95 comprobaciones locales aprobadas, compilaciones Debug/Release correctas, capturas del panel vacío/compacto/mínimo/amplio y arrastre/clic con ratón en una ventana aislada. La actualización en otro equipo y los recorridos autenticados de producción siguen pendientes.
+La versión **1.11.7** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.7), desde el código `b8f55e8`. Añade Ver imagen en Productos: consulta la foto asociada sin editar, distingue ausencia/error/formato incompatible y permite recargar. JPG/PNG son compatibles de forma nativa; otros formatos dependen de los códecs de Windows. Se verificaron los seis archivos públicos y ambos manifiestos; ofrece delta desde 1.11.6. Validación: 104 comprobaciones locales aprobadas, compilaciones Debug/Release correctas y captura del visor con imagen simulada. Se confirmó en producción que el bucket público `product-images` existe, admite 5 MiB y tiene cero imágenes asociadas en `product_images`; ambos clientes apuntan al mismo proyecto. La primera carga real, su visualización en ambos clientes y la actualización en otro equipo siguen pendientes.
 
 Por indicación del usuario, cada mejora terminada debe verificarse y publicarse con una nueva versión para actualizar la aplicación instalada. Esta autorización reemplaza la espera anterior de confirmación por publicación.
 
@@ -89,7 +89,7 @@ Recorrido completo con sesión real de propietario contra la base de datos de pr
 | Módulo | Estado actual | Trabajo pendiente principal |
 | --- | --- | --- |
 | Inicio | Indicadores y actividad reciente conectados a Supabase. | Revisar métricas con datos reales y mejorar filtros/periodos si el negocio los requiere. |
-| Productos | Consulta, alta, edición, estado y detalle. | Completar reglas y revisión de casos límite del catálogo. |
+| Productos | Consulta, alta, edición, estado, detalle y visor de imagen sin edición. | Completar reglas y revisión de casos límite del catálogo. |
 | Categorías | Consulta, alta, edición y activación. | Revisar ordenamiento y dependencias con el catálogo. |
 | Presentaciones | Consulta, alta, edición y activación. | Validar equivalencias, precios y restricciones con operaciones reales. |
 | Inventario y lotes | Consulta, alta, detalle, movimientos y ajuste controlado de stock. | Revisión operativa con casos reales, vencimientos y permisos. |
