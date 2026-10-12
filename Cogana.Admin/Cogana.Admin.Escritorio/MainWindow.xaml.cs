@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using Cogana.Admin.Escritorio.Controles;
 using System.Text;
 using Cogana.Admin.Aplicacion.Contratos;
 using Cogana.Admin.Aplicacion.Modelos;
@@ -22,13 +24,40 @@ public partial class MainWindow : Window
         set => SetValue(EsMenuCompactoProperty, value);
     }
     private void AlAlternarMenu(object sender, RoutedEventArgs e) => EsMenuCompacto = !EsMenuCompacto;
+    public static readonly DependencyProperty AnchoMenuProperty = DependencyProperty.Register(
+        nameof(AnchoMenu), typeof(double), typeof(MainWindow), new PropertyMetadata(252d,
+            (objeto, cambio) => { var ventana = (MainWindow)objeto;
+                if (ventana.ColumnaMenu is not null) ventana.ColumnaMenu.Width = new GridLength((double)cambio.NewValue); }));
+    public double AnchoMenu { get => (double)GetValue(AnchoMenuProperty); set => SetValue(AnchoMenuProperty, value); }
     private void ActualizarMenu()
     {
         if (ColumnaMenu is null) return;
-        ColumnaMenu.Width = new GridLength(EsMenuCompacto ? 104 : 252);
+        var origen = AnchoMenu;
+        var destino = EsMenuCompacto ? 104d : 252d;
+        BeginAnimation(AnchoMenuProperty, null);
+        if (IsLoaded && SystemParameters.ClientAreaAnimation)
+        {
+            AnchoMenu = origen;
+            // transition: width .25s ease del ZIP. Sustituye el reloj desde el ancho visible.
+            var transicion = new DoubleAnimationUsingKeyFrames { Duration = TimeSpan.FromMilliseconds(250), FillBehavior = FillBehavior.Stop };
+            transicion.KeyFrames.Add(new DiscreteDoubleKeyFrame(origen, KeyTime.FromTimeSpan(TimeSpan.Zero)));
+            transicion.KeyFrames.Add(new SplineDoubleKeyFrame(destino, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(250)), new KeySpline(.25, .1, .25, 1)));
+            transicion.Completed += (_, _) => { AnchoMenu = destino; BeginAnimation(AnchoMenuProperty, null); };
+            BeginAnimation(AnchoMenuProperty, transicion, HandoffBehavior.SnapshotAndReplace);
+        }
+        else AnchoMenu = destino;
         ContenedorMenu.Padding = new Thickness(EsMenuCompacto ? 8 : 12, 16, EsMenuCompacto ? 8 : 12, 16);
         BotonAlternarMenu.Content = EsMenuCompacto ? "›" : "‹  Contraer menú";
         BotonCerrarSesion.Content = EsMenuCompacto ? "⇥" : "Cerrar sesión";
+    }
+    private void AnimarSeleccion(ListBoxItem opcion, Point? origen = null)
+    {
+        foreach (var elemento in MenuModulos.Items)
+            if (MenuModulos.ItemContainerGenerator.ContainerFromItem(elemento) is ListBoxItem otra && otra != opcion)
+                (otra.Template.FindName("EfectoSeleccion", otra) as EfectoSeleccionMenu)?.Detener();
+        opcion.ApplyTemplate();
+        if (opcion.Template.FindName("EfectoSeleccion", opcion) is EfectoSeleccionMenu efecto)
+            efecto.Iniciar(origen ?? new Point(opcion.ActualWidth / 2, opcion.ActualHeight / 2), SystemParameters.ClientAreaAnimation);
     }
     private void AlRestaurarPanel(object sender, RoutedEventArgs e)
     {
@@ -48,6 +77,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Closed += (_, _) => BeginAnimation(AnchoMenuProperty, null);
         Loaded += AlCargarVentana;
         Activated += AlActivarVentana;
     }
@@ -84,6 +114,12 @@ public partial class MainWindow : Window
 
     private async void AlCambiarModulo(object sender, SelectionChangedEventArgs e)
     {
+        foreach (var elemento in MenuModulos.Items)
+            if (MenuModulos.ItemContainerGenerator.ContainerFromItem(elemento) is ListBoxItem anterior)
+                (anterior.Template.FindName("EfectoSeleccion", anterior) as EfectoSeleccionMenu)?.Detener();
+        if (_opcionPresionada is null && MenuModulos.IsKeyboardFocusWithin && MenuModulos.SelectedItem is not null &&
+            MenuModulos.ItemContainerGenerator.ContainerFromItem(MenuModulos.SelectedItem) is ListBoxItem opcion)
+            AnimarSeleccion(opcion);
         if (DataContext is not VentanaPrincipalViewModel viewModel)
         {
             return;
@@ -210,6 +246,7 @@ public partial class MainWindow : Window
         {
             opcion.IsSelected = true;
             opcion.Focus();
+            AnimarSeleccion(opcion, posicion);
         }
         e.Handled = true;
     }

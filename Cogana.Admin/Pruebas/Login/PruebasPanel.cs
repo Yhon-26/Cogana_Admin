@@ -47,11 +47,23 @@ internal static class PruebasPanel
         vm.QuitarWidget(widget);
         verificar(!almacen.Nombres.Contains("Promociones"), "Quitar una tarjeta también actualiza la disposición");
         var anchoExpandido=menu.ActualWidth;
-        ventana.EsMenuCompacto=true; ventana.UpdateLayout(); Esperar();
+        ventana.EsMenuCompacto=true;
+        verificar(!SystemParameters.ClientAreaAnimation || ventana.HasAnimatedProperties,
+            "Contraer utiliza una transición de ancho cuando Windows permite animaciones");
+        ventana.UpdateLayout(); Esperar(70);
+        var anchoIntermedio=ventana.AnchoMenu;
+        ventana.EsMenuCompacto=false;
+        verificar(Math.Abs(ventana.AnchoMenu-anchoIntermedio)<2,
+            "Invertir una transición parte del ancho actual sin saltos");
+        ventana.EsMenuCompacto=true; Esperar(350); ventana.UpdateLayout();
+        verificar(Math.Abs(ventana.AnchoMenu-104)<1 && !ventana.HasAnimatedProperties,
+            "Alternar rápidamente termina compacto y libera el reloj");
         verificar(menu.ActualWidth<anchoExpandido-100 && menu.IsVisible, "El menú compacto recupera espacio y conserva la navegación");
         verificar(((Button)ventana.FindName("BotonCerrarSesion")).IsVisible, "Cerrar sesión permanece disponible en el menú compacto");
         Capturar(ventana,"panel-compacto.png");
-        ventana.EsMenuCompacto=false; ventana.Width=1180; ventana.UpdateLayout(); Esperar();
+        ventana.EsMenuCompacto=false; ventana.Width=1180; Esperar(350); ventana.UpdateLayout();
+        verificar(Math.Abs(ventana.AnchoMenu-252)<1,"Expandir recupera el ancho completo");
+        ProbarEfecto(ventana,menu,verificar);
         verificar(menu.ActualWidth>100, "El menú puede volver a mostrar los nombres");
         var barra=(FrameworkElement)ventana.FindName("BarraEstado");
         verificar(barra.TransformToAncestor(ventana).Transform(new Point()).Y>ventana.ActualHeight-100,
@@ -142,9 +154,30 @@ internal static class PruebasPanel
         protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(System.Net.Http.HttpRequestMessage solicitud,CancellationToken token)
             => Task.FromResult(new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.NoContent));
     }
-    private static void Esperar()
+    private static void ProbarEfecto(MainWindow ventana,ListBox menu,Action<bool,string> verificar)
     {
-        var marco=new DispatcherFrame(); var reloj=new DispatcherTimer {Interval=TimeSpan.FromMilliseconds(100)};
+        var opcion=(ListBoxItem)menu.ItemContainerGenerator.ContainerFromIndex(0);
+        opcion.ApplyTemplate();
+        var efecto=(Cogana.Admin.Escritorio.Controles.EfectoSeleccionMenu)opcion.Template.FindName("EfectoSeleccion",opcion);
+        efecto.Iniciar(new Point(18,20),true); Esperar(100);
+        verificar(efecto.Tiempo>0 && !efecto.IsHitTestVisible,"El efecto avanza sin interceptar clics o arrastres");
+        efecto.Iniciar(new Point(60,20),true);
+        verificar(efecto.Origen==new Point(60,20) && efecto.Tiempo<.1,"Un clic repetido reinicia la onda desde el nuevo punto");
+        efecto.Detener(); efecto.Tiempo=.2; Capturar(ventana,"menu-onda.png"); efecto.Detener();
+        efecto.Iniciar(new Point(18,20),false);
+        verificar(efecto.Tiempo<0 && !efecto.HasAnimatedProperties,"Sin animaciones de Windows la selección permanece inmediata");
+        efecto.Iniciar(new Point(18,20),true);
+        menu.SelectedIndex=1;
+        verificar(!efecto.HasAnimatedProperties,"Cambiar de módulo cancela el efecto de la opción anterior");
+        menu.SelectedIndex=0;
+        efecto.Iniciar(new Point(18,20),true); Esperar(1300);
+        verificar(efecto.Tiempo<0 && !efecto.HasAnimatedProperties,"El efecto concluye y libera su reloj");
+        efecto.Iniciar(new Point(18,20),true); efecto.RaiseEvent(new RoutedEventArgs(FrameworkElement.UnloadedEvent));
+        verificar(!efecto.HasAnimatedProperties && efecto.Tiempo<0,"Descargar la opción cancela cualquier efecto pendiente");
+    }
+    private static void Esperar(int milisegundos=100)
+    {
+        var marco=new DispatcherFrame(); var reloj=new DispatcherTimer {Interval=TimeSpan.FromMilliseconds(milisegundos)};
         reloj.Tick+=(_,_)=>{reloj.Stop();marco.Continue=false;}; reloj.Start(); Dispatcher.PushFrame(marco);
     }
     private static IEnumerable<DependencyObject> Descendientes(DependencyObject raiz)

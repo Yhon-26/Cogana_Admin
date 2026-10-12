@@ -37,6 +37,7 @@
                 BorderThickness="1"
                 CornerRadius="22"
                 Padding="12,16">
+            <Border.ClipToBounds>True</Border.ClipToBounds>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -86,7 +87,10 @@
                                                 Background="{TemplateBinding Background}"
                                                 CornerRadius="12" BorderBrush="Transparent" BorderThickness="1"
                                                 Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter />
+                                            <Grid>
+                                                <ContentPresenter />
+                                                <controles:EfectoSeleccionMenu x:Name="EfectoSeleccion" />
+                                            </Grid>
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsKeyboardFocusWithin" Value="True">
