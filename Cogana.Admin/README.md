@@ -63,8 +63,7 @@ el botón **Verificar conexión**.
 Cada mejora terminada de este proyecto debe verificarse, incrementar su versión y publicarse en el canal de GitHub para que la aplicación instalada pueda actualizarse. Esta continuidad de publicación fue autorizada por el usuario el 11/10/2026.
 
 La app se distribuye e instala con [Velopack](https://velopack.io) y se actualiza
-desde la propia interfaz con el botón **Buscar actualizaciones** (tarjeta
-"Conexión segura" del inicio). La versión en ejecución se muestra en esa misma tarjeta.
+desde la propia interfaz con el botón **Buscar actualizaciones** de la barra inferior. La versión en ejecución se muestra en esa misma barra.
 
 Para generar una versión instalable:
 
