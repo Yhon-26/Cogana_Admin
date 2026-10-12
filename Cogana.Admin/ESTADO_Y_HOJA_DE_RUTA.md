@@ -1,13 +1,15 @@
 # Cogana Admin: estado y hoja de ruta
 
 **Ubicación del proyecto:** `D:\Cogana_Admin\Cogana.Admin`  
-**Actualizado:** 11 de octubre de 2026
+**Actualizado:** 12 de octubre de 2026
 
 Esta guía resume el estado conocido del software de escritorio. El código fuente es la referencia para el comportamiento actual; las funciones indicadas como pendientes todavía no deben considerarse disponibles.
 
-## Publicación vigente (11/10/2026)
+## Publicación vigente (12/10/2026)
 
-La versión **1.11.7** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.7), desde el código `b8f55e8`. Añade Ver imagen en Productos: consulta la foto asociada sin editar, distingue ausencia/error/formato incompatible y permite recargar. JPG/PNG son compatibles de forma nativa; otros formatos dependen de los códecs de Windows. Se verificaron los seis archivos públicos y ambos manifiestos; ofrece delta desde 1.11.6. Validación: 104 comprobaciones locales aprobadas, compilaciones Debug/Release correctas y captura del visor con imagen simulada. Se confirmó en producción que el bucket público `product-images` existe, admite 5 MiB y tiene cero imágenes asociadas en `product_images`; ambos clientes apuntan al mismo proyecto. La primera carga real, su visualización en ambos clientes y la actualización en otro equipo siguen pendientes.
+La versión **1.11.8** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.8), desde el código `4532fbc`. Adapta únicamente las animaciones del menú del ZIP de Figma: ondas, anillos y partículas desde el clic, origen central para teclado y transición de ancho de 250 ms al contraer/expandir. Respeta la preferencia de animaciones de Windows, admite interrupciones y libera los relojes al terminar o descargar los controles. Conserva navegación, arrastre, disposición guardada y cierre de sesión. Validación: 114 comprobaciones locales aprobadas, compilación sin advertencias ni errores y capturas revisadas del efecto y menú compacto. Se verificaron los seis archivos públicos, sus hashes, ambos manifiestos y la etiqueta; ofrece delta desde 1.11.7. La actualización instalada en otro equipo y la percepción de fluidez durante el uso real quedan pendientes.
+
+La versión 1.11.7 añadió Ver imagen en Productos. Continúa pendiente la primera carga real y su visualización en ambos clientes; la última consulta de producción mostró cero imágenes asociadas. JPG/PNG son compatibles de forma nativa; otros formatos dependen de los códecs de Windows.
 
 Por indicación del usuario, cada mejora terminada debe verificarse y publicarse con una nueva versión para actualizar la aplicación instalada. Esta autorización reemplaza la espera anterior de confirmación por publicación.
 
