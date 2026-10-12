@@ -52,13 +52,13 @@ public partial class MainWindow : Window
     }
     private void AnimarSeleccion(ListBoxItem opcion, Point? origen = null)
     {
-        foreach (var elemento in MenuModulos.Items)
-            if (MenuModulos.ItemContainerGenerator.ContainerFromItem(elemento) is ListBoxItem otra && otra != opcion)
-                (otra.Template.FindName("EfectoSeleccion", otra) as EfectoSeleccionMenu)?.Detener();
-        opcion.ApplyTemplate();
-        if (opcion.Template.FindName("EfectoSeleccion", opcion) is EfectoSeleccionMenu efecto)
-            efecto.Iniciar(origen ?? new Point(opcion.ActualWidth / 2, opcion.ActualHeight / 2), SystemParameters.ClientAreaAnimation);
+        UpdateLayout();
+        var posicion = opcion.TranslatePoint(new Point(), EfectoSeleccion);
+        var punto = origen ?? new Point(opcion.ActualWidth / 2, opcion.ActualHeight / 2);
+        EfectoSeleccion.ZonaOpcion = new Rect(posicion, new Size(opcion.ActualWidth, opcion.ActualHeight));
+        EfectoSeleccion.Iniciar(posicion + (Vector)punto, SystemParameters.ClientAreaAnimation);
     }
+
     private void AlRestaurarPanel(object sender, RoutedEventArgs e)
     {
         if (DataContext is VentanaPrincipalViewModel viewModel) viewModel.RestaurarPanelInicial();
@@ -78,6 +78,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Closed += (_, _) => BeginAnimation(AnchoMenuProperty, null);
+        MenuModulos.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler((_, _) => EfectoSeleccion.Detener()));
+        SizeChanged += (_, _) => EfectoSeleccion.Detener();
         Loaded += AlCargarVentana;
         Activated += AlActivarVentana;
     }
@@ -114,9 +116,7 @@ public partial class MainWindow : Window
 
     private async void AlCambiarModulo(object sender, SelectionChangedEventArgs e)
     {
-        foreach (var elemento in MenuModulos.Items)
-            if (MenuModulos.ItemContainerGenerator.ContainerFromItem(elemento) is ListBoxItem anterior)
-                (anterior.Template.FindName("EfectoSeleccion", anterior) as EfectoSeleccionMenu)?.Detener();
+        EfectoSeleccion?.Detener();
         if (_opcionPresionada is null && MenuModulos.IsKeyboardFocusWithin && MenuModulos.SelectedItem is not null &&
             MenuModulos.ItemContainerGenerator.ContainerFromItem(MenuModulos.SelectedItem) is ListBoxItem opcion)
             AnimarSeleccion(opcion);
@@ -289,6 +289,7 @@ public partial class MainWindow : Window
         _inicioArrastreModulo = null;
         _opcionPresionada = null;
         opcion.ReleaseMouseCapture();
+        EfectoSeleccion.Detener();
         if (DataContext is not VentanaPrincipalViewModel viewModel) return;
         var anterior = viewModel.ModuloSeleccionado;
         viewModel.ModuloSeleccionado = viewModel.Modulos[0];

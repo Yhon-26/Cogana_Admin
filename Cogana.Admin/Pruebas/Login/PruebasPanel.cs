@@ -156,14 +156,37 @@ internal static class PruebasPanel
     }
     private static void ProbarEfecto(MainWindow ventana,ListBox menu,Action<bool,string> verificar)
     {
-        var opcion=(ListBoxItem)menu.ItemContainerGenerator.ContainerFromIndex(0);
-        opcion.ApplyTemplate();
-        var efecto=(Cogana.Admin.Escritorio.Controles.EfectoSeleccionMenu)opcion.Template.FindName("EfectoSeleccion",opcion);
+        menu.SelectedIndex=5; ventana.UpdateLayout();
+        var opcion=(ListBoxItem)menu.ItemContainerGenerator.ContainerFromIndex(5);
+        var efecto=(Cogana.Admin.Escritorio.Controles.EfectoSeleccionMenu)ventana.FindName("EfectoSeleccion");
+        var esquina=opcion.TranslatePoint(new Point(),efecto);
+        efecto.ZonaOpcion=new Rect(esquina,new Size(opcion.ActualWidth,opcion.ActualHeight));
+        var centro=esquina+new Vector(80,opcion.ActualHeight/2);
         efecto.Iniciar(new Point(18,20),true); Esperar(100);
         verificar(efecto.Tiempo>0 && !efecto.IsHitTestVisible,"El efecto avanza sin interceptar clics o arrastres");
         efecto.Iniciar(new Point(60,20),true);
         verificar(efecto.Origen==new Point(60,20) && efecto.Tiempo<.1,"Un clic repetido reinicia la onda desde el nuevo punto");
-        efecto.Detener(); efecto.Tiempo=.2; Capturar(ventana,"menu-onda.png"); efecto.Detener();
+        efecto.Iniciar(centro,true); efecto.Detener(); efecto.Tiempo=.2;
+        Esperar(30); Capturar(ventana,"menu-onda.png");
+        var imagen=new RenderTargetBitmap((int)efecto.ActualWidth,(int)efecto.ActualHeight,96,96,PixelFormats.Pbgra32);
+        imagen.Render(efecto);
+        var pixeles=new byte[imagen.PixelWidth*imagen.PixelHeight*4]; imagen.CopyPixels(pixeles,imagen.PixelWidth*4,0);
+        var hayOndaExterior=false;
+        for(var y=0;y<imagen.PixelHeight;y++)
+            for(var x=0;x<imagen.PixelWidth;x++)
+                if(!efecto.ZonaOpcion.Contains(new Point(x,y)) && pixeles[(y*imagen.PixelWidth+x)*4+3]>10) hayOndaExterior=true;
+        verificar(hayOndaExterior,"Los anillos se dibujan fuera del botón sobre las filas vecinas");
+        var carpeta=System.IO.Path.Combine(AppContext.BaseDirectory,"menu-inmersivo");System.IO.Directory.CreateDirectory(carpeta);
+        for(var i=0;i<45;i++)
+        {
+            efecto.Tiempo=i<25 ? i*.05 : -1;
+            Esperar(30);
+            var cuadro=new RenderTargetBitmap((int)ventana.ActualWidth,(int)ventana.ActualHeight,96,96,PixelFormats.Pbgra32);
+            cuadro.Render(ventana);
+            var png=new PngBitmapEncoder();png.Frames.Add(BitmapFrame.Create(new CroppedBitmap(cuadro,new Int32Rect(8,8,244,700))));
+            using var archivo=System.IO.File.Create(System.IO.Path.Combine(carpeta,$"cuadro-{i:D3}.png"));png.Save(archivo);
+        }
+        efecto.Detener();
         efecto.Iniciar(new Point(18,20),false);
         verificar(efecto.Tiempo<0 && !efecto.HasAnimatedProperties,"Sin animaciones de Windows la selección permanece inmediata");
         efecto.Iniciar(new Point(18,20),true);
