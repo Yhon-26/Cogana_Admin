@@ -96,6 +96,13 @@ public partial class MainWindow : Window
         }
     }
 
+    private void AlVerImagenProducto(object sender, RoutedEventArgs e)
+    {
+        if (ServicioImagenes is null || DataContext is not VentanaPrincipalViewModel { PuedeVerImagen: true, FilaModuloSeleccionada: not null } vm) return;
+        new Vistas.VentanaImagenProducto(ServicioImagenes, TiendaId, vm.FilaModuloSeleccionada.Id,
+            vm.FilaModuloSeleccionada.Columna2) { Owner=this }.ShowDialog();
+    }
+
     private async void AlCrearRegistro(object sender, RoutedEventArgs e)
     {
         if (DataContext is not VentanaPrincipalViewModel { ModuloSeleccionado: not null } viewModel ||

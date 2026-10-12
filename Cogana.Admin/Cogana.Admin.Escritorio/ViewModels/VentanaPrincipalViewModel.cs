@@ -289,6 +289,8 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
             Notificar(nameof(EsModuloPendiente));
             Notificar(nameof(PuedeCrearRegistro));
             Notificar(nameof(PuedeEditarRegistro));
+            Notificar(nameof(EsModuloProductos));
+            Notificar(nameof(PuedeVerImagen));
             Notificar(nameof(TextoEditarRegistro));
             Notificar(nameof(PuedeGestionarPedido));
             Notificar(nameof(PuedeCambiarEstadoRegistro));
@@ -466,12 +468,16 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
             {
                 Notificar(nameof(PuedeGestionarPedido));
                 Notificar(nameof(PuedeEditarRegistro));
+                Notificar(nameof(PuedeVerImagen));
                 Notificar(nameof(TextoEditarRegistro));
                 Notificar(nameof(PuedeCambiarEstadoRegistro));
                 Notificar(nameof(TextoAccionEstado));
             }
         }
     }
+
+    public bool EsModuloProductos => ModuloSeleccionado?.Nombre == "Productos";
+    public bool PuedeVerImagen => EsModuloProductos && FilaModuloSeleccionada is not null;
 
     public bool PuedeGestionarPedido =>
         ModuloSeleccionado?.Nombre == "Pedidos" &&

@@ -33,6 +33,12 @@ El menú izquierdo permite abrir un módulo con un clic o arrastrarlo al Inicio 
 
 Para una ventana aislada del panel: `dotnet run --project Pruebas/Login/Login.csproj -c Release -- --panel-visual`. No carga datos ni modifica la disposición real del usuario.
 
+## Imágenes de productos
+
+Los archivos se suben al bucket público `product-images` de Supabase Storage, con ruta `{tiendaId}/{productoId}.{extensión}`. `product_images.storage_path` vincula el objeto con el producto; el catálogo móvil lee esa ruta mediante `image_path` y obtiene la URL pública del mismo bucket. No depende del archivo original de la computadora una vez guardado correctamente. El bucket desplegado fue comprobado con límite de 5 MiB; al 11/10/2026 había cero filas de imágenes asociadas, por lo que aún falta validar la primera carga real y su visualización en ambos clientes.
+
+En Productos, selecciona una fila y pulsa **Ver imagen** para abrir una consulta de la foto actual sin editar. El visor distingue ausencia de foto, descarga fallida y formato incompatible, permite volver a cargar y cancela la consulta al cerrar. Usa los códecs disponibles de Windows; JPG y PNG se admiten de forma nativa. No cambia buckets, políticas ni el flujo de subida existente.
+
 ## Marca del escritorio
 
 El logo monocromático aprobado se muestra en el login, recuperación y cabecera del menú. El símbolo compacto aparece en el carril oscuro, estados del acceso y ventanas. El ejecutable y el instalador incluyen el mismo ícono de Windows con nueve tamaños y transparencia. Los recursos están embebidos; su procedencia, prompts y usos están documentados en `Cogana.Admin.Escritorio/Recursos/Marca/README.md`.

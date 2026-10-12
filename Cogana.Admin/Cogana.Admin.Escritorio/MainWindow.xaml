@@ -574,8 +574,13 @@
                             </StackPanel>
                         </Grid>
 
-                        <TextBlock Grid.Row="1" Text="{Binding MensajeModulo}" FontSize="11"
-                                   Foreground="{StaticResource BrochaTextoSuave}" Margin="2,14,0,13" />
+                        <Grid Grid.Row="1" Margin="2,12,0,12">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding MensajeModulo}" FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <Button Grid.Column="1" x:Name="BotonVerImagen" Content="Ver imagen" Click="AlVerImagenProducto"
+                                    IsEnabled="{Binding PuedeVerImagen}" Visibility="{Binding EsModuloProductos, Converter={StaticResource BoolAVisibilidad}}"
+                                    ToolTip="Selecciona un producto para consultar su imagen" Style="{StaticResource BotonSecundario}" Padding="14,7" Margin="12,0,0,0"/>
+                        </Grid>
 
                         <Border Grid.Row="2" Background="#F0F1EF" CornerRadius="13" Padding="14,11">
                             <Grid>

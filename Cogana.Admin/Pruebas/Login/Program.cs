@@ -104,6 +104,7 @@ internal static class Program
             ProbarEstadosAcceso(Verificar);
             ProbarRecuperacion(Verificar);
             PruebasPanel.Probar(Verificar, args.Contains("--panel-visual"));
+            PruebasImagenProducto.Probar(Verificar);
             Console.WriteLine($"{cantidad} verificaciones totales correctas, sin conexión a Supabase.");
         }
     }

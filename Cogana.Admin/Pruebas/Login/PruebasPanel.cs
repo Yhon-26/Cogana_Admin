@@ -29,6 +29,13 @@ internal static class PruebasPanel
         promocion.IsSelected = true; Esperar();
         verificar(vm.ModuloSeleccionado?.Nombre=="Promociones", "La selección del menú abre el módulo completo");
         vm.ModuloSeleccionado=vm.Modulos[0];
+        vm.ModuloSeleccionado=vm.Modulos.Single(m=>m.Nombre=="Productos"); Esperar();
+        verificar(vm.EsModuloProductos && !vm.PuedeVerImagen,"Ver imagen requiere seleccionar un producto");
+        vm.FilaModuloSeleccionada=new(Guid.NewGuid(),"SKU","Producto","","","","Activo");
+        verificar(vm.PuedeVerImagen,"Seleccionar un producto habilita Ver imagen");
+        vm.ModuloSeleccionado=vm.Modulos.Single(m=>m.Nombre=="Categorías");
+        verificar(!vm.EsModuloProductos && !vm.PuedeVerImagen,"Otros módulos no ofrecen la foto de producto");
+        vm.ModuloSeleccionado=vm.Modulos[0];
         var cantidad=vm.WidgetsInicio.Count;
         vm.AgregarWidgetPorNombre("Promociones");
         verificar(vm.WidgetsInicio.Count==cantidad+1 && almacen.Nombres.Contains("Promociones"), "Agregar desde el menú guarda la tarjeta");
