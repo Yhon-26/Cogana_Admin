@@ -209,7 +209,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
             }
         }
 
-        if (WidgetsInicio.Count == 0)
+        if (WidgetsInicio.Count == 0 && !_servicioPanelInicio.TieneConfiguracionGuardada)
         {
             // Primera ejecución: panel sugerido. El usuario puede quitarlos o añadir otros.
             foreach (var nombre in (string[])["Pedidos", "Productos", "Inventario y lotes"])
@@ -224,6 +224,12 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
 
     private void GuardarWidgets() =>
         _servicioPanelInicio.Guardar([.. WidgetsInicio.Select(widget => widget.Nombre)]);
+
+    public void RestaurarPanelInicial()
+    {
+        foreach (var nombre in new[] { "Pedidos", "Productos", "Inventario y lotes" })
+            AgregarWidgetPorNombre(nombre);
+    }
 
     private async Task CargarDatosWidgetAsync(WidgetInicioViewModel widget)
     {

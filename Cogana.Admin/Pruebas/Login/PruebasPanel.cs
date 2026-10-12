@@ -39,6 +39,34 @@ internal static class PruebasPanel
         verificar(almacen.Nombres[0]=="Promociones", "Reordenar mantiene la persistencia existente");
         vm.QuitarWidget(widget);
         verificar(!almacen.Nombres.Contains("Promociones"), "Quitar una tarjeta también actualiza la disposición");
+        var anchoExpandido=menu.ActualWidth;
+        ventana.EsMenuCompacto=true; ventana.UpdateLayout(); Esperar();
+        verificar(menu.ActualWidth<anchoExpandido-100 && menu.IsVisible, "El menú compacto recupera espacio y conserva la navegación");
+        verificar(((Button)ventana.FindName("BotonCerrarSesion")).IsVisible, "Cerrar sesión permanece disponible en el menú compacto");
+        Capturar(ventana,"panel-compacto.png");
+        ventana.EsMenuCompacto=false; ventana.Width=1180; ventana.UpdateLayout(); Esperar();
+        verificar(menu.ActualWidth>100, "El menú puede volver a mostrar los nombres");
+        var barra=(FrameworkElement)ventana.FindName("BarraEstado");
+        verificar(barra.TransformToAncestor(ventana).Transform(new Point()).Y>ventana.ActualHeight-100,
+            "La barra de estado permanece en el borde inferior");
+        foreach(var tarjeta in vm.WidgetsInicio.ToArray()) vm.QuitarWidget(tarjeta);
+        ventana.UpdateLayout(); Esperar();
+        var restaurar=(Button)ventana.FindName("BotonRestaurarPanel");
+        verificar(restaurar.IsVisible, "El panel vacío ofrece restaurar las tarjetas iniciales");
+        Capturar(ventana,"panel-vacio.png");
+        var vmVacio=new VentanaPrincipalViewModel(new ServicioEstadoBackend(cliente),new ServicioResumenInicioSupabase(cliente),
+            new ServicioModulosAdministrativosSupabase(cliente),new ServicioReportesAdministrativosSupabase(cliente),
+            new ServicioActualizacionesVelopack(),almacen,new(Guid.NewGuid(),"cuenta@example.test","","",Guid.NewGuid(),"admin"));
+        verificar(vmVacio.WidgetsInicio.Count==0, "Reabrir respeta un panel guardado vacío");
+        restaurar.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); ventana.UpdateLayout(); Esperar();
+        verificar(vm.WidgetsInicio.Select(w=>w.Nombre).SequenceEqual(new[]{"Pedidos","Productos","Inventario y lotes"}) && almacen.Nombres.Count==3,
+            "Restaurar recupera y guarda las tres tarjetas iniciales");
+        vm.RestaurarPanelInicial(); verificar(vm.WidgetsInicio.Count==3,"Restaurar no duplica tarjetas");
+        ProbarDistribucion(verificar);
+        Capturar(ventana,"panel-minimo.png");
+        ventana.Width=1920; ventana.Height=1000; ventana.UpdateLayout(); Esperar();
+        Capturar(ventana,"panel-amplio.png");
+        ventana.Width=1440; ventana.Height=850; ventana.UpdateLayout(); Esperar();
         var salida=(Button)ventana.FindName("BotonCerrarSesion");
         verificar(salida.IsVisible && salida.ActualWidth>100, "Cerrar sesión es visible junto a la cuenta");
         var espera = new TaskCompletionSource(); var solicitudes=0;
@@ -58,6 +86,24 @@ internal static class PruebasPanel
             ventana.Close();
             ProbarRegresoAlLogin(verificar);
         }
+    }
+    private static void ProbarDistribucion(Action<bool,string> verificar)
+    {
+        var tablero=new Cogana.Admin.Escritorio.Controles.TableroAdaptable();
+        for(int i=0;i<4;i++) tablero.Children.Add(new Border{Height=80});
+        tablero.Measure(new Size(1400,double.PositiveInfinity)); tablero.Arrange(new Rect(0,0,1400,80));
+        verificar(tablero.Children.Cast<FrameworkElement>().All(c=>Math.Abs(c.ActualWidth-350)<1), "Cuatro tarjetas aprovechan el ancho de una fila amplia");
+        tablero.Measure(new Size(900,double.PositiveInfinity)); tablero.Arrange(new Rect(0,0,900,160));
+        verificar(tablero.Children.Cast<FrameworkElement>().All(c=>Math.Abs(c.ActualWidth-450)<1) && tablero.DesiredSize.Height==160,
+            "Al reducir el ancho las tarjetas pasan a dos columnas sin recortarse");
+        tablero.Measure(new Size(300,double.PositiveInfinity)); tablero.Arrange(new Rect(0,0,300,320));
+        verificar(tablero.DesiredSize.Height==320, "Una columna mantiene el contenido en espacios estrechos");
+    }
+    private static void Capturar(Window ventana,string nombre)
+    {
+        var bitmap=new RenderTargetBitmap((int)ventana.ActualWidth,(int)ventana.ActualHeight,96,96,PixelFormats.Pbgra32);
+        bitmap.Render(ventana); var png=new PngBitmapEncoder(); png.Frames.Add(BitmapFrame.Create(bitmap));
+        using var archivo=System.IO.File.Create(System.IO.Path.Combine(AppContext.BaseDirectory,nombre)); png.Save(archivo);
     }
     private static void ProbarRegresoAlLogin(Action<bool,string> verificar)
     {
@@ -101,6 +147,7 @@ internal static class PruebasPanel
     }
     private sealed class AlmacenPanel : IServicioPanelInicio
     {
+        public bool TieneConfiguracionGuardada => true;
         public IReadOnlyList<string> Nombres {get;private set;} = ["Pedidos","Productos","Inventario y lotes"];
         public IReadOnlyList<string> Cargar()=>Nombres;
         public void Guardar(IReadOnlyList<string> nombres)=>Nombres=nombres.ToArray();

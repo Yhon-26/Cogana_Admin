@@ -25,6 +25,8 @@ Para comprobar geometría, renderizado, interacción y estados de acceso sin con
 
 ## Panel de inicio y sesión
 
+La navegación usa un único menú lateral que puede contraerse a íconos. La cuenta y Cerrar sesión permanecen disponibles en ambos modos. El tablero reparte las tarjetas en columnas iguales según el ancho disponible; conserva el arrastre y el orden guardado. El panel vacío ofrece Restaurar panel inicial y se conserva vacío al reabrir si fue guardado así. La conexión, la tienda y las actualizaciones aparecen en una franja fija inferior, también dentro de los módulos. No agrega datos de muestra ni cambia contratos de Supabase.
+
 El menú izquierdo permite abrir un módulo con un clic o arrastrarlo al Inicio para agregar su tarjeta. Al comenzar el arrastre desde otro módulo aparece el Inicio; cancelar devuelve la selección anterior. No hay una bandeja duplicada de selecciones. Las tarjetas conservan su orden guardado, se reordenan desde la cabecera y se quitan con ✕; agregar un módulo existente no crea duplicados.
 
 **Cerrar sesión**, debajo de la cuenta, elimina el acceso local y solicita el cierre de la sesión de este escritorio con alcance `local`. Vuelve al login sin cerrar la aplicación, con servicios nuevos. Conserva Recordar cuenta si el usuario lo eligió, pero no inicia sesión automáticamente. Un fallo de conexión también elimina los tokens locales. El ciclo real de ventanas, la salida normal, el fallo de red y la renovación pendiente se verifican con servicios de prueba; no equivale a comprobar una cuenta de producción.

@@ -10,6 +10,7 @@ namespace Cogana.Admin.Infraestructura.Servicios;
 /// </summary>
 public sealed class ServicioPanelInicioArchivo : IServicioPanelInicio
 {
+    public bool TieneConfiguracionGuardada => File.Exists(RutaArchivo);
     private static readonly string RutaArchivo = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "CoganaAdmin",

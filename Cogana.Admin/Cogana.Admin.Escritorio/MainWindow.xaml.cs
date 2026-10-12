@@ -13,6 +13,27 @@ namespace Cogana.Admin.Escritorio;
 
 public partial class MainWindow : Window
 {
+    public static readonly DependencyProperty EsMenuCompactoProperty = DependencyProperty.Register(
+        nameof(EsMenuCompacto), typeof(bool), typeof(MainWindow),
+        new PropertyMetadata(false, (objeto, _) => ((MainWindow)objeto).ActualizarMenu()));
+    public bool EsMenuCompacto
+    {
+        get => (bool)GetValue(EsMenuCompactoProperty);
+        set => SetValue(EsMenuCompactoProperty, value);
+    }
+    private void AlAlternarMenu(object sender, RoutedEventArgs e) => EsMenuCompacto = !EsMenuCompacto;
+    private void ActualizarMenu()
+    {
+        if (ColumnaMenu is null) return;
+        ColumnaMenu.Width = new GridLength(EsMenuCompacto ? 104 : 252);
+        ContenedorMenu.Padding = new Thickness(EsMenuCompacto ? 8 : 12, 16, EsMenuCompacto ? 8 : 12, 16);
+        BotonAlternarMenu.Content = EsMenuCompacto ? "›" : "‹  Contraer menú";
+        BotonCerrarSesion.Content = EsMenuCompacto ? "⇥" : "Cerrar sesión";
+    }
+    private void AlRestaurarPanel(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is VentanaPrincipalViewModel viewModel) viewModel.RestaurarPanelInicial();
+    }
     public IServicioCatalogoAdministrativo? ServicioCatalogo { get; init; }
     public IServicioPedidosAdministrativos? ServicioPedidos { get; init; }
     public IServicioInventarioAdministrativo? ServicioInventario { get; init; }
@@ -167,7 +188,7 @@ public partial class MainWindow : Window
         {
             _cerrandoSesion = false;
             IsEnabled = true;
-            BotonCerrarSesion.Content = "Cerrar sesión";
+            BotonCerrarSesion.Content = EsMenuCompacto ? "⇥" : "Cerrar sesión";
         }
     }
 
@@ -287,8 +308,8 @@ public partial class MainWindow : Window
 
     private void OcultarDestinoModulo()
     {
-        ZonaDestinoWidgets.Background = Brushes.Transparent;
-        ZonaDestinoWidgets.BorderBrush = Brushes.Transparent;
+        ZonaDestinoWidgets.ClearValue(Border.BackgroundProperty);
+        ZonaDestinoWidgets.ClearValue(Border.BorderBrushProperty);
         AvisoDestinoWidgets.Visibility = Visibility.Collapsed;
     }
 
