@@ -23,7 +23,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Recursos\Marca\Cogana.ico</ApplicationIcon>
     <StartupObject>Cogana.Admin.Escritorio.App</StartupObject>
-    <Version>1.11.9</Version>
+    <Version>1.11.10</Version>
   </PropertyGroup>
 
 </Project>

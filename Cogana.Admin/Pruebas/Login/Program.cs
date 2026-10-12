@@ -50,6 +50,12 @@ internal static class Program
             new XAttribute(XNamespace.Xmlns + "x", "http://schemas.microsoft.com/winfx/2006/xaml"),
             documento.Root!.Element(espacio + "Application.Resources")!.Elements());
         aplicacion.Resources = (ResourceDictionary)XamlReader.Parse(diccionario.ToString());
+        if (args.Contains("--skeleton"))
+        {
+            PruebasSkeleton.Probar(Verificar);
+            Console.WriteLine($"{cantidad} comprobaciones de Skeleton correctas.");
+            return;
+        }
         var superficie = new Grid { Width = 472, Height = 540, Background = Brushes.Transparent };
         var texto = new TextBox { Text = "Texto de prueba", Name = "CampoPrueba", Margin = new Thickness(24), FontSize = 18, Height = 46 };
         var boton = new Button { Content = "Acción de prueba", Margin = new Thickness(24), Height = 46 };
@@ -104,6 +110,7 @@ internal static class Program
             ProbarEstadosAcceso(Verificar);
             ProbarRecuperacion(Verificar);
             PruebasPanel.Probar(Verificar, args.Contains("--panel-visual"));
+            PruebasSkeleton.Probar(Verificar);
             PruebasImagenProducto.Probar(Verificar);
             Console.WriteLine($"{cantidad} verificaciones totales correctas, sin conexión a Supabase.");
         }

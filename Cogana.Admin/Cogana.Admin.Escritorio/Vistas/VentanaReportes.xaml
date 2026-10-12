@@ -129,7 +129,7 @@
                     </StackPanel>
                 </Grid>
 
-                <UniformGrid Grid.Row="1" Columns="5" Margin="0,20,0,16">
+                <UniformGrid x:Name="ResumenReporteReal" controles:RevelacionContenido.Activa="True" Grid.Row="1" Columns="5" Margin="0,20,0,16">
                     <Border Background="#F2F3F1" CornerRadius="16" Padding="15" Margin="0,0,8,0">
                         <StackPanel><TextBlock Text="VENTAS" FontSize="9" Foreground="{StaticResource BrochaTextoSuave}" />
                             <TextBlock x:Name="TotalVentas" Text="S/ 0.00" FontSize="22" FontWeight="SemiBold" Margin="0,5,0,0" /></StackPanel>
@@ -152,12 +152,12 @@
                     </Border>
                 </UniformGrid>
 
-                <Border Grid.Row="2" Background="#EEF4F1" CornerRadius="13" Padding="12" Margin="0,0,0,14">
+                <Border x:Name="CajaPeriodo" Grid.Row="2" Background="#EEF4F1" CornerRadius="13" Padding="12" Margin="0,0,0,14">
                     <TextBlock x:Name="ResumenPeriodo" Text="Selecciona un periodo para consultar."
                                FontSize="10" Foreground="#34473F" />
                 </Border>
 
-                <TabControl Grid.Row="3" Background="Transparent" BorderThickness="0"
+                <TabControl x:Name="ContenidoReporteReal" controles:RevelacionContenido.Activa="True" Grid.Row="3" Background="Transparent" BorderThickness="0"
                             ItemContainerStyle="{StaticResource PestanaReporte}">
                     <TabItem Header="Resumen visual">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
@@ -387,9 +387,10 @@
                     </TabItem>
                 </TabControl>
 
+                <controles:SkeletonCarga x:Name="SkeletonReporte" Grid.Row="1" Grid.RowSpan="3" Tipo="Reportes" Margin="0,16,0,0" />
                 <Grid Grid.Row="4" Margin="0,15,0,0">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock x:Name="MensajeFormulario" Foreground="#9A443F" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center" />
+                    <TextBlock x:Name="MensajeFormulario" AutomationProperties.LiveSetting="Polite" Foreground="#9A443F" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                         <Button x:Name="BotonExportar" Content="Exportar reporte CSV" Click="AlExportar"
                                 Style="{StaticResource BotonSecundario}" IsEnabled="False" Margin="0,0,9,0" />

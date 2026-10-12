@@ -189,16 +189,20 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <ProgressBar Grid.Column="1" Style="{StaticResource IndicadorCarga}"
-                                 Margin="0,0,12,0"
-                                 Visibility="{Binding EstaCargandoInicio, Converter={StaticResource BoolAVisibilidad}}" />
+                    <TextBlock Grid.Column="1" Text="Cargando contenido…" Margin="0,0,12,0" VerticalAlignment="Center"
+                               FontSize="11" AutomationProperties.LiveSetting="Polite"
+                               Visibility="{Binding EstaCargandoInicio, Converter={StaticResource BoolAVisibilidad}}" />
 
                     <Button Grid.Column="2" Content="Actualizar resumen"
                             Command="{Binding VerificarConexionCommand}"
-                            Style="{StaticResource BotonPrincipal}" Height="40" Padding="16,8" />
+                            Height="40" Padding="16,8">
+                        <Button.Style><Style TargetType="Button" BasedOn="{StaticResource BotonPrincipal}"><Style.Triggers>
+                            <DataTrigger Binding="{Binding EstaCargandoInicio}" Value="True"><Setter Property="IsEnabled" Value="False" /></DataTrigger>
+                        </Style.Triggers></Style></Button.Style>
+                    </Button>
                 </Grid>
 
-                <UniformGrid Grid.Row="1" Columns="4" Margin="0,20,0,16">
+                <UniformGrid x:Name="ResumenReal" controles:RevelacionContenido.Activa="True" Grid.Row="1" Columns="4" Margin="0,20,0,16">
                     <UniformGrid.Style>
                         <Style TargetType="UniformGrid">
                             <Setter Property="Visibility" Value="Visible" />
@@ -206,6 +210,10 @@
                                 <DataTrigger Binding="{Binding EsModuloInicio}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                <MultiDataTrigger><MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding EsModuloInicio}" Value="True" />
+                                    <Condition Binding="{Binding EstaCargandoInicio}" Value="True" />
+                                </MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Hidden" /></MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
                     </UniformGrid.Style>
@@ -238,7 +246,9 @@
                         </StackPanel>
                     </Border>
                 </UniformGrid>
-
+                <Grid Grid.Row="1" Margin="0,20,0,16" Visibility="{Binding EsModuloInicio, Converter={StaticResource BoolAVisibilidad}}">
+                    <controles:SkeletonCarga x:Name="SkeletonResumen" Tipo="Resumen" Activo="{Binding EstaCargandoInicio}" MinHeight="120" />
+                </Grid>
 
                 <Border Grid.Row="2"
                         x:Name="ZonaWidgets">
@@ -323,8 +333,13 @@
                                                 </Border>
                                                 <StackPanel Grid.Column="1" Margin="11,0,0,0" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding Nombre}" FontSize="16" FontWeight="SemiBold" />
-                                                    <TextBlock Text="{Binding Total, StringFormat={}{0} registros en Supabase}"
-                                                               FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" />
+                                                    <TextBlock
+                                                               FontSize="10" Foreground="{StaticResource BrochaTextoSuave}" >
+            <TextBlock.Style><Style TargetType="TextBlock">
+                <Setter Property="Text" Value="{Binding Total, StringFormat={}{0} registros en Supabase}" />
+                <Style.Triggers><DataTrigger Binding="{Binding EstaCargando}" Value="True"><Setter Property="Text" Value="Consultando datos…" /></DataTrigger></Style.Triggers>
+            </Style></TextBlock.Style>
+        </TextBlock>
                                                 </StackPanel>
                                                 <Button Grid.Column="2" Content="✕" Click="AlQuitarWidget"
                                                         ToolTip="Quitar sección del panel"
@@ -332,10 +347,8 @@
                                             </Grid>
 
                                             <Grid Grid.Row="1" MinHeight="150" Margin="0,12,0,0">
-                                                <ProgressBar Style="{StaticResource IndicadorCarga}"
-                                                             HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                             Visibility="{Binding EstaCargando, Converter={StaticResource BoolAVisibilidad}}" />
-                                                <Grid>
+                                                <controles:SkeletonCarga Tipo="Tarjeta" Activo="{Binding EstaCargando}" />
+                                                <Grid controles:RevelacionContenido.Activa="True">
                                                     <Grid.Style>
                                                         <Style TargetType="Grid">
                                                             <Setter Property="Visibility" Value="Visible" />
@@ -343,6 +356,7 @@
                                                                 <DataTrigger Binding="{Binding EsReporte}" Value="True">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                 </DataTrigger>
+                                                                <DataTrigger Binding="{Binding EstaCargando}" Value="True"><Setter Property="Visibility" Value="Hidden" /></DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Grid.Style>
@@ -421,6 +435,14 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+                        <controles:SkeletonCarga x:Name="SkeletonPanelVacio" Tipo="PanelVacio" MinHeight="180">
+                            <controles:SkeletonCarga.Style><Style TargetType="controles:SkeletonCarga"><Style.Triggers>
+                                <MultiDataTrigger><MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding TieneWidgetsInicio}" Value="False" />
+                                    <Condition Binding="{Binding EstaCargandoInicio}" Value="True" />
+                                </MultiDataTrigger.Conditions><Setter Property="Activo" Value="True" /></MultiDataTrigger>
+                            </Style.Triggers></Style></controles:SkeletonCarga.Style>
+                        </controles:SkeletonCarga>
 
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,26,0,10">
                             <StackPanel.Style>
@@ -430,7 +452,7 @@
                                         <DataTrigger Binding="{Binding TieneWidgetsInicio}" Value="False">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
-                                    </Style.Triggers>
+                                    <DataTrigger Binding="{Binding EstaCargandoInicio}" Value="True"><Setter Property="Visibility" Value="Hidden" /></DataTrigger></Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
                             <Border Width="54" Height="54" CornerRadius="18" Background="{StaticResource BrochaAcentoSuave}" HorizontalAlignment="Center">
@@ -470,6 +492,7 @@
                                 <DataTrigger Binding="{Binding EsModuloPendiente}" Value="True">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding EstaCargandoModulo}" Value="True"><Setter Property="IsEnabled" Value="False" /></DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
@@ -499,8 +522,13 @@
                             </Border>
                             <StackPanel Grid.Column="1" Margin="13,1,20,0">
                                 <TextBlock Text="{Binding ModuloSeleccionado.Nombre}" FontSize="20" FontWeight="SemiBold" />
-                                <TextBlock Text="{Binding TotalModulo, StringFormat={}{0} registros en el módulo}"
-                                           Foreground="{StaticResource BrochaTextoSuave}" FontSize="11" Margin="0,3,0,0" />
+                                <TextBlock
+                                           Foreground="{StaticResource BrochaTextoSuave}" FontSize="11" Margin="0,3,0,0" >
+            <TextBlock.Style><Style TargetType="TextBlock">
+                <Setter Property="Text" Value="{Binding TotalModulo, StringFormat={}{0} registros en el módulo}" />
+                <Style.Triggers><DataTrigger Binding="{Binding EstaCargandoModulo}" Value="True"><Setter Property="Text" Value="Consultando datos…" /></DataTrigger></Style.Triggers>
+            </Style></TextBlock.Style>
+        </TextBlock>
                             </StackPanel>
                             <Border Grid.Column="2" Background="#F2F3F1" BorderBrush="{StaticResource BrochaBorde}"
                                     BorderThickness="1" CornerRadius="16" Padding="14,5" Margin="0,0,10,0">
@@ -577,9 +605,7 @@
                                 </Button.Style>
                             </Button>
                             <StackPanel Grid.Column="8" Orientation="Horizontal">
-                                <ProgressBar Style="{StaticResource IndicadorCarga}"
-                                             VerticalAlignment="Center" Margin="0,0,10,0"
-                                             Visibility="{Binding EstaCargandoModulo, Converter={StaticResource BoolAVisibilidad}}" />
+
                                 <Button Content="Actualizar" Command="{Binding ActualizarModuloCommand}"
                                         Style="{StaticResource BotonPrincipal}" />
                             </StackPanel>
@@ -587,13 +613,14 @@
 
                         <Grid Grid.Row="1" Margin="2,12,0,12">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding MensajeModulo}" FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding MensajeModulo}" AutomationProperties.LiveSetting="Polite" FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                             <Button Grid.Column="1" x:Name="BotonVerImagen" Content="Ver imagen" Click="AlVerImagenProducto"
                                     IsEnabled="{Binding PuedeVerImagen}" Visibility="{Binding EsModuloProductos, Converter={StaticResource BoolAVisibilidad}}"
                                     ToolTip="Selecciona un producto para consultar su imagen" Style="{StaticResource BotonSecundario}" Padding="14,7" Margin="12,0,0,0"/>
                         </Grid>
 
                         <Border Grid.Row="2" Background="#F0F1EF" CornerRadius="13" Padding="14,11">
+                            <Border.Style><Style TargetType="Border"><Style.Triggers><DataTrigger Binding="{Binding EstaCargandoModulo}" Value="True"><Setter Property="Visibility" Value="Hidden" /></DataTrigger></Style.Triggers></Style></Border.Style>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1.15*" />
@@ -612,7 +639,9 @@
                             </Grid>
                         </Border>
 
-                        <Grid Grid.Row="3" Margin="0,4,0,0">
+                        <controles:SkeletonCarga x:Name="SkeletonModulo" Grid.Row="2" Grid.RowSpan="2" Tipo="Tabla" MinHeight="310" Activo="{Binding EstaCargandoModulo}" />
+                        <Grid x:Name="ContenidoModulo" Grid.Row="3" Margin="0,4,0,0" controles:RevelacionContenido.Activa="True">
+                            <Grid.Style><Style TargetType="Grid"><Style.Triggers><DataTrigger Binding="{Binding EstaCargandoModulo}" Value="True"><Setter Property="Visibility" Value="Hidden" /></DataTrigger></Style.Triggers></Style></Grid.Style>
                             <ListBox ItemsSource="{Binding FilasModulo}" SelectedItem="{Binding FilaModuloSeleccionada}"
                                      Background="Transparent" BorderThickness="0"
                                      MaxHeight="510" ScrollViewer.HorizontalScrollBarVisibility="Disabled"

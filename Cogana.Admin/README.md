@@ -35,6 +35,14 @@ El menú izquierdo permite abrir un módulo con un clic o arrastrarlo al Inicio 
 
 Para una ventana aislada del panel: `dotnet run --project Pruebas/Login/Login.csproj -c Release -- --panel-visual`. No carga datos ni modifica la disposición real del usuario.
 
+## Skeleton Screens durante las consultas
+
+El resumen de Inicio, el panel vacío, las tarjetas de módulos, las listas administrativas y la ventana de Reportes muestran marcadores grises mientras esperan sus consultas reales. La animación se adaptó del ZIP de Figma: barrido de luz de 1,6 s con desfases de 100 ms entre indicadores, barrido del panel de 1,8 s y pista inferior de 1,3 s. Los datos aparecen con una entrada de opacidad de 450 ms cuando concluye la espera. No se importó el temporizador demostrativo de 1,1 s ni se agregaron esperas artificiales.
+
+Durante la consulta se ocultan los valores y el estado vacío; se informa “Consultando datos…” y las acciones del módulo quedan deshabilitadas. Un error retira la carga y conserva un mensaje para intentar nuevamente. Cambiar de módulo cancela la consulta anterior e ignora cualquier respuesta tardía, de modo que no pueda terminar el Skeleton ni mostrar filas de otra sección. Una conexión fallida también finaliza las tarjetas pendientes de Inicio.
+
+Los marcadores no interceptan clics ni se anuncian como datos. Los estados textuales de carga son accesibles. Se respeta la preferencia de animaciones de Windows; minimizar, ocultar o descargar los controles detiene sus relojes. No modifica contratos, tablas, políticas ni datos compartidos con el móvil. Las capturas de prueba corresponden a servicios simulados; falta comprobar la fluidez con consultas de producción en el equipo instalado.
+
 ## Imágenes de productos
 
 Los archivos se suben al bucket público `product-images` de Supabase Storage, con ruta `{tiendaId}/{productoId}.{extensión}`. `product_images.storage_path` vincula el objeto con el producto; el catálogo móvil lee esa ruta mediante `image_path` y obtiene la URL pública del mismo bucket. No depende del archivo original de la computadora una vez guardado correctamente. El bucket desplegado fue comprobado con límite de 5 MiB; al 11/10/2026 había cero filas de imágenes asociadas, por lo que aún falta validar la primera carga real y su visualización en ambos clientes.

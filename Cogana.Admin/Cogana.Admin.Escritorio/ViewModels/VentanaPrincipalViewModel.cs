@@ -31,6 +31,8 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
     private string _resumenActualizado = "Pendiente de actualización";
     private readonly List<FilaModuloDatos> _todasFilasModulo = [];
     private bool _estaCargandoModulo;
+    private long _versionCargaModulo;
+    private CancellationTokenSource? _cargaModulo;
     private string _textoBusqueda = string.Empty;
     private string _mensajeModulo = "Selecciona Actualizar para consultar Supabase.";
     private string _encabezado1 = "Nombre";
@@ -77,10 +79,10 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
             new("Configuración", "Tienda, horarios y operación", "CO")
         ];
 
-        ModuloSeleccionado = Modulos[0];
         PedidosRecientes = [];
         FilasModulo = [];
         WidgetsInicio = [];
+        ModuloSeleccionado = Modulos[0];
         RestaurarWidgetsGuardados();
         VerificarConexionCommand = new ComandoAsincrono(CargarInicioAsync);
         ActualizarModuloCommand = new ComandoAsincrono(CargarModuloActualAsync);
@@ -280,11 +282,16 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         get => _moduloSeleccionado;
         set
         {
-            if (!Establecer(ref _moduloSeleccionado, value))
+            if (_moduloSeleccionado == value)
             {
                 return;
             }
-
+            _moduloSeleccionado = value;
+            _versionCargaModulo++;
+            _cargaModulo?.Cancel();
+            EstaCargandoModulo = false;
+            _todasFilasModulo.Clear(); FilasModulo.Clear(); FilaModuloSeleccionada = null; TotalModulo = 0;
+            Notificar(nameof(TieneFilasModulo));
             Notificar(nameof(EsModuloInicio));
             Notificar(nameof(EsModuloPendiente));
             Notificar(nameof(PuedeCrearRegistro));
@@ -300,6 +307,8 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
             MensajeModulo = EsModuloInicio
                 ? string.Empty
                 : "Cargando información del módulo...";
+            // La selección visual puede iniciar la consulta de inmediato: notificar después de limpiar la anterior.
+            Notificar(nameof(ModuloSeleccionado));
         }
     }
 
@@ -583,6 +592,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
 
             if (!conexion.EsExitosa)
             {
+                foreach (var widget in WidgetsInicio) widget.IndicarFallo(conexion.Mensaje);
                 return;
             }
 
@@ -591,12 +601,19 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
             {
                 EstadoConexion = resultado.Mensaje;
                 ConexionExitosa = false;
+                foreach (var widget in WidgetsInicio) widget.IndicarFallo(resultado.Mensaje);
                 return;
             }
 
             AplicarResumen(resultado.Resumen);
             EstadoConexion = "Conexión activa con Cogana/Supabase.";
             await RefrescarWidgetsAsync();
+        }
+        catch (Exception)
+        {
+            ConexionExitosa = false;
+            EstadoConexion = "No se pudo actualizar el resumen. Revisa la conexión e intenta nuevamente.";
+            foreach (var widget in WidgetsInicio) widget.IndicarFallo(EstadoConexion);
         }
         finally
         {
@@ -606,35 +623,40 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
 
     public async Task CargarModuloActualAsync()
     {
-        if (EstaCargandoModulo || EsModuloInicio || ModuloSeleccionado is null)
-        {
-            return;
-        }
-
+        if (EstaCargandoModulo || EsModuloInicio || ModuloSeleccionado is null) return;
+        var modulo = ModuloSeleccionado.Nombre;
+        var version = ++_versionCargaModulo;
+        using var cancelacion = new CancellationTokenSource();
+        _cargaModulo = cancelacion;
         EstaCargandoModulo = true;
-        MensajeModulo = $"Consultando {ModuloSeleccionado.Nombre.ToLowerInvariant()}...";
-
+        FilaModuloSeleccionada = null;
+        MensajeModulo = $"Consultando {modulo.ToLowerInvariant()}...";
         try
         {
-            var resultado = await _servicioModulos.ObtenerAsync(
-                ModuloSeleccionado.Nombre,
-                _sesion.TiendaId);
-
+            var resultado = await _servicioModulos.ObtenerAsync(modulo, _sesion.TiendaId, cancelacion.Token);
+            // Una respuesta anterior no puede terminar el skeleton ni reemplazar el módulo actual.
+            if (version != _versionCargaModulo) return;
             if (!resultado.EsExitoso || resultado.Datos is null)
             {
-                _todasFilasModulo.Clear();
-                FilasModulo.Clear();
-                TotalModulo = 0;
-                MensajeModulo = resultado.Mensaje;
-                Notificar(nameof(TieneFilasModulo));
-                return;
+                _todasFilasModulo.Clear(); FilasModulo.Clear(); TotalModulo = 0;
+                MensajeModulo = resultado.Mensaje; Notificar(nameof(TieneFilasModulo)); return;
             }
-
             AplicarModulo(resultado.Datos);
+        }
+        catch (OperationCanceledException) when (cancelacion.IsCancellationRequested) { }
+        catch (Exception)
+        {
+            if (version == _versionCargaModulo)
+            {
+                _todasFilasModulo.Clear(); FilasModulo.Clear(); TotalModulo = 0;
+                MensajeModulo = "No se pudo consultar el módulo. Revisa la conexión e intenta actualizar.";
+                Notificar(nameof(TieneFilasModulo));
+            }
         }
         finally
         {
-            EstaCargandoModulo = false;
+            if (version == _versionCargaModulo) EstaCargandoModulo = false;
+            if (ReferenceEquals(_cargaModulo, cancelacion)) _cargaModulo = null;
         }
     }
 

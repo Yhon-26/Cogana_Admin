@@ -80,6 +80,12 @@ public partial class VentanaReportes : Window
             return;
         }
 
+        if (SkeletonReporte.Activo) return;
+        SkeletonReporte.Activo = true;
+        CajaPeriodo.Visibility = Visibility.Hidden;
+        Periodo.IsEnabled = FechaInicio.IsEnabled = FechaFin.IsEnabled = false;
+        ResumenReporteReal.Visibility = Visibility.Hidden;
+        ContenidoReporteReal.Visibility = Visibility.Hidden;
         BotonConsultar.IsEnabled = false;
         BotonExportar.IsEnabled = false;
         MensajeFormulario.Text = "Generando reporte desde Supabase...";
@@ -103,6 +109,12 @@ public partial class VentanaReportes : Window
         }
         finally
         {
+            SkeletonReporte.Activo = false;
+            CajaPeriodo.Visibility = Visibility.Visible;
+            Periodo.IsEnabled = true;
+            FechaInicio.IsEnabled = FechaFin.IsEnabled = Periodo.SelectedValue is string valor && valor == "custom";
+            ResumenReporteReal.Visibility = Visibility.Visible;
+            ContenidoReporteReal.Visibility = Visibility.Visible;
             BotonConsultar.IsEnabled = true;
         }
     }
