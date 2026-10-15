@@ -1,13 +1,16 @@
 # Cogana Admin: estado y hoja de ruta
 
 **Ubicación del proyecto:** `D:\Cogana_Admin\Cogana.Admin`  
-**Actualizado:** 12 de octubre de 2026
+**Actualizado:** 14 de octubre de 2026
 
 Esta guía resume el estado conocido del software de escritorio. El código fuente es la referencia para el comportamiento actual; las funciones indicadas como pendientes todavía no deben considerarse disponibles.
 
-## Publicación vigente (12/10/2026)
+## Publicación vigente (14/10/2026)
 
-La versión **1.11.10** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.10), desde el código `c747572`. Implementa Skeleton Screens del ZIP actualizado de Figma en el resumen de Inicio, panel vacío, tarjetas de módulos, listas administrativas y Reportes. El barrido de luz y la pista inferior están ligados a consultas reales; no se importó la espera simulada de 1,1 s. Oculta valores y estados vacíos durante la consulta, muestra “Consultando datos…” y deshabilita las acciones pendientes. Los errores finalizan la carga; las respuestas tardías de un módulo anterior se cancelan o descartan al navegar. Respeta la preferencia de animaciones de Windows y pausa/libera los relojes al minimizar, ocultar o cerrar. Validación: 132 comprobaciones de interfaz y 33 de acceso aprobadas (165 en total), compilación sin advertencias ni errores, capturas de Inicio/Productos/Reportes y secuencia del barrido revisadas. Se verificaron los seis archivos públicos, hashes, ambos manifiestos y etiqueta; ofrece delta desde 1.11.9. Queda pendiente confirmar la fluidez con consultas de producción en la instalación del usuario.
+La versión **1.11.11** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.11), desde el código `a214b16`. Unifica la cabecera de las 15 ventanas WPF con su propio fondo, conserva los comandos de minimizar/maximizar/restaurar/cerrar y las zonas nativas de arrastre/redimensionamiento mediante WindowChrome. Los formularios y detalles usan una sola superficie; se retiró su contorno decorativo exterior duplicado y el login conserva su tarjeta central. Las barras de desplazamiento comparten pulgares redondeados de 6 px, carril transparente y estados de interacción, manteniendo su Track nativo y ambas orientaciones. Validación: 149 comprobaciones de interfaz y 33 de acceso aprobadas (182 en total), compilación sin advertencias ni errores, capturas de principal/formulario y prueba manual de rueda y doble clic de cabecera en una ventana aislada sin guardar registros. Se verificaron los seis archivos públicos, hashes, ambos manifiestos y etiqueta; ofrece delta desde 1.11.10. Queda pendiente comprobar varios monitores y escalas de pantalla en otros equipos. Los selectores y mensajes propios de Windows conservan la apariencia del sistema.
+
+Se conservan los Skeleton Screens de 1.11.10 en Inicio, tarjetas, listas y Reportes, ligados a consultas reales y protegidos frente a respuestas tardías al navegar.
+
 
 Se conserva la animación inmersiva del menú de 1.11.9: ondas y partículas sobre las filas vecinas, borde que escala con el anillo, halo, sombra y punto activo.
 
