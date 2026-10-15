@@ -23,6 +23,14 @@ Para comprobar geometría, renderizado, interacción y estados de acceso sin con
 - `Cogana.Admin.Infraestructura`: conexión con Supabase y servicios externos.
 - `Cogana.Admin.Escritorio`: interfaz WPF y ViewModels.
 
+## Marco de ventanas y desplazamiento
+
+Las 15 ventanas WPF del escritorio usan una cabecera común integrada con su propio color de fondo. `WindowChrome` conserva las zonas nativas de arrastre y redimensionamiento; los botones accesibles llaman a los comandos de minimizar, maximizar/restaurar y cerrar. La cabecera cambia el icono y nombre accesible a Restaurar cuando corresponde. Las ventanas que no admiten cambios de tamaño deshabilitan esos comandos. La comprobación local de maximización respeta el área de trabajo y la barra de tareas del monitor de prueba.
+
+Los formularios, detalles, recuperación, imágenes, configuración y reportes muestran una sola superficie: se eliminó únicamente el margen y borde decorativo exterior duplicado. El login conserva su tarjeta central. Las barras de desplazamiento comparten un pulgar redondeado de 6 px, carril transparente y estados de puntero/arrastre, manteniendo las piezas nativas `PART_Track`, rueda, desplazamiento por página y automatización. Se verificaron ambas orientaciones y que Guardar siga visible en Nuevo producto. Los selectores de archivos y demás diálogos propios de Windows conservan la apariencia del sistema.
+
+La revisión visual y la interacción manual se realizaron en ventanas aisladas, con respuestas simuladas y sin guardar registros. Queda pendiente comprobar varios monitores y escalas de pantalla en otros equipos.
+
 ## Panel de inicio y sesión
 
 La navegación usa un único menú lateral que puede contraerse a íconos. La cuenta y Cerrar sesión permanecen disponibles en ambos modos. El tablero reparte las tarjetas en columnas iguales según el ancho disponible; conserva el arrastre y el orden guardado. El panel vacío ofrece Restaurar panel inicial y se conserva vacío al reabrir si fue guardado así. La conexión, la tienda y las actualizaciones aparecen en una franja fija inferior, también dentro de los módulos. No agrega datos de muestra ni cambia contratos de Supabase.

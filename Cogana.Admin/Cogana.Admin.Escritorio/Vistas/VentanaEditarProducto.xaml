@@ -1,4 +1,4 @@
-<Window x:Class="Cogana.Admin.Escritorio.Vistas.VentanaEditarProducto"
+<Window Style="{StaticResource {x:Type Window}}" x:Class="Cogana.Admin.Escritorio.Vistas.VentanaEditarProducto"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Detalle del producto"
@@ -8,12 +8,12 @@
         MinHeight="680"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
-        Background="{StaticResource BrochaFondo}">
-    <Grid Margin="22">
+        Background="{StaticResource BrochaSuperficie}">
+    <Grid Margin="0">
         <Border Background="{StaticResource BrochaSuperficie}"
                 BorderBrush="#12000000"
-                BorderThickness="1"
-                CornerRadius="28"
+                BorderThickness="0"
+                CornerRadius="0"
                 Padding="26">
             <Grid>
                 <Grid.RowDefinitions>

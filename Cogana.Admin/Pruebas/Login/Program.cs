@@ -47,9 +47,16 @@ internal static class Program
         XNamespace espacio = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
         var documento = XDocument.Load(System.IO.Path.Combine(AppContext.BaseDirectory, "RecursosAplicacion.xaml"));
         var diccionario = new XElement(espacio + "ResourceDictionary",
-            new XAttribute(XNamespace.Xmlns + "x", "http://schemas.microsoft.com/winfx/2006/xaml"),
+            documento.Root!.Attributes().Where(a => a.IsNamespaceDeclaration && a.Name.LocalName != "xmlns")
+                .Select(a => a.Name.LocalName == "controles" ? new XAttribute(a.Name, a.Value + ";assembly=Cogana.Admin.Escritorio") : a),
             documento.Root!.Element(espacio + "Application.Resources")!.Elements());
         aplicacion.Resources = (ResourceDictionary)XamlReader.Parse(diccionario.ToString());
+        if (args.Contains("--marco"))
+        {
+            PruebasMarco.Probar(Verificar,args.Contains("--visual"));
+            Console.WriteLine($"{cantidad} comprobaciones correctas.");
+            return;
+        }
         if (args.Contains("--skeleton"))
         {
             PruebasSkeleton.Probar(Verificar);
@@ -111,6 +118,7 @@ internal static class Program
             ProbarRecuperacion(Verificar);
             PruebasPanel.Probar(Verificar, args.Contains("--panel-visual"));
             PruebasSkeleton.Probar(Verificar);
+            PruebasMarco.Probar(Verificar);
             PruebasImagenProducto.Probar(Verificar);
             Console.WriteLine($"{cantidad} verificaciones totales correctas, sin conexión a Supabase.");
         }

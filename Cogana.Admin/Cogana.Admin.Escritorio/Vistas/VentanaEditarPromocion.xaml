@@ -1,4 +1,4 @@
-<Window x:Class="Cogana.Admin.Escritorio.Vistas.VentanaEditarPromocion"
+<Window Style="{StaticResource {x:Type Window}}" x:Class="Cogana.Admin.Escritorio.Vistas.VentanaEditarPromocion"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Editar promoción"
@@ -8,10 +8,10 @@
         MinHeight="730"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
-        Background="{StaticResource BrochaFondo}">
-    <Grid Margin="22">
+        Background="{StaticResource BrochaSuperficie}">
+    <Grid Margin="0">
         <Border Background="{StaticResource BrochaSuperficie}" BorderBrush="#12000000"
-                BorderThickness="1" CornerRadius="28" Padding="26">
+                BorderThickness="0" CornerRadius="0" Padding="26">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
