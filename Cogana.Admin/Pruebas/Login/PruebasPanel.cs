@@ -135,8 +135,10 @@ internal static class PruebasPanel
             new Cogana.Admin.Infraestructura.Configuracion.ConfiguracionSupabase(null,string.Empty));
         typeof(App).GetMethod("MostrarInicioSesion",flags)!.Invoke(app,null);
         var login=app.MainWindow;
-        typeof(App).GetMethod("AbrirPanelPrincipal",flags)!.Invoke(app,
-            [new SesionUsuario(Guid.NewGuid(),"cuenta@example.test","","",Guid.NewGuid(),"admin")]);
+        // El onboarding tiene su propio arnés. Esta prueba recorre el cierre de sesión
+        // desde el panel confirmado sin depender de la preferencia del usuario de Windows.
+        typeof(App).GetMethod("AbrirPanelConfirmado",flags)!.Invoke(app,
+            [new SesionUsuario(Guid.NewGuid(),"cuenta@example.test","","",Guid.NewGuid(),"admin"), true]);
         var panel=(MainWindow)app.MainWindow;
         verificar(panel.IsVisible && !login.IsVisible, "El ciclo real de App reemplaza el login por el panel");
         using var clienteSalida=new ClienteSupabaseRest(new(new Uri("https://prueba.example.test"),"publica-prueba"),new SalidaSimulada());
