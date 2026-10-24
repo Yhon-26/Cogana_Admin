@@ -83,6 +83,28 @@ public partial class App : Application
 
     private void AbrirPanelPrincipal(SesionUsuario sesion)
     {
+        // La introducción animada saluda una sola vez por equipo antes de abrir el panel.
+        // Cualquier cierre (fin, salto o X) marca el flag y abre el panel normalmente.
+        var estadoOnboarding = new EstadoPrimerIngreso();
+        estadoOnboarding.Cargar();
+        if (!estadoOnboarding.Visto)
+        {
+            var onboarding = new VentanaOnboarding(sesion);
+            onboarding.Finalizado += () =>
+            {
+                estadoOnboarding.MarcarVisto(GetType().Assembly.GetName().Version?.ToString(3) ?? "desconocida");
+                AbrirPanelPrincipal(sesion);
+            };
+            MainWindow = onboarding;
+            onboarding.Show();
+            if (_ventanaInicioSesion is not null)
+            {
+                _ventanaInicioSesion.Close();
+                _ventanaInicioSesion = null;
+            }
+            return;
+        }
+
         if (_servicioEstado is null ||
             _servicioResumenInicio is null ||
             _servicioModulos is null ||

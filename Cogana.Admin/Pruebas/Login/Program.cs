@@ -63,6 +63,12 @@ internal static class Program
             Console.WriteLine($"{cantidad} comprobaciones de Skeleton correctas.");
             return;
         }
+        if (args.Contains("--onboarding"))
+        {
+            PruebasOnboarding.Probar(Verificar, args.Contains("--visual"));
+            Console.WriteLine($"{cantidad} comprobaciones de Onboarding correctas.");
+            return;
+        }
         var superficie = new Grid { Width = 472, Height = 540, Background = Brushes.Transparent };
         var texto = new TextBox { Text = "Texto de prueba", Name = "CampoPrueba", Margin = new Thickness(24), FontSize = 18, Height = 46 };
         var boton = new Button { Content = "Acción de prueba", Margin = new Thickness(24), Height = 46 };
