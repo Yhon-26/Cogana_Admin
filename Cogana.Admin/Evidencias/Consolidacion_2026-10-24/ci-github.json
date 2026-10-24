@@ -1,0 +1,99 @@
+{
+  "id": 40132579159,
+  "url": "https://github.com/Yhon-26/Cogana_Admin/actions/runs/40132579159",
+  "sourceCommit": "d2220b5bdecaf2776fee334b3fb7f97aa28e3b37",
+  "status": "completed",
+  "conclusion": "success",
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/setup-dotnet@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet restore Cogana.Admin.slnx --locked-mode",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet restore Pruebas/Acceso/Acceso.csproj --locked-mode",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet restore Pruebas/Operaciones/Operaciones.csproj --locked-mode",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet restore Pruebas/Login/Login.csproj --locked-mode",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet build Cogana.Admin.slnx -c Release --no-restore",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet run --project Pruebas/Acceso/Acceso.csproj -c Release",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run node Pruebas/Acceso/funcion-acceso.mjs",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet run --project Pruebas/Operaciones/Operaciones.csproj -c Release",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet run --project Pruebas/Login/Login.csproj -c Release",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run dotnet run --project Pruebas/Login/Login.csproj -c Release --no-build -- --onboarding",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/setup-dotnet@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}
