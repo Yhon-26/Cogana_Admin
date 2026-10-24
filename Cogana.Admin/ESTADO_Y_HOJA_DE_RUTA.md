@@ -1,13 +1,15 @@
 # Cogana Admin: estado y hoja de ruta
 
 **Ubicación del proyecto:** `D:\Cogana_Admin\Cogana.Admin`  
-**Actualizado:** 14 de octubre de 2026
+**Actualizado:** 23 de octubre de 2026
 
 Esta guía resume el estado conocido del software de escritorio. El código fuente es la referencia para el comportamiento actual; las funciones indicadas como pendientes todavía no deben considerarse disponibles.
 
-## Publicación vigente (14/10/2026)
+## Publicación vigente (23/10/2026)
 
-La versión **1.11.11** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.11), desde el código `a214b16`. Unifica la cabecera de las 15 ventanas WPF con su propio fondo, conserva los comandos de minimizar/maximizar/restaurar/cerrar y las zonas nativas de arrastre/redimensionamiento mediante WindowChrome. Los formularios y detalles usan una sola superficie; se retiró su contorno decorativo exterior duplicado y el login conserva su tarjeta central. Las barras de desplazamiento comparten pulgares redondeados de 6 px, carril transparente y estados de interacción, manteniendo su Track nativo y ambas orientaciones. Validación: 149 comprobaciones de interfaz y 33 de acceso aprobadas (182 en total), compilación sin advertencias ni errores, capturas de principal/formulario y prueba manual de rueda y doble clic de cabecera en una ventana aislada sin guardar registros. Se verificaron los seis archivos públicos, hashes, ambos manifiestos y etiqueta; ofrece delta desde 1.11.10. Queda pendiente comprobar varios monitores y escalas de pantalla en otros equipos. Los selectores y mensajes propios de Windows conservan la apariencia del sistema.
+La versión **1.11.12** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.11.12), desde el código `378a33d`. Corrige el fallo que dejaba el módulo Pedidos con el mensaje "No se pudo consultar el módulo" y cero registros: los auxiliares de conversión numérica del servicio de módulos (`Entero`, `EnteroLargo`, `EnteroLargoNullable`) llamaban a `TryGetInt64`/`TryGetInt32` sobre valores JSON nulos, lo que lanza excepción en lugar de devolver falso; cualquier pedido con `final_total_cents` nulo (todos los pendientes) abortaba la carga completa. La guardia ahora verifica `JsonValueKind.Number` antes de parsear. Validación: reproducción con el código real de la app (consola contra producción con sesión autenticada) confirmó la excepción original y, tras el fix, los 11 módulos cargan con datos reales — Pedidos 5, Productos 27, Categorías 12, Presentaciones 31, Inventario 1, Proveedores 2, Clientes 2, Promociones 1, Reportes 4, Usuarios 3, Configuración 8. Compilación Release sin errores; delta 1.11.11 → 1.11.12 disponible. Tras actualizar, Pedidos muestra los pedidos reales del negocio.
+
+La versión 1.11.11 unificó la cabecera de las 15 ventanas WPF con su propio fondo, WindowChrome y barras de desplazamiento redondeadas. Se conservan los Skeleton Screens de 1.11.10 y la animación inmersiva del menú de 1.11.9.
 
 Se conservan los Skeleton Screens de 1.11.10 en Inicio, tarjetas, listas y Reportes, ligados a consultas reales y protegidos frente a respuestas tardías al navegar.
 
@@ -15,7 +17,17 @@ Se conservan los Skeleton Screens de 1.11.10 en Inicio, tarjetas, listas y Repor
 Se conserva la animación inmersiva del menú de 1.11.9: ondas y partículas sobre las filas vecinas, borde que escala con el anillo, halo, sombra y punto activo.
 
 
-La versión 1.11.7 añadió Ver imagen en Productos. Continúa pendiente la primera carga real y su visualización en ambos clientes; la última consulta de producción mostró cero imágenes asociadas. JPG/PNG son compatibles de forma nativa; otros formatos dependen de los códecs de Windows.
+La versión 1.11.7 añadió Ver imagen en Productos. **Verificado el 23/10/2026:** el bucket `product-images` y sus cuatro políticas de storage están aplicados y probados funcionalmente (subida/actualización/borrado del propietario permitidos, usuario sin membresía y anónimo rechazados, lectura pública correcta sobre objetos reales); existen dos imágenes reales de producto subidas desde la app. JPG/PNG son compatibles de forma nativa; otros formatos dependen de los códecs de Windows.
+
+## Verificación de negocio 23/10/2026
+
+Prueba móvil → admin con datos reales: se creó un pedido desde la aplicación móvil y el resumen del Inicio lo reflejó de inmediato (Pedidos pendientes pasó de 3 a 4). El módulo Pedidos fallaba por el defecto corregido en 1.11.12; el resto de la integración (órdenes, `order_number`, cliente, totales estimados) quedó confirmada por REST con sesión autenticada y por la consulta equivalente en base de datos. Queda por recorrer en la interfaz: abrir el pedido, intervenir con cambios de estado vía `transition_order` y revisar el reflejo en Reportes.
+
+Estado administrativo verificado el mismo día contra producción:
+
+- Cuenta propietaria `yhonq430@gmail.com` con nombre "Yhon" en `profiles.full_name` (antes mostraba "Sin nombre registrado").
+- Lote viejo `QA-LOTE-001` (100 unidades del producto QA desactivado) eliminado sin referencias colgantes. Queda un lote nuevo del 12/10 con ese código para un producto real del catálogo (ACEITE VEGETAL BELTRÁN, stock 0). El producto de prueba desactivado "QA Revisión funcional (editada)" sigue en el catálogo.
+- Cuenta `qa.prueba@cogana.test` reactivada (membresía activa, rol admin) y flujo de primer ingreso verificado de extremo a extremo con la contraseña temporal: el flag `cogana_admin_cambio_contrasena_pendiente` obligó al cambio por la Edge Function `admin-users` (HTTP 200), la nueva contraseña ingresó correctamente y la temporal quedó invalidada. La reactivación y el restablecimiento fueron operaciones directas de administración, sin filas en `staff_access_audit`.
 
 Por indicación del usuario, cada mejora terminada debe verificarse y publicarse con una nueva versión para actualizar la aplicación instalada. Esta autorización reemplaza la espera anterior de confirmación por publicación.
 
@@ -90,7 +102,7 @@ Recorrido completo con sesión real de propietario contra la base de datos de pr
 
 **Hallazgo corregido durante la revisión:** el token de sesión expiraba a la hora y todos los módulos pasaban a fallar con mensajes genéricos ("No fue posible cargar...") hasta reiniciar la app, porque el cliente REST no renovaba la sesión. Corregido con renovación automática transparente al recibir 401. Pendiente de confirmar en la práctica: dejar la app abierta más de una hora y verificar que los módulos siguen cargando.
 
-**Hallazgos menores:** la cuenta propietaria aparece como "Sin nombre registrado" (no hay nombre completo en el perfil de Supabase Auth; se puede completar desde el dashboard); el lote QA-LOTE-001 quedó activo con 100 unidades del producto QA desactivado (borrar desde el dashboard si se desea, o usar el ajuste de stock); la cuenta de prueba `qa.prueba@cogana.test` quedó suspendida (su borrado definitivo requiere el dashboard de Supabase).
+**Hallazgos menores (30/09/2026), resueltos el 23/10/2026:** el nombre de la cuenta propietaria está completo ("Yhon"); el lote QA-LOTE-001 viejo fue eliminado; la cuenta de prueba `qa.prueba@cogana.test` está reactivada y su primer ingreso con cambio de contraseña quedó verificado.
 
 ## Qué aparece en el menú y qué falta
 
@@ -102,11 +114,11 @@ Recorrido completo con sesión real de propietario contra la base de datos de pr
 | Presentaciones | Consulta, alta, edición y activación. | Validar equivalencias, precios y restricciones con operaciones reales. |
 | Inventario y lotes | Consulta, alta, detalle, movimientos y ajuste controlado de stock. | Revisión operativa con casos reales, vencimientos y permisos. |
 | Proveedores | Consulta, alta, edición y activación. | Revisar validaciones y datos fiscales/contacto. |
-| Pedidos | Lista, detalle completo e intervención mediante cambios de estado permitidos. | Verificación funcional con pedidos reales, especialmente entrega y pagos. |
+| Pedidos | Lista corregida en 1.11.12 (carga con los 5 pedidos reales); detalle completo e intervención mediante cambios de estado permitidos. | Recorrer en la interfaz la intervención del pedido real del 23/10: cambios de estado, pagos y reflejo en Reportes. |
 | Clientes | Consulta y detalle de perfil, direcciones, preferencias e historial. | Las modificaciones de información personal no están habilitadas. |
 | Promociones | Consulta, alta, edición, estado y asignación de productos. | Validar cálculo y vigencia con casos comerciales reales. |
 | Reportes | Periodos de 7 y 30 días, mes actual o rango personalizado; tablero visual de ventas, estados, productos, pagos y stock; tablas detalladas y exportación CSV. | Validar resultados y criterios contables con pedidos reales de la tienda. |
-| Usuarios | Directorio del personal, alta con contraseña inicial, edición de nombre/teléfono, roles y suspensión/reactivación. Las operaciones sensibles están limitadas al propietario y auditadas en Supabase. | Verificar el primer ingreso y todos los cambios con cuentas reales controladas. |
+| Usuarios | Directorio del personal, alta con contraseña inicial, edición de nombre/teléfono, roles y suspensión/reactivación. Las operaciones sensibles están limitadas al propietario y auditadas en Supabase. | Primer ingreso de la cuenta de prueba verificado el 23/10/2026 con cambio de contraseña inicial vía `admin-users`. |
 | Configuración | Consulta y edición de datos comerciales, contacto, atención, pagos, preparación, horario semanal y fechas especiales. | Verificar los cambios con datos operativos reales y confirmar cómo se mostrarán las excepciones en la aplicación móvil. |
 
 ## Siguientes bloques recomendados
@@ -140,7 +152,7 @@ sin impedir las operaciones de cliente del móvil. Este bloque no altera RLS.
 
 ### Otros bloques
 
-1. ~~**Revisión funcional autenticada**~~ **Completada el 30/09/2026** (ver sección "Revisión funcional autenticada"). Queda pendiente verificar el primer ingreso real del usuario invitado de prueba y el comportamiento tras una hora de sesión abierta (renovación de token).
+1. ~~**Revisión funcional autenticada**~~ **Completada el 30/09/2026** (ver sección "Revisión funcional autenticada"). El primer ingreso del usuario invitado de prueba quedó verificado el 23/10/2026; sigue pendiente el comportamiento tras una hora de sesión abierta (renovación de token en vivo).
 2. **Instalador y publicación:** la versión 1.10.5 está compilada en Release, empaquetada con Velopack y publicada en GitHub Releases; incluye Setup, paquete completo, actualización delta desde 1.10.4 y portátil. La aplicación instalada puede detectarla desde **Buscar actualizaciones**. Pendiente: probar la instalación en un equipo limpio y decidir si se requiere firma de código.
 3. **Validaciones operativas:** recorrer con datos reales las reglas del catálogo, equivalencias de presentaciones, vencimientos de inventario, cálculos de promociones y criterios de ventas completadas (ver tabla de módulos). La revisión funcional cubrió la mecánica de los formularios; estas validaciones de negocio siguen abiertas.
 4. **Perspectiva del login:** implementada el 11/10/2026. La proyección de un plano rotado usa un shader WPF, mantiene campos nativos mediante `EffectMapping` y vuelve al plano al interactuar con el formulario. Incluye suavizado y pausa al desactivar/minimizar. La 1.11.2 retira el control visible Reducir movimiento por indicación del usuario y mantiene la interacción activa. Verificación ampliada: 54 comprobaciones de geometría, renderizado, ciclo de ventana, estados de acceso y cuenta recordada; 27 de recuperación y cambio inicial. El almacén de Windows se probó con un destino aislado y datos ficticios; ningún test utiliza credenciales reales ni conecta con Supabase. El enlace se comprobó bajo el cursor en una ventana de prueba de Windows.
