@@ -1,0 +1,12 @@
+[15:58:02 INF] Velopack CLI 1.2.158, for distributing applications.
+[15:58:02 WRN] There is a newer version of vpk available (1.2.161). Run 'dotnet tool update -g vpk'
+[15:58:02 INF] Preparing to upload 4 asset(s) to GitHub
+[15:58:04 INF] Creating draft release titled 'Cogana Admin v1.13.0'
+[15:58:04 INF] Uploading asset 'CoganaAdmin-1.13.0-full.nupkg'..
+[15:58:08 INF] Uploading asset 'CoganaAdmin-1.13.0-delta.nupkg'..
+[15:58:08 INF] Uploading asset 'CoganaAdmin-win-Portable.zip'..
+[15:58:11 INF] Uploading asset 'CoganaAdmin-win-Setup.exe'..
+[15:58:19 INF] Uploading releases.win.json
+[15:58:19 INF] Uploading legacy RELEASES (compatibility)
+[15:58:20 INF] Converting draft to full published release.
+[15:58:21 WRN] There is a newer version of vpk available (1.2.161). Run 'dotnet tool update -g vpk'

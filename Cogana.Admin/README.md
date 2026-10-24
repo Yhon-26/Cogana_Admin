@@ -1,6 +1,6 @@
 # Cogana Admin
 
-**Consolidación local 1.13.0 (24/10/2026):** sesión y reintentos, guardados, atención de pedidos, configuración operativa, paginación y accesibilidad. Consulta [CONSOLIDACION_2026-10-24.md](CONSOLIDACION_2026-10-24.md) para ver la implementación, las pruebas y las validaciones reales pendientes. Esta versión se prepara localmente; no implica que ya esté publicada en el canal de actualizaciones.
+**Versión estable 1.13.0 (24/10/2026):** publicada en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.13.0), disponible mediante **Buscar actualizaciones**. Incluye sesión y reintentos, guardados, atención de pedidos, configuración operativa, paginación y accesibilidad. Consulta [CONSOLIDACION_2026-10-24.md](CONSOLIDACION_2026-10-24.md) para ver la implementación, las pruebas y las validaciones reales pendientes.
 
 Consulta [ESTADO_Y_HOJA_DE_RUTA.md](ESTADO_Y_HOJA_DE_RUTA.md) para ver qué está implementado, qué sigue pendiente y cómo abrir la solución en Visual Studio.
 

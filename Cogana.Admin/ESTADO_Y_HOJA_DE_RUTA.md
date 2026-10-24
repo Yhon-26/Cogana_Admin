@@ -1,15 +1,15 @@
 # Cogana Admin: estado y hoja de ruta
 
-## Consolidación local 1.13.0 — 24/10/2026
+## Publicación estable 1.13.0 — 24/10/2026
 
-Se implementaron los bloques de sesión/guardados, operación de pedidos, regresiones y rendimiento/accesibilidad. El detalle, las pruebas finales y los pendientes de aceptación están en [CONSOLIDACION_2026-10-24.md](CONSOLIDACION_2026-10-24.md). El canal público continúa en 1.12.0 hasta validar y publicar esta preparación. Las secciones siguientes conservan el historial de versiones anteriores.
+Se implementaron los bloques de sesión/guardados, operación de pedidos, regresiones y rendimiento/accesibilidad. El detalle, las pruebas finales y los pendientes de aceptación están en [CONSOLIDACION_2026-10-24.md](CONSOLIDACION_2026-10-24.md). El canal público ofrece [1.13.0 estable](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.13.0), con seis archivos y delta desde 1.12.0. Se comprobaron las huellas de los activos y el feed público. La instalación desde el programa sigue pendiente de aceptación manual. Las secciones siguientes conservan el historial de versiones anteriores.
 
 **Ubicación del proyecto:** `D:\Cogana_Admin\Cogana.Admin`  
 **Actualizado:** 23 de octubre de 2026
 
 Esta guía resume el estado conocido del software de escritorio. El código fuente es la referencia para el comportamiento actual; las funciones indicadas como pendientes todavía no deben considerarse disponibles.
 
-## Publicación vigente (23/10/2026)
+## Historial: publicación 1.12.0 (23/10/2026)
 
 La versión **1.12.0** está publicada como estable en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.12.0). Añade el **onboarding animado de bienvenida**: tras el primer ingreso exitoso se abre una presentación inmersiva de cuatro actos — Bienvenida con emblema y anillos vivos, el panel módulo a módulo con tarjetas escalonadas, la sincronía móvil↔panel con paquetes que viajan por el conector y un contador que suma al recibir, y el cierre con pasos marcados — con la misma atmósfera del login (aurora viviente, partículas, tarjeta con brillo giratorio, parallax amortiguado del mouse). Navegación con Continuar/Anterior, puntos indicadores en píldora, teclado (←/→/Esc) y enlace "Saltar introducción"; cualquier cierre marca el flag local `onboarding.json` y abre el panel, por lo que se muestra una sola vez por equipo. Validación: 41 comprobaciones nuevas del arnés (`--onboarding`: estado inicial, navegación completa, teclado, disparo único de Finalizado, salto por Escape y por cierre de ventana, persistencia del flag en archivo aislado) más 39 de marco y 39 de skeleton; capturas de los cuatro actos revisadas visualmente; compilación sin advertencias ni errores; delta desde 1.11.12. Corrección durante la verificación: los storyboards con `BeginTime` no deben arrancar antes del primer render y el `Loaded` debe suscribirse en el constructor; los elementos escalonados arrancan con opacidad base 0 para evitar el parpadeo del primer fotograma.
 

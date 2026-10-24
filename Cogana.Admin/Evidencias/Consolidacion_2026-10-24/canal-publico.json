@@ -1,6 +1,49 @@
 {
-  "tag": "v1.12.0",
-  "published_at": "2026-10-24T18:50:07Z",
+  "tag": "v1.13.0",
   "draft": false,
-  "prerelease": false
+  "prerelease": false,
+  "published_at": "2026-10-24T20:58:22Z",
+  "url": "https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.13.0",
+  "target_commitish": "bf85a65e3c18a5da84f63c49355b897fa0ef783d",
+  "assets": [
+    {
+      "name": "CoganaAdmin-1.13.0-delta.nupkg",
+      "size": 338044,
+      "digest": "sha256:0481ecaa03a606bb6ba982b1ffce1e36a66c9baa855c97f5215e8e8bdd944eb8",
+      "browser_download_url": "https://github.com/Yhon-26/Cogana_Admin/releases/download/v1.13.0/CoganaAdmin-1.13.0-delta.nupkg"
+    },
+    {
+      "name": "CoganaAdmin-1.13.0-full.nupkg",
+      "size": 4907196,
+      "digest": "sha256:ac0dc2d1ee9b695422ebe5a960aac86bd06b2fc0970fe1be9b9bfb58bdcdf351",
+      "browser_download_url": "https://github.com/Yhon-26/Cogana_Admin/releases/download/v1.13.0/CoganaAdmin-1.13.0-full.nupkg"
+    },
+    {
+      "name": "CoganaAdmin-win-Portable.zip",
+      "size": 4830002,
+      "digest": "sha256:6458da6b51b5f4dbf2fd4ec7c216a7b99c3c6689a2ef70dc03cb1d6770122665",
+      "browser_download_url": "https://github.com/Yhon-26/Cogana_Admin/releases/download/v1.13.0/CoganaAdmin-win-Portable.zip"
+    },
+    {
+      "name": "CoganaAdmin-win-Setup.exe",
+      "size": 12499644,
+      "digest": "sha256:157fbdbc83c68b126080e0beb90da7bc530e3ebc1449f0f6509afbe733b95681",
+      "browser_download_url": "https://github.com/Yhon-26/Cogana_Admin/releases/download/v1.13.0/CoganaAdmin-win-Setup.exe"
+    },
+    {
+      "name": "RELEASES",
+      "size": 81,
+      "digest": "sha256:b0f7d37d07759fd7b54d5403955718992deec11d3f001ffb8be8c23a7fdbe5e3",
+      "browser_download_url": "https://github.com/Yhon-26/Cogana_Admin/releases/download/v1.13.0/RELEASES"
+    },
+    {
+      "name": "releases.win.json",
+      "size": 503,
+      "digest": "sha256:29f5cd47d4d8dabd543ed62adcd1fd4f6477bc11313a25c64e449887bcafde61",
+      "browser_download_url": "https://github.com/Yhon-26/Cogana_Admin/releases/download/v1.13.0/releases.win.json"
+    }
+  ],
+  "feedVersions": [
+    "1.13.0"
+  ]
 }

@@ -1,6 +1,6 @@
 # Consolidación de Cogana Admin — 24/10/2026
 
-**Versión local:** 1.13.0. **Canal público verificado al iniciar:** 1.12.0. Los cambios de este bloque se preparan y verifican localmente; esta nota no acredita publicación ni una compra real completa.
+**Versión estable publicada:** [1.13.0](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.13.0). **Código del paquete y tag:** `bf85a65e3c18a5da84f63c49355b897fa0ef783d`. Se verificaron los seis archivos públicos, sus huellas SHA-256 y el feed de actualización. Esto acredita la publicación; la instalación y una compra real completa siguen pendientes de aceptación manual.
 
 ## Entrega por bloques
 
@@ -43,7 +43,7 @@ Se reutilizan RPC y columnas comprobados en el backend. **No se desplegó una mi
 - El arnés WPF comprueba el guardado parcial de producto, reintentos, estados de atención, paginación, manejo del fallo del actualizador, foco, paleta de contraste y tamaño compacto.
 - Se añadió CI para Windows que ejecuta explícitamente los arneses y Node. Se fija la familia del SDK .NET 10 mediante `global.json`, con avance a versiones estables de su misma familia, y se generaron archivos de bloqueo de dependencias.
 
-La instantánea de firmas verifica los nombres de parámetros del cliente. Las respuestas HTTP de las pruebas son simuladas: no equivalen a ejecutar las políticas de Postgres ni a confirmar dinero, stock o una entrega real. La canalización se ha definido localmente; todavía no se ha ejecutado en GitHub.
+La instantánea de firmas verifica los nombres de parámetros del cliente. Las respuestas HTTP de las pruebas son simuladas: no equivalen a ejecutar las políticas de Postgres ni a confirmar dinero, stock o una entrega real. La primera ejecución de GitHub compiló y aprobó acceso, Edge e infraestructura; detectó que una comprobación antigua del menú suponía animaciones habilitadas. Se ajustó el arnés para comprobar también el ancho final cuando Windows las desactiva. El estado actualizado de las ejecuciones está en [GitHub Actions](https://github.com/Yhon-26/Cogana_Admin/actions/workflows/validacion-escritorio.yml).
 
 ### 4. Rendimiento y accesibilidad
 
@@ -75,7 +75,7 @@ Los resultados se presentan por suite; sus recuentos no se suman como casos de n
 
 ## Paquete local para revisión
 
-Se generaron el [instalador 1.13.0](D:/Cogana_Admin/Cogana.Admin/Releases/CoganaAdmin-win-Setup.exe), el [portátil](D:/Cogana_Admin/Cogana.Admin/Releases/CoganaAdmin-win-Portable.zip), el paquete completo y un delta desde 1.12.0. Son artefactos locales, sin firma Authenticode. No se ejecutó el instalador ni se publicó esta versión en GitHub/Supabase.
+Se publicaron en [GitHub Releases](https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.13.0) el instalador 1.13.0, el portátil, el paquete completo, el delta desde 1.12.0 y los dos archivos del canal de actualización. Se verificó que `latest` apunta a esta versión estable y que las huellas SHA-256 remotas coinciden. Velopack genera los feeds públicos para esta release; no son idénticos al índice local que contiene versiones históricas. Los paquetes no tienen firma Authenticode. No se ejecutó el instalador ni se modificó el canal de Supabase.
 
 Las huellas de los paquetes finales se registran en `Evidencias/Consolidacion_2026-10-24/paquetes.json`. La preparación utiliza el runtime .NET Desktop 10 del equipo; el Setup contempla su instalación si falta.
 
@@ -97,7 +97,7 @@ Las huellas de los paquetes finales se registran en `Evidencias/Consolidacion_20
 | H13 | Pendiente de decidir y diseñar garantía global de cambio temporal fuera del cliente actual. |
 | H14 | Mejoras implementadas y pruebas locales; pendiente validación con Narrador, hardware y escalas reales. |
 | H15 | Avisos de seguridad identificados; no se modificaron ajustes de Auth, privilegios de cron ni políticas compartidas. |
-| H16 | Arneses, firmas, SDK, lockfiles y CI añadidos; pendiente ejecutar CI remoto y entorno de integración real. |
+| H16 | Arneses, firmas, SDK, lockfiles y CI añadidos; ejecución remota registrada y corregida la suposición de animaciones en el arnés. Pendiente entorno de integración real. |
 | H17 | Documentación de entrega actualizada; restauración, copia independiente, firma e instalación limpia siguen pendientes. |
 | H18 | Se incorporaron contratos específicos; no se realizó una reescritura general de arquitectura ni traducciones. |
 

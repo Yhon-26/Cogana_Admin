@@ -81,7 +81,7 @@ Correcto: Descarta duplicados, Inicio y nombres ajenos
 Correcto: Reordenar mantiene la persistencia existente
 Correcto: Quitar una tarjeta también actualiza la disposición
 Correcto: Contraer utiliza una transición de ancho cuando Windows permite animaciones
-Correcto: Invertir una transición parte del ancho actual sin saltos
+Correcto: Invertir el menú conserva la transición o aplica el ancho final si Windows desactiva animaciones
 Correcto: Alternar rápidamente termina compacto y libera el reloj
 Correcto: El menú compacto recupera espacio y conserva la navegación
 Correcto: Cerrar sesión permanece disponible en el menú compacto

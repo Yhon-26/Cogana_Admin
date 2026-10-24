@@ -1,26 +1,45 @@
 {
+  "releaseUrl": "https://github.com/Yhon-26/Cogana_Admin/releases/tag/v1.13.0",
+  "sourceCommit": "bf85a65e3c18a5da84f63c49355b897fa0ef783d",
+  "published": true,
+  "verifiedAtUtc": "2026-10-24T20:58:56.5969760Z",
   "version": "1.13.0",
-  "published": false,
   "files": [
     {
-      "name": "CoganaAdmin-win-Setup.exe",
-      "bytes": 12499607,
-      "sha256": "FADDF2FED6D876873CD623BADE6E86986492C9D863B0BEF5885B81B47A484D03"
-    },
-    {
-      "name": "CoganaAdmin-win-Portable.zip",
-      "bytes": 4829965,
-      "sha256": "4E81273CA8B7A237693A0BF163609949F4855437B50DA131A298CA6684FFC0D2"
+      "name": "CoganaAdmin-1.13.0-delta.nupkg",
+      "bytes": 338044,
+      "sha256": "0481ECAA03A606BB6BA982B1FFCE1E36A66C9BAA855C97F5215E8E8BDD944EB8",
+      "remoteDigestVerified": true
     },
     {
       "name": "CoganaAdmin-1.13.0-full.nupkg",
-      "bytes": 4907159,
-      "sha256": "064828B745D25F125F06DF2AB1C53069F1123B01CFB670CCC48CFB642F4FC9C0"
+      "bytes": 4907196,
+      "sha256": "AC0DC2D1EE9B695422EBE5A960AAC86BD06B2FC0970FE1BE9B9BFB58BDCDF351",
+      "remoteDigestVerified": true
     },
     {
-      "name": "CoganaAdmin-1.13.0-delta.nupkg",
-      "bytes": 338041,
-      "sha256": "7D81F2C599F97AF5D55BE4FDD2B416B36D9268C06B8D5FC156426AE4E0CDD9E6"
+      "name": "CoganaAdmin-win-Portable.zip",
+      "bytes": 4830002,
+      "sha256": "6458DA6B51B5F4DBF2FD4EC7C216A7B99C3C6689A2EF70DC03CB1D6770122665",
+      "remoteDigestVerified": true
+    },
+    {
+      "name": "CoganaAdmin-win-Setup.exe",
+      "bytes": 12499644,
+      "sha256": "157FBDBC83C68B126080E0BEB90DA7BC530E3EBC1449F0F6509AFBE733B95681",
+      "remoteDigestVerified": true
+    },
+    {
+      "name": "RELEASES",
+      "bytes": 81,
+      "sha256": "B0F7D37D07759FD7B54D5403955718992DEEC11D3F001FFB8BE8C23A7FDBE5E3",
+      "remoteDigestVerified": true
+    },
+    {
+      "name": "releases.win.json",
+      "bytes": 503,
+      "sha256": "29F5CD47D4D8DABD543ED62ADCD1FD4F6477BC11313A25C64E449887BCAFDE61",
+      "remoteDigestVerified": true
     }
   ]
 }

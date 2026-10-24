@@ -53,8 +53,10 @@ internal static class PruebasPanel
         ventana.UpdateLayout(); Esperar(70);
         var anchoIntermedio=ventana.AnchoMenu;
         ventana.EsMenuCompacto=false;
-        verificar(Math.Abs(ventana.AnchoMenu-anchoIntermedio)<2,
-            "Invertir una transición parte del ancho actual sin saltos");
+        verificar(SystemParameters.ClientAreaAnimation
+                ? Math.Abs(ventana.AnchoMenu-anchoIntermedio)<2
+                : Math.Abs(ventana.AnchoMenu-252)<1,
+            "Invertir el menú conserva la transición o aplica el ancho final si Windows desactiva animaciones");
         ventana.EsMenuCompacto=true; Esperar(350); ventana.UpdateLayout();
         verificar(Math.Abs(ventana.AnchoMenu-104)<1 && !ventana.HasAnimatedProperties,
             "Alternar rápidamente termina compacto y libera el reloj");
