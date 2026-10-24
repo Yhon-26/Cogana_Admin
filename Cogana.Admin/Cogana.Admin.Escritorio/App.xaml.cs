@@ -29,7 +29,6 @@ public partial class App : Application
     private IServicioPanelInicio? _servicioPanelInicio;
     private VentanaInicioSesion? _ventanaInicioSesion;
     private IServicioAutenticacion? _servicioAutenticacion;
-    private readonly List<ClienteSupabaseRest> _clientesAnteriores = [];
     private ConfiguracionSupabase? _configuracionSupabase;
 
     [STAThread]
@@ -81,19 +80,21 @@ public partial class App : Application
         _ventanaInicioSesion.Show();
     }
 
-    private void AbrirPanelPrincipal(SesionUsuario sesion)
+    private void AbrirPanelPrincipal(SesionUsuario sesion) => AbrirPanelConfirmado(sesion, false);
+
+    private void AbrirPanelConfirmado(SesionUsuario sesion, bool introduccionFinalizada)
     {
         // La introducción animada saluda una sola vez por equipo antes de abrir el panel.
         // Cualquier cierre (fin, salto o X) marca el flag y abre el panel normalmente.
         var estadoOnboarding = new EstadoPrimerIngreso();
         estadoOnboarding.Cargar();
-        if (!estadoOnboarding.Visto)
+        if (!introduccionFinalizada && !estadoOnboarding.Visto)
         {
             var onboarding = new VentanaOnboarding(sesion);
             onboarding.Finalizado += () =>
             {
                 estadoOnboarding.MarcarVisto(GetType().Assembly.GetName().Version?.ToString(3) ?? "desconocida");
-                AbrirPanelPrincipal(sesion);
+                AbrirPanelConfirmado(sesion, true);
             };
             MainWindow = onboarding;
             onboarding.Show();
@@ -133,11 +134,13 @@ public partial class App : Application
                 sesion),
             ServicioCatalogo = _servicioCatalogo,
             ServicioPedidos = _servicioPedidos,
+            ServicioOperacionPedidos = new ServicioOperacionPedidosSupabase(_clienteSupabase!),
             ServicioInventario = _servicioInventario,
             ServicioPromociones = _servicioPromociones,
             ServicioClientes = _servicioClientes,
             ServicioUsuarios = _servicioUsuarios,
             ServicioConfiguracion = _servicioConfiguracion,
+            ServicioOperacionTienda = new ServicioOperacionTiendaSupabase(_clienteSupabase!),
             ServicioReportes = _servicioReportes,
             ServicioImagenes = _servicioImagenes,
             TiendaId = sesion.TiendaId
@@ -158,9 +161,8 @@ public partial class App : Application
             }
             if (_clienteSupabase is { } anterior)
             {
-                anterior.LimpiarTokenAcceso();
-                // Deja finalizar las consultas en curso sin reutilizar su cliente en el login.
-                _clientesAnteriores.Add(anterior);
+                // Se retira ahora y libera sus recursos cuando terminan las solicitudes activas.
+                anterior.Dispose();
             }
             // Cada ingreso usa servicios nuevos; ninguna consulta anterior comparte su sesión.
             MostrarInicioSesion();
@@ -180,7 +182,6 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _clienteSupabase?.Dispose();
-        foreach (var anterior in _clientesAnteriores) anterior.Dispose();
         base.OnExit(e);
     }
 }

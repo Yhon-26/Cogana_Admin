@@ -14,12 +14,26 @@ public partial class VentanaConfiguracionTienda : Window
     private Guid _operacionId = Guid.NewGuid();
     private readonly ObservableCollection<HorarioFormulario> _horarios = [];
     private readonly ObservableCollection<ExcepcionFormulario> _excepciones = [];
+    public bool HuboCambios {get;private set;}
 
-    public VentanaConfiguracionTienda(IServicioConfiguracionTienda servicio, Guid tiendaId)
+    public VentanaConfiguracionTienda(IServicioConfiguracionTienda servicio, Guid tiendaId, IServicioOperacionTienda? operacion = null)
     {
         _servicio = servicio;
         _tiendaId = tiendaId;
         InitializeComponent();
+        if (operacion is not null)
+        {
+            var panelOperacion=new PanelOperacionTienda(operacion, tiendaId);
+            panelOperacion.Guardado+=()=>HuboCambios=true;
+            Closing+=(_,e)=>{if(panelOperacion.EstaGuardando)e.Cancel=true;};
+            var tabOperacion=new System.Windows.Controls.TabItem { Header="Operación y pagos", Content=panelOperacion };
+            Pestanas.Items.Add(tabOperacion);
+            Pestanas.SelectionChanged+=(_,e)=>
+            {
+                if(ReferenceEquals(e.OriginalSource,Pestanas))
+                    BotonGuardar.Visibility=ReferenceEquals(Pestanas.SelectedItem,tabOperacion)?Visibility.Collapsed:Visibility.Visible;
+            };
+        }
         TablaHorarios.ItemsSource = _horarios;
         TablaExcepciones.ItemsSource = _excepciones;
         Loaded += AlCargar;

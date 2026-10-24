@@ -1,0 +1,34 @@
+Correcto: El reintento usa el token renovado
+Correcto: Una imagen conserva exactamente sus bytes al reintentar
+Correcto: Conserva los encabezados del cuerpo y operación
+Correcto: Ocho consultas concurrentes comparten una sola renovación
+Correcto: No informa éxito si falla la escritura de metadatos de imagen
+Correcto: El reemplazo nunca borra la referencia anterior antes de guardar
+Correcto: Un guardado rechazado conserva el objeto anterior
+Correcto: Un HTTP 204 sin fila confirmada no se presenta como guardado efectivo
+Correcto: La imagen se confirma antes de limpiar el objeto anterior; una limpieza pendiente no revierte el guardado
+Correcto: El alta usa el identificador estable del formulario
+Correcto: El alta usa el identificador estable del formulario
+Correcto: Un alta repetida recupera el mismo producto sin duplicarlo
+Correcto: La página consulta solo el tramo solicitado
+Correcto: La búsqueda se envía al servidor
+Correcto: La búsqueda puede devolver registros posteriores a los primeros 250 y conserva el total real
+Correcto: Las siete operaciones usan los RPC vigentes del backend
+Correcto: Cada operación conserva tienda e identificador de idempotencia
+Correcto: La preparación envía cantidades base sin calcular dinero en el cliente
+Correcto: El recojo exige el contrato de código, no una transición completed
+Correcto: La entrega se completa sobre la asignación real
+Correcto: Contrato vigente: confirm_manual_payment
+Correcto: Contrato vigente: reject_manual_payment
+Correcto: Contrato vigente: settle_manual_difference
+Correcto: Contrato vigente: finalize_weighted_order
+Correcto: Contrato vigente: assign_delivery
+Correcto: Contrato vigente: complete_pickup
+Correcto: Contrato vigente: complete_delivery
+Correcto: Contrato vigente: propose_substitution
+Correcto: Contrato vigente: decide_substitution
+Correcto: Contrato vigente: open_inventory_package
+Correcto: Contrato vigente: set_fulfillment_rules
+Correcto: Un HTTP 200 sin identidad del registro no confirma una operación del pedido
+Correcto: El onboarding termina en memoria aun si el archivo no se puede escribir
+33 comprobaciones de regresión correctas. Sin producción, correos ni credenciales reales.

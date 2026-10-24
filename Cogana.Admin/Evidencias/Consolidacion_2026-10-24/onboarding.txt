@@ -1,0 +1,42 @@
+Correcto: Plano neutro sin deformación
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: Perspectiva real: los lados cercanos y lejanos tienen distinta longitud
+Correcto: Sin archivo previo la introducción está pendiente
+Correcto: MarcarVisto activa la marca en memoria
+Correcto: La marca sobrevive a una nueva carga del archivo
+Correcto: El acto 1 abre visible y los demás permanecen ocultos
+Correcto: El pie arranca sin botón Anterior y con Continuar
+Correcto: El punto activo es la píldora más ancha
+Correcto: La entrada escalonada del acto 1 deja el título visible
+Correcto: Continuar pasa al acto 2 y oculta el acto 1
+Correcto: Desde el acto 2 aparece Anterior
+Correcto: Continuar pasa al acto de sincronía
+Correcto: Continuar pasa al acto final
+Correcto: En el acto final Continuar se convierte en la entrada al panel
+Correcto: Anterior regresa al acto de sincronía
+Correcto: La flecha derecha avanza al acto final
+Correcto: La flecha izquierda retrocede
+Correcto: Completar dispara Finalizado exactamente una vez
+Correcto: La ventana del onboarding se cierra al completar
+Correcto: Escape salta la introducción y avisa al anfitrión
+Correcto: Cerrar la ventana con X también avisa que se saltó la introducción
+41 comprobaciones de Onboarding correctas.

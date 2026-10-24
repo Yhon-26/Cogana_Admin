@@ -163,6 +163,15 @@
                                              AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" />
                                     <Button x:Name="BotonAjustar" Content="Registrar ajuste" Click="AlAjustar"
                                             Style="{StaticResource BotonPrincipal}" Margin="0,14,0,0" IsEnabled="False" />
+                                    <StackPanel x:Name="PanelPaquetes" Visibility="Collapsed" Margin="0,22,0,0">
+                                        <TextBlock Text="Abrir paquetes sellados" FontSize="16" FontWeight="SemiBold"/>
+                                        <Label Content="Paquete del lote" Target="{Binding ElementName=Paquete}"/>
+                                        <ComboBox x:Name="Paquete" DisplayMemberPath="Descripcion" AutomationProperties.Name="Paquete sellado del lote"/>
+                                        <Label Content="Unidades completas a abrir" Target="{Binding ElementName=UnidadesPaquete}"/>
+                                        <TextBox x:Name="UnidadesPaquete" Text="1" Style="{StaticResource CampoFormulario}" AutomationProperties.Name="Unidades completas a abrir"/>
+                                        <TextBlock Text="Indica el motivo en el campo anterior. El servidor convierte las unidades a existencia suelta y registra el movimiento." TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                        <Button x:Name="BotonAbrirPaquete" Content="Abrir paquetes" Click="AlAbrirPaquete" Style="{StaticResource BotonSecundario}" Margin="0,12,0,0"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </Border>
                         </StackPanel>

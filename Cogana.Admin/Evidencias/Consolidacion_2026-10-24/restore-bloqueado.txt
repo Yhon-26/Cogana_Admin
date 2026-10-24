@@ -1,0 +1,5 @@
+  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Escritorio\Cogana.Admin.Escritorio.csproj (en 188 ms).
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Infraestructura\Cogana.Admin.Infraestructura.csproj (en 187 ms).
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Aplicacion\Cogana.Admin.Aplicacion.csproj (en 185 ms).
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Dominio\Cogana.Admin.Dominio.csproj (en 181 ms).

@@ -7,4 +7,5 @@ public sealed record ModuloDatos(
     string Encabezado4,
     string Encabezado5,
     string AccionPrincipal,
-    IReadOnlyList<FilaModuloDatos> Filas);
+    IReadOnlyList<FilaModuloDatos> Filas,
+    int? TotalRegistros = null);

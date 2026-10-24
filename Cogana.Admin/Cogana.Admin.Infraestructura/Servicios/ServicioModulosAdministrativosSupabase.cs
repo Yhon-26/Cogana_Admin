@@ -7,8 +7,18 @@ using Cogana.Admin.Aplicacion.Modelos;
 namespace Cogana.Admin.Infraestructura.Servicios;
 
 public sealed class ServicioModulosAdministrativosSupabase(ClienteSupabaseRest cliente)
-    : IServicioModulosAdministrativos
+    : IServicioModulosAdministrativos, IServicioModulosPaginados
 {
+    private ConsultaPagina? _pagina;
+    private int? _total;
+    private sealed record ConsultaPagina(int Desplazamiento, int Cantidad, string Busqueda);
+    public async Task<ResultadoModuloDatos> ObtenerPaginaAsync(string modulo, Guid tienda, int desplazamiento, int cantidad, string busqueda, CancellationToken token = default)
+    {
+        // Cada consulta conserva su contexto; Inicio y el módulo pueden cargarse concurrentemente.
+        var servicio = new ServicioModulosAdministrativosSupabase(cliente)
+            { _pagina = new(Math.Max(0, desplazamiento), Math.Clamp(cantidad, 1, 250), busqueda.Trim()) };
+        return await servicio.ObtenerAsync(modulo, tienda, token);
+    }
     public async Task<ResultadoModuloDatos> ObtenerAsync(
         string modulo,
         Guid tiendaId,
@@ -38,7 +48,7 @@ public sealed class ServicioModulosAdministrativosSupabase(ClienteSupabaseRest c
                 _ => new ModuloDatos("", "", "", "", "", "", [])
             };
 
-            return ResultadoModuloDatos.Correcto(datos);
+            return ResultadoModuloDatos.Correcto(datos with { TotalRegistros = _total });
         }
         catch (OperationCanceledException)
         {
@@ -300,6 +310,43 @@ public sealed class ServicioModulosAdministrativosSupabase(ClienteSupabaseRest c
         Func<JsonElement, FilaModuloDatos> convertir,
         CancellationToken token)
     {
+        if (_pagina is not null)
+        {
+            ruta = System.Text.RegularExpressions.Regex.Replace(ruta, "&limit=[0-9]+", string.Empty);
+            ruta = System.Text.RegularExpressions.Regex.Replace(ruta, "order=([^&]+)", m=>m.Value+",id.asc");
+            ruta += $"&offset={_pagina.Desplazamiento}&limit={_pagina.Cantidad}";
+            var tabla = ruta.Split('?')[0].Split('/').Last();
+            var columnas = tabla switch
+            {
+                "products" => new[] { "name", "sku", "brand" },
+                "categories" => ["name", "slug"],
+                "product_presentations" => ["name", "sku"],
+                "inventory_lots" => ["lot_code"],
+                "suppliers" => ["name", "tax_id", "phone"],
+                "orders" => ["order_number", "customer_name", "status"],
+                "customers" => ["name", "phone", "email"],
+                "promotions" => ["name", "promotion_type"],
+                _ => Array.Empty<string>()
+            };
+            if (_pagina.Busqueda.Length>0 && columnas.Length>0)
+            {
+                var texto=_pagina.Busqueda.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("*", "").Replace("%", "");
+                var filtro="("+string.Join(',',columnas.Select(c=>c+".ilike.\"*"+texto+"*\""))+")";
+                ruta += "&or="+Uri.EscapeDataString(filtro);
+            }
+            using var solicitud = new HttpRequestMessage(HttpMethod.Get, ruta);
+            solicitud.Headers.TryAddWithoutValidation("Prefer", "count=exact");
+            using var respuesta = await cliente.EnviarAsync(solicitud, token);
+            respuesta.EnsureSuccessStatusCode();
+            _total = respuesta.Content.Headers.ContentRange?.Length is long total ? (int)Math.Min(total, int.MaxValue) : null;
+            if (_total is null && (respuesta.Content.Headers.TryGetValues("Content-Range",out var rangos) || respuesta.Headers.TryGetValues("Content-Range",out rangos)))
+            {
+                var rango=rangos.FirstOrDefault();
+                if(rango is not null && int.TryParse(rango[(rango.LastIndexOf('/')+1)..],out var cantidadTotal)) _total=cantidadTotal;
+            }
+            using var contenido = await JsonDocument.ParseAsync(await respuesta.Content.ReadAsStreamAsync(token), cancellationToken: token);
+            return contenido.RootElement.EnumerateArray().Select(convertir).ToList();
+        }
         var documento = await ObtenerJsonAsync(ruta, token);
         return documento.EnumerateArray().Select(convertir).ToList();
     }

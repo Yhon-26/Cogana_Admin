@@ -125,7 +125,7 @@ public sealed class ServicioPedidosAdministrativosSupabase(ClienteSupabaseRest c
             pago.ImporteCentimos,
             TraducirEstadoPago(pago.Estado),
             pago.Error,
-            pago.CreadoEn)).ToList();
+            pago.CreadoEn) { CodigoTipo=pago.Tipo, CodigoEstado=pago.Estado, CodigoMetodo=pago.Metodo }).ToList();
     }
 
     public async Task<EntregaPedidoDetalle?> ObtenerEntregaAsync(

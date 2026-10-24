@@ -58,11 +58,7 @@ public sealed class ServicioPromocionesAdministrativasSupabase(ClienteSupabaseRe
         var ruta =
             "/rest/v1/products?select=id,name,is_active" +
             $"&store_id=eq.{tiendaId:D}&order=name.asc&limit=500";
-        using var respuesta = await cliente.ObtenerAsync(ruta, cancellationToken);
-        respuesta.EnsureSuccessStatusCode();
-        var productos = await respuesta.Content.ReadFromJsonAsync<List<RespuestaProducto>>(
-            OpcionesJson,
-            cancellationToken) ?? [];
+        var productos = await cliente.ObtenerListaCompletaAsync<RespuestaProducto>(ruta, cancellationToken);
         return productos.Select(producto => new ProductoPromocionSeleccion(
             producto.Id,
             producto.Nombre,

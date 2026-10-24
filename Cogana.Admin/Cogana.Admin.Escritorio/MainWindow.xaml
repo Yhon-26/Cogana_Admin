@@ -8,8 +8,8 @@
         Title="Cogana Admin"
         Height="850"
         Width="1440"
-        MinHeight="720"
-        MinWidth="1180"
+        MinHeight="480"
+        MinWidth="760"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BrochaFondo}">
 
@@ -79,7 +79,7 @@
                             <Setter Property="Margin" Value="0,2" />
                             <Setter Property="Background" Value="Transparent" />
                             <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
-                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListBoxItem">
@@ -504,23 +504,12 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="310" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                        <WrapPanel VerticalAlignment="Center">
                             <Border Width="46" Height="46" CornerRadius="15" Background="{StaticResource BrochaAcentoSuave}">
                                 <TextBlock Text="{Binding ModuloSeleccionado.Inicial}" Foreground="{StaticResource BrochaAcento}"
                                            FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
-                            <StackPanel Grid.Column="1" Margin="13,1,20,0">
+                            <StackPanel Grid.Column="1" Margin="13,1,20,12">
                                 <TextBlock Text="{Binding ModuloSeleccionado.Nombre}" FontSize="20" FontWeight="SemiBold" />
                                 <TextBlock
                                            Foreground="{StaticResource BrochaTextoSuave}" FontSize="11" Margin="0,3,0,0" >
@@ -530,8 +519,8 @@
             </Style></TextBlock.Style>
         </TextBlock>
                             </StackPanel>
-                            <Border Grid.Column="2" Background="#F2F3F1" BorderBrush="{StaticResource BrochaBorde}"
-                                    BorderThickness="1" CornerRadius="16" Padding="14,5" Margin="0,0,10,0">
+                            <Border Grid.Column="2" Width="290" Background="#F2F3F1" BorderBrush="{StaticResource BrochaBorde}"
+                                    BorderThickness="1" CornerRadius="16" Padding="14,5" Margin="0,0,10,10">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="24" />
@@ -544,7 +533,7 @@
                                 </Grid>
                             </Border>
                             <Button Grid.Column="3" Content="{Binding AccionPrincipal}" Click="AlCrearRegistro"
-                                    Margin="0,0,9,0">
+                                    Margin="0,0,9,10">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource BotonSecundario}">
                                         <Setter Property="Visibility" Value="Visible" />
@@ -556,7 +545,7 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button Grid.Column="4" Content="{Binding TextoEditarRegistro}" Click="AlEditarRegistro" Margin="0,0,9,0">
+                            <Button Grid.Column="4" Content="{Binding TextoEditarRegistro}" Click="AlEditarRegistro" Margin="0,0,9,10">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource BotonSecundario}">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -568,7 +557,7 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button Grid.Column="5" Content="Gestionar pedido" Click="AlGestionarPedido" Margin="0,0,9,0">
+                            <Button Grid.Column="5" Content="Gestionar pedido" Click="AlGestionarPedido" Margin="0,0,9,10">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource BotonSecundario}">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -580,7 +569,7 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button Grid.Column="6" Content="{Binding TextoAccionEstado}" Click="AlCambiarEstadoRegistro" Margin="0,0,9,0">
+                            <Button Grid.Column="6" Content="{Binding TextoAccionEstado}" Click="AlCambiarEstadoRegistro" Margin="0,0,9,10">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource BotonSecundario}">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -592,7 +581,7 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button Grid.Column="7" Content="Exportar CSV" Click="AlExportarReporte" Margin="0,0,9,0">
+                            <Button Grid.Column="7" Content="Exportar CSV" Click="AlExportarReporte" Margin="0,0,9,10">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource BotonSecundario}">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -609,15 +598,21 @@
                                 <Button Content="Actualizar" Command="{Binding ActualizarModuloCommand}"
                                         Style="{StaticResource BotonPrincipal}" />
                             </StackPanel>
-                        </Grid>
+                        </WrapPanel>
 
-                        <Grid Grid.Row="1" Margin="2,12,0,12">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding MensajeModulo}" AutomationProperties.LiveSetting="Polite" FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                            <Button Grid.Column="1" x:Name="BotonVerImagen" Content="Ver imagen" Click="AlVerImagenProducto"
+                        <WrapPanel Grid.Row="1" Margin="2,12,0,12">
+                            <TextBlock Text="{Binding MensajeModulo}" AutomationProperties.LiveSetting="Polite" FontSize="11" Foreground="{StaticResource BrochaTextoSuave}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="340" Margin="0,0,12,8"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding UsaPaginacion, Converter={StaticResource BoolAVisibilidad}}">
+                                    <Button Content="Anterior" Command="{Binding PaginaAnteriorCommand}" IsEnabled="{Binding PuedePaginaAnterior}" Style="{StaticResource BotonSecundario}" Padding="10,6"/>
+                                    <TextBlock Text="{Binding TextoPagina}" VerticalAlignment="Center" Margin="8,0"/>
+                                    <Button Content="Siguiente" Command="{Binding PaginaSiguienteCommand}" IsEnabled="{Binding PuedePaginaSiguiente}" Style="{StaticResource BotonSecundario}" Padding="10,6"/>
+                                </StackPanel>
+                            <Button x:Name="BotonVerImagen" Content="Ver imagen" Click="AlVerImagenProducto"
                                     IsEnabled="{Binding PuedeVerImagen}" Visibility="{Binding EsModuloProductos, Converter={StaticResource BoolAVisibilidad}}"
                                     ToolTip="Selecciona un producto para consultar su imagen" Style="{StaticResource BotonSecundario}" Padding="14,7" Margin="12,0,0,0"/>
-                        </Grid>
+                            </StackPanel>
+                        </WrapPanel>
 
                         <Border Grid.Row="2" Background="#F0F1EF" CornerRadius="13" Padding="14,11">
                             <Border.Style><Style TargetType="Border"><Style.Triggers><DataTrigger Binding="{Binding EstaCargandoModulo}" Value="True"><Setter Property="Visibility" Value="Hidden" /></DataTrigger></Style.Triggers></Style></Border.Style>
@@ -649,7 +644,7 @@
                                 <ListBox.ItemContainerStyle>
                                     <Style TargetType="ListBoxItem">
                                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="ListBoxItem">

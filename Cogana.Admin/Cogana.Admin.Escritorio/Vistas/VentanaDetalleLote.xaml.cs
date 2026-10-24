@@ -12,6 +12,8 @@ public partial class VentanaDetalleLote : Window
     private readonly Guid _loteId;
     private Guid _operacionId = Guid.NewGuid();
     private LoteInventarioDetalle? _lote;
+    private readonly Dictionary<string,Guid> _aperturas=[];
+    private bool _guardando;
 
     public VentanaDetalleLote(
         IServicioInventarioAdministrativo servicio,
@@ -23,6 +25,7 @@ public partial class VentanaDetalleLote : Window
         _loteId = loteId;
         InitializeComponent();
         Loaded += AlCargar;
+        Closing += (_,e)=>{if(_guardando)e.Cancel=true;};
     }
 
     private async void AlCargar(object sender, RoutedEventArgs e)
@@ -55,9 +58,15 @@ public partial class VentanaDetalleLote : Window
                 ? "Este lote todavía no tiene movimientos registrados."
                 : $"{movimientos.Count:N0} movimientos registrados, del más reciente al más antiguo.";
             BotonAjustar.IsEnabled = true;
+            if (_servicio is IServicioPaquetesInventario paquetes)
+            {
+                Paquete.ItemsSource=await paquetes.ObtenerPaquetesAsync(_tiendaId,_loteId);
+                PanelPaquetes.Visibility=Visibility.Visible;
+                BotonAbrirPaquete.IsEnabled=_lote.Estado=="available" && Paquete.Items.Count>0;
+            }
             MensajeVentana.Text = string.Empty;
         }
-        catch (HttpRequestException)
+        catch (Exception error) when(error is HttpRequestException or System.Text.Json.JsonException or OperationCanceledException)
         {
             MensajeVentana.Text = "No fue posible cargar el lote. Revisa la conexión con Supabase.";
         }
@@ -86,6 +95,7 @@ public partial class VentanaDetalleLote : Window
 
     private async void AlAjustar(object sender, RoutedEventArgs e)
     {
+        if(_guardando)return;
         MensajeVentana.Text = ValidarAjuste() ?? string.Empty;
         if (!string.IsNullOrEmpty(MensajeVentana.Text)) return;
 
@@ -98,7 +108,11 @@ public partial class VentanaDetalleLote : Window
         if (confirmacion != MessageBoxResult.Yes) return;
 
         BotonAjustar.IsEnabled = false;
+        _guardando=true;
+        PanelPaquetes.IsEnabled=false;
         MensajeVentana.Text = "Registrando ajuste y movimiento...";
+        try
+        {
         var resultado = await _servicio.AjustarExistenciaAsync(
             _tiendaId,
             _loteId,
@@ -115,6 +129,8 @@ public partial class VentanaDetalleLote : Window
         {
             BotonAjustar.IsEnabled = true;
         }
+        }
+        finally{_guardando=false;PanelPaquetes.IsEnabled=true;}
     }
 
     private string? ValidarAjuste()
@@ -146,4 +162,22 @@ public partial class VentanaDetalleLote : Window
     };
 
     private void AlCerrar(object sender, RoutedEventArgs e) => Close();
+
+    private async void AlAbrirPaquete(object sender,RoutedEventArgs e)
+    {
+        if(_guardando || _servicio is not IServicioPaquetesInventario servicio || Paquete.SelectedItem is not PaqueteLote paquete)return;
+        if(!long.TryParse(UnidadesPaquete.Text,out var unidades)||unidades<=0||unidades>paquete.Sellados||string.IsNullOrWhiteSpace(MotivoAjuste.Text))
+        {MensajeVentana.Text="Selecciona unidades disponibles e indica el motivo de apertura.";return;}
+        if(MessageBox.Show(this,$"Se abrirán {unidades} paquetes de {paquete.Nombre} y se sumarán a la existencia suelta. ¿Continuar?","Abrir paquetes",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+        var clave=$"{paquete.PresentacionId}|{unidades}|{MotivoAjuste.Text.Trim()}";
+        if(!_aperturas.TryGetValue(clave,out var id))_aperturas[clave]=id=Guid.NewGuid();
+        _guardando=true;PanelPaquetes.IsEnabled=BotonAjustar.IsEnabled=false;
+        try
+        {
+            var resultado=await servicio.AbrirPaquetesAsync(_tiendaId,_loteId,paquete.PresentacionId,unidades,MotivoAjuste.Text,id);
+            if(resultado.EsExitoso)await CargarDatosAsync();
+            MensajeVentana.Text=resultado.Mensaje;
+        }
+        finally{_guardando=false;PanelPaquetes.IsEnabled=BotonAjustar.IsEnabled=true;}
+    }
 }

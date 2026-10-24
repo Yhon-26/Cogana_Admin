@@ -53,6 +53,7 @@ public sealed class EstadoPrimerIngreso
 
     public void MarcarVisto(string version)
     {
+        Visto = true;
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_ruta)!);
@@ -66,7 +67,7 @@ public sealed class EstadoPrimerIngreso
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException)
         {
-            // Si el disco no permite guardar, la introducción vuelve a mostrarse en el siguiente ingreso.
+            // Se permite continuar en esta sesión aunque la preferencia no persista.
         }
     }
 }

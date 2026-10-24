@@ -1,0 +1,14 @@
+  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Dominio\Cogana.Admin.Dominio.csproj (en 192 ms).
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Escritorio\Cogana.Admin.Escritorio.csproj (en 200 ms).
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Aplicacion\Cogana.Admin.Aplicacion.csproj (en 197 ms).
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Infraestructura\Cogana.Admin.Infraestructura.csproj (en 200 ms).
+  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Pruebas\Acceso\Acceso.csproj (en 227 ms).
+  3 de 4 proyectos están actualizados para la restauración.
+  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Pruebas\Operaciones\Operaciones.csproj (en 215 ms).
+  3 de 4 proyectos están actualizados para la restauración.
+  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado D:\Cogana_Admin\Cogana.Admin\Pruebas\Login\Login.csproj (en 219 ms).
+  4 de 5 proyectos están actualizados para la restauración.

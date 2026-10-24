@@ -65,11 +65,13 @@ public partial class MainWindow : Window
     }
     public IServicioCatalogoAdministrativo? ServicioCatalogo { get; init; }
     public IServicioPedidosAdministrativos? ServicioPedidos { get; init; }
+    public IServicioOperacionPedidos? ServicioOperacionPedidos { get; init; }
     public IServicioInventarioAdministrativo? ServicioInventario { get; init; }
     public IServicioPromocionesAdministrativas? ServicioPromociones { get; init; }
     public IServicioClientesAdministrativos? ServicioClientes { get; init; }
     public IServicioUsuariosAdministrativos? ServicioUsuarios { get; init; }
     public IServicioConfiguracionTienda? ServicioConfiguracion { get; init; }
+    public IServicioOperacionTienda? ServicioOperacionTienda { get; init; }
     public IServicioReportesAdministrativos? ServicioReportes { get; init; }
     public IServicioImagenesProducto? ServicioImagenes { get; init; }
     public Guid TiendaId { get; init; }
@@ -185,12 +187,13 @@ public partial class MainWindow : Window
         var ventana = new Vistas.VentanaDetallePedido(
             ServicioPedidos,
             TiendaId,
-            viewModel.FilaModuloSeleccionada.Id)
+            viewModel.FilaModuloSeleccionada.Id,
+            ServicioOperacionPedidos)
         {
             Owner = this
         };
 
-        if (ventana.ShowDialog() == true)
+        if (ventana.ShowDialog() == true || ventana.HuboCambios)
         {
             await viewModel.CargarModuloActualAsync();
             await viewModel.CargarInicioAsync();
@@ -523,7 +526,7 @@ public partial class MainWindow : Window
         {
             ventana = ServicioConfiguracion is null
                 ? null
-                : new Vistas.VentanaConfiguracionTienda(ServicioConfiguracion, TiendaId);
+                : new Vistas.VentanaConfiguracionTienda(ServicioConfiguracion, TiendaId, ServicioOperacionTienda);
         }
         else if (fila is null)
         {
@@ -591,7 +594,7 @@ public partial class MainWindow : Window
         ventana.Owner = this;
 
         var esInventario = viewModel.ModuloSeleccionado.Nombre == "Inventario y lotes";
-        if (ventana.ShowDialog() == true || esInventario)
+        if (ventana.ShowDialog() == true || esInventario || ventana is Vistas.VentanaConfiguracionTienda {HuboCambios:true})
         {
             await viewModel.CargarModuloActualAsync();
             await viewModel.CargarInicioAsync();
@@ -675,7 +678,13 @@ public partial class MainWindow : Window
             fila.Columna5,
             fila.Estado)));
 
-        File.WriteAllLines(dialogo.FileName, lineas, new UTF8Encoding(true));
+        try { File.WriteAllLines(dialogo.FileName, lineas, new UTF8Encoding(true)); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        {
+            MessageBox.Show("No se pudo guardar el archivo. Elige otra carpeta o cierra el CSV si está abierto.",
+                "No se pudo exportar", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         MessageBox.Show(
             "Reporte exportado correctamente.",
             "Exportación completada",

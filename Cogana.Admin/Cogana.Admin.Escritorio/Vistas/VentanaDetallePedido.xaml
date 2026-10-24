@@ -288,7 +288,10 @@
                                TextWrapping="Wrap" VerticalAlignment="Center" Margin="1,0,14,0" />
                     <Button Grid.Column="1" x:Name="BotonGestionar" Content="Cambiar estado" Click="AlGestionar"
                             Style="{StaticResource BotonSecundario}" Margin="0,0,9,0" IsEnabled="False" />
-                    <Button Grid.Column="2" Content="Cerrar" Click="AlCerrar" Style="{StaticResource BotonPrincipal}" />
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <Button x:Name="BotonAtender" Content="Atender pedido" Click="AlAtender" Style="{StaticResource BotonPrincipal}" Margin="0,0,8,0" IsEnabled="False"/>
+                        <Button Content="Cerrar" Click="AlCerrar" Style="{StaticResource BotonSecundario}"/>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Border>

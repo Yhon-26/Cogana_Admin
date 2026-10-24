@@ -62,7 +62,7 @@ public sealed class WidgetInicioViewModel : BaseViewModel
         {
             Filas.Add(fila);
         }
-        Total = datos.Filas.Count;
+        Total = datos.TotalRegistros ?? datos.Filas.Count;
         Notificar(nameof(TieneFilas));
     }
 

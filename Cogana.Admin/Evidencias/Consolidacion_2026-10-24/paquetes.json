@@ -1,0 +1,26 @@
+{
+  "version": "1.13.0",
+  "published": false,
+  "files": [
+    {
+      "name": "CoganaAdmin-win-Setup.exe",
+      "bytes": 12499607,
+      "sha256": "FADDF2FED6D876873CD623BADE6E86986492C9D863B0BEF5885B81B47A484D03"
+    },
+    {
+      "name": "CoganaAdmin-win-Portable.zip",
+      "bytes": 4829965,
+      "sha256": "4E81273CA8B7A237693A0BF163609949F4855437B50DA131A298CA6684FFC0D2"
+    },
+    {
+      "name": "CoganaAdmin-1.13.0-full.nupkg",
+      "bytes": 4907159,
+      "sha256": "064828B745D25F125F06DF2AB1C53069F1123B01CFB670CCC48CFB642F4FC9C0"
+    },
+    {
+      "name": "CoganaAdmin-1.13.0-delta.nupkg",
+      "bytes": 338041,
+      "sha256": "7D81F2C599F97AF5D55BE4FDD2B416B36D9268C06B8D5FC156426AE4E0CDD9E6"
+    }
+  ]
+}

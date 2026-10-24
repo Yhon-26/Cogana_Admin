@@ -1,0 +1,15 @@
+Correcto: Rechaza sesión inválida
+Correcto: Rechaza membresía suspendida
+Correcto: Rechaza repartidor en flujo del escritorio
+Correcto: user_metadata no autoriza retirar la marca
+Correcto: Bloquea operaciones normales con contraseña temporal
+Correcto: Rechaza contraseña corta
+Correcto: Auth rechazado conserva marca
+Correcto: Fallo al retirar marca conserva bloqueo
+Correcto: Administrador cambia solo su contraseña; conserva otros metadatos
+Correcto: Solo propietario invita
+Correcto: Cuenta nueva se marca desde servidor
+Correcto: Cuenta existente conserva contraseña y metadatos
+12 comprobaciones correctas; sin conexión a producción.
+(node:31736) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

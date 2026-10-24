@@ -47,6 +47,7 @@ public partial class VentanaOnboarding : Window
         Activated += (_, _) => { if (IsLoaded) ActualizarMovimiento(); };
         Deactivated += (_, _) => { if (IsLoaded) ActualizarMovimiento(); };
         StateChanged += (_, _) => { if (IsLoaded) ActualizarMovimiento(); };
+        SystemParameters.StaticPropertyChanged += AlCambiarPreferencias;
     }
 
     private void AlCargarVentana(object sender, RoutedEventArgs e)
@@ -54,6 +55,7 @@ public partial class VentanaOnboarding : Window
         Loaded -= AlCargarVentana;
         ActualizarMovimiento();
         (Resources["AnimacionEntrada"] as Storyboard)?.Begin(this, true);
+        if(!SystemParameters.ClientAreaAnimation) (Resources["AnimacionEntrada"] as Storyboard)?.SkipToFill(this);
         // El acto 1 se reproduce en la misma vía diferida que los demás: los
         // storyboards con BeginTime no aplican bien antes del primer render.
         Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
@@ -99,6 +101,13 @@ public partial class VentanaOnboarding : Window
     private async void IrA(int destino)
     {
         if (destino < 0 || destino >= _paginas.Length || destino == _indice) return;
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            _paginas[_indice].Visibility=Visibility.Collapsed;
+            _indice=destino;
+            _paginas[_indice].Visibility=Visibility.Visible;
+            ReproducirEntrada(_indice); ActualizarPie(); return;
+        }
         var version = ++_versionNavegacion;
         var origen = _indice;
         var haciaAdelante = destino > origen;
@@ -148,7 +157,9 @@ public partial class VentanaOnboarding : Window
     private void ReproducirEntrada(int indice)
     {
         // Sin modo controlable: estos storyboards se dejan correr hasta el final.
-        (Resources[_clavesEntrada[indice]] as Storyboard)?.Begin(this);
+        var historia=Resources[_clavesEntrada[indice]] as Storyboard;
+        historia?.Begin(this,true);
+        if(!SystemParameters.ClientAreaAnimation) historia?.SkipToFill(this);
     }
 
     private void ActualizarPie()
@@ -157,7 +168,7 @@ public partial class VentanaOnboarding : Window
         {
             var activo = i == _indice;
             _puntos[i].BeginAnimation(WidthProperty, new DoubleAnimation(activo ? 22 : 8,
-                TimeSpan.FromMilliseconds(240))
+                TimeSpan.FromMilliseconds(SystemParameters.ClientAreaAnimation ? 240 : 0))
             {
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
             });
@@ -179,7 +190,7 @@ public partial class VentanaOnboarding : Window
         (Resources["AnimacionEntrada"] as Storyboard)?.Remove(this);
         Lienzo.Animando = false;
 
-        var salida = TimeSpan.FromMilliseconds(220);
+        var salida = TimeSpan.FromMilliseconds(SystemParameters.ClientAreaAnimation ? 220 : 0);
         TarjetaOnboarding.BeginAnimation(OpacityProperty, new DoubleAnimation(0, salida)
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
@@ -208,6 +219,7 @@ public partial class VentanaOnboarding : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        SystemParameters.StaticPropertyChanged -= AlCambiarPreferencias;
         _cerrada = true;
         DetenerSeguimiento();
         Lienzo.Animando = false;
@@ -244,7 +256,7 @@ public partial class VentanaOnboarding : Window
 
     private void IniciarSeguimiento()
     {
-        if (_renderizando || _cerrada || _completado) return;
+        if (_renderizando || _cerrada || _completado || !SystemParameters.ClientAreaAnimation || !IsActive) return;
         _ultimoFotograma = Stopwatch.GetTimestamp();
         CompositionTarget.Rendering += AlRenderizarMovimiento;
         _renderizando = true;
@@ -273,7 +285,7 @@ public partial class VentanaOnboarding : Window
     /// No reinicia los bucles que ya corren para evitar saltos en la deriva.</summary>
     private void ActualizarMovimiento()
     {
-        var animar = IsActive && WindowState != WindowState.Minimized && !_completado && !_cerrada;
+        var animar = SystemParameters.ClientAreaAnimation && IsActive && WindowState != WindowState.Minimized && !_completado && !_cerrada;
         if (animar == _buclesActivos)
         {
             GestionarFlujoSincronia();
@@ -296,6 +308,21 @@ public partial class VentanaOnboarding : Window
             TarjetaEscala.ScaleX = TarjetaEscala.ScaleY = 1;
         }
         GestionarFlujoSincronia();
+    }
+
+    private void AlCambiarPreferencias(object? sender,PropertyChangedEventArgs e)
+    {
+        if(e.PropertyName!=nameof(SystemParameters.ClientAreaAnimation) || !IsLoaded || _cerrada)return;
+        Dispatcher.BeginInvoke(()=>
+        {
+            if(_cerrada)return;
+            ActualizarMovimiento();
+            if(!SystemParameters.ClientAreaAnimation)
+            {
+                (Resources["AnimacionEntrada"] as Storyboard)?.SkipToFill(this);
+                (Resources[_clavesEntrada[_indice]] as Storyboard)?.SkipToFill(this);
+            }
+        });
     }
 
     private void GestionarFlujoSincronia()

@@ -1,0 +1,34 @@
+Correcto: No permite cambiar sin verificar acceso
+Correcto: Rechaza enlace no autorizado sin enviar solicitudes
+Correcto: Rechaza enlace no autorizado sin enviar solicitudes
+Correcto: Rechaza enlace no autorizado sin enviar solicitudes
+Correcto: Rechaza enlace no autorizado sin enviar solicitudes
+Correcto: Rechaza enlace no autorizado sin enviar solicitudes
+Correcto: Valida correo antes de solicitar recuperación
+Correcto: Solicitud de correo genérica sin enumerar usuarios
+Correcto: Rechaza recuperación vencida
+Correcto: Rechaza cuenta sin membresía administrativa
+Correcto: Limpia la sesión de una cuenta sin membresía
+Correcto: Verifica enlace contra Auth
+Correcto: Intercambia hash mediante POST, sin abrir el enlace
+Correcto: Rechaza contraseña corta
+Correcto: No anuncia éxito cuando Auth rechaza el cambio
+Correcto: Guarda contraseña y exige nuevo ingreso
+Correcto: Recuperación normal usa Auth del usuario
+Correcto: La sesión de recuperación no se reutiliza después del cambio
+Correcto: El ingreso temporal no entrega una sesión al panel
+Correcto: El ViewModel solicita cambio y bloquea el panel
+Correcto: Cambio inicial usa la operación protegida del servidor
+Correcto: Envía contrato de cambio inicial con tienda
+Correcto: Cancelar elimina la sesión pendiente
+Correcto: user_metadata no controla la obligación
+Correcto: Acepta código de recuperación con correo
+Correcto: El código se verifica con tipo recovery
+Correcto: Error de red al comprobar permisos elimina tokens
+Correcto: Cerrar sesión limita el alcance a este dispositivo
+Correcto: Cerrar sesión elimina la autorización local
+Correcto: Permite otro ingreso después de cerrar sesión
+Correcto: Un fallo de red no conserva el acceso local
+Correcto: Cerrar sesión elimina también el acceso de recuperación pendiente
+Correcto: Una renovación en curso no restaura una sesión cerrada
+33 comprobaciones correctas; ninguna usa producción ni envía correos.

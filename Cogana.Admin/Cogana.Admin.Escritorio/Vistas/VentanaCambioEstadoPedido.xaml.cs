@@ -43,7 +43,8 @@ public partial class VentanaCambioEstadoPedido : Window
                 : [new("ready_for_delivery", "Listo para delivery"), new("awaiting_adjustment", "Esperar ajuste")],
             "awaiting_adjustment" => [new("preparing", "Continuar preparación")],
             "ready_for_delivery" => [new("out_for_delivery", "Enviar a reparto")],
-            "ready_for_pickup" or "out_for_delivery" => [new("completed", "Completar pedido")],
+            // El cierre se hace con complete_pickup/complete_delivery y código del cliente.
+            "ready_for_pickup" or "out_for_delivery" => [],
             _ => []
         };
 

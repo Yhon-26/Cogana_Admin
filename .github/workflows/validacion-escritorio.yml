@@ -1,0 +1,34 @@
+name: Validación de escritorio
+on:
+  push:
+    paths: ['Cogana.Admin/**', '.github/workflows/validacion-escritorio.yml']
+  pull_request:
+    paths: ['Cogana.Admin/**', '.github/workflows/validacion-escritorio.yml']
+permissions:
+  contents: read
+jobs:
+  verificar:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: Cogana.Admin
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: dotnet restore Cogana.Admin.slnx --locked-mode
+      - run: dotnet restore Pruebas/Acceso/Acceso.csproj --locked-mode
+      - run: dotnet restore Pruebas/Operaciones/Operaciones.csproj --locked-mode
+      - run: dotnet restore Pruebas/Login/Login.csproj --locked-mode
+      - run: dotnet build Cogana.Admin.slnx -c Release --no-restore
+      - run: dotnet run --project Pruebas/Acceso/Acceso.csproj -c Release
+      - run: node Pruebas/Acceso/funcion-acceso.mjs
+      - run: dotnet run --project Pruebas/Operaciones/Operaciones.csproj -c Release
+      - run: dotnet run --project Pruebas/Login/Login.csproj -c Release
+      - run: dotnet run --project Pruebas/Login/Login.csproj -c Release --no-build -- --onboarding

@@ -23,11 +23,7 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
         var ruta =
             "/rest/v1/categories?select=id,name" +
             $"&store_id=eq.{tiendaId:D}&is_active=eq.true&order=name.asc";
-        using var respuesta = await cliente.ObtenerAsync(ruta, cancellationToken);
-        respuesta.EnsureSuccessStatusCode();
-        var categorias = await respuesta.Content.ReadFromJsonAsync<List<RespuestaCategoria>>(
-            OpcionesJson,
-            cancellationToken) ?? [];
+        var categorias = await cliente.ObtenerListaCompletaAsync<RespuestaCategoria>(ruta, cancellationToken);
         return categorias.Select(c => new OpcionCategoria(c.Id, c.Nombre)).ToList();
     }
 
@@ -38,11 +34,7 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
         var ruta =
             "/rest/v1/products?select=id,name,base_unit" +
             $"&store_id=eq.{tiendaId:D}&is_active=eq.true&order=name.asc";
-        using var respuesta = await cliente.ObtenerAsync(ruta, cancellationToken);
-        respuesta.EnsureSuccessStatusCode();
-        var productos = await respuesta.Content.ReadFromJsonAsync<List<RespuestaProducto>>(
-            OpcionesJson,
-            cancellationToken) ?? [];
+        var productos = await cliente.ObtenerListaCompletaAsync<RespuestaProducto>(ruta, cancellationToken);
         return productos.Select(p => new OpcionProducto(p.Id, p.Nombre, p.UnidadBase)).ToList();
     }
 
@@ -53,11 +45,7 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
         var ruta =
             "/rest/v1/suppliers?select=id,name" +
             $"&store_id=eq.{tiendaId:D}&is_active=eq.true&order=name.asc";
-        using var respuesta = await cliente.ObtenerAsync(ruta, cancellationToken);
-        respuesta.EnsureSuccessStatusCode();
-        var proveedores = await respuesta.Content.ReadFromJsonAsync<List<RespuestaProveedor>>(
-            OpcionesJson,
-            cancellationToken) ?? [];
+        var proveedores = await cliente.ObtenerListaCompletaAsync<RespuestaProveedor>(ruta, cancellationToken);
         return proveedores.Select(p => new OpcionProveedor(p.Id, p.Nombre)).ToList();
     }
 
@@ -183,12 +171,14 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
         NuevoProducto producto,
         CancellationToken cancellationToken = default)
     {
+        var registroId = producto.IdRegistro ?? Guid.NewGuid();
         try
         {
-            using var solicitud = new HttpRequestMessage(HttpMethod.Post, "/rest/v1/products")
+            using var solicitud = new HttpRequestMessage(HttpMethod.Post, "/rest/v1/products?on_conflict=id")
             {
                 Content = JsonContent.Create(new
                 {
+                    id = registroId,
                     store_id = tiendaId,
                     category_id = producto.CategoriaId,
                     sku = LimpiarOpcional(producto.Sku),
@@ -201,7 +191,7 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
                     is_active = true
                 })
             };
-            solicitud.Headers.TryAddWithoutValidation("Prefer", "return=representation");
+            solicitud.Headers.TryAddWithoutValidation("Prefer", "resolution=ignore-duplicates,return=representation");
             using var respuesta = await cliente.EnviarAsync(solicitud, cancellationToken);
             if (!respuesta.IsSuccessStatusCode)
             {
@@ -211,6 +201,15 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
 
             var creados = await respuesta.Content.ReadFromJsonAsync<List<ProductoCreado>>(
                 cancellationToken: cancellationToken);
+            if (creados?.Count == 0)
+            {
+                using var comprobacion = await cliente.ObtenerAsync(
+                    $"/rest/v1/products?select=id&store_id=eq.{tiendaId:D}&id=eq.{registroId:D}", cancellationToken);
+                comprobacion.EnsureSuccessStatusCode();
+                creados = await comprobacion.Content.ReadFromJsonAsync<List<ProductoCreado>>(cancellationToken);
+            }
+            if (creados?.FirstOrDefault()?.Id != registroId)
+                return new(false, "No se pudo confirmar el producto guardado. Reintenta sin cerrar este formulario.", null);
             return new ResultadoCreacionProducto(
                     true, "Producto registrado correctamente.",
                     creados?.FirstOrDefault()?.Id);
@@ -257,14 +256,9 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
                     updated_at = DateTimeOffset.UtcNow
                 })
             };
-            solicitud.Headers.TryAddWithoutValidation("Prefer", "return=minimal");
+            solicitud.Headers.TryAddWithoutValidation("Prefer", "return=representation");
             using var respuesta = await cliente.EnviarAsync(solicitud, cancellationToken);
-            if (respuesta.IsSuccessStatusCode)
-            {
-                return ResultadoOperacion.Correcta("Producto actualizado correctamente.");
-            }
-
-            return ResultadoOperacion.Fallida(await LeerErrorAsync(respuesta, cancellationToken));
+            return await VerificarEdicionAsync(respuesta, "Producto actualizado correctamente.", cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -504,15 +498,10 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
                     updated_at = DateTimeOffset.UtcNow
                 })
             };
-            solicitud.Headers.TryAddWithoutValidation("Prefer", "return=minimal");
+            solicitud.Headers.TryAddWithoutValidation("Prefer", "return=representation");
             using var respuesta = await cliente.EnviarAsync(solicitud, cancellationToken);
-            if (respuesta.IsSuccessStatusCode)
-            {
-                return ResultadoOperacion.Correcta(
-                    activo ? "Registro activado correctamente." : "Registro desactivado correctamente.");
-            }
-
-            return ResultadoOperacion.Fallida(await LeerErrorAsync(respuesta, cancellationToken));
+            return await VerificarEdicionAsync(respuesta,
+                activo ? "Registro activado correctamente." : "Registro desactivado correctamente.", cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -574,11 +563,9 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
             {
                 Content = JsonContent.Create(contenido)
             };
-            solicitud.Headers.TryAddWithoutValidation("Prefer", "return=minimal");
+            solicitud.Headers.TryAddWithoutValidation("Prefer", "return=representation");
             using var respuesta = await cliente.EnviarAsync(solicitud, cancellationToken);
-            return respuesta.IsSuccessStatusCode
-                ? ResultadoOperacion.Correcta(mensajeExito)
-                : ResultadoOperacion.Fallida(await LeerErrorAsync(respuesta, cancellationToken));
+            return await VerificarEdicionAsync(respuesta, mensajeExito, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -588,6 +575,19 @@ public sealed class ServicioCatalogoAdministrativoSupabase(ClienteSupabaseRest c
         {
             return ResultadoOperacion.Fallida("No fue posible actualizar la información en Supabase.");
         }
+    }
+
+    private static async Task<ResultadoOperacion> VerificarEdicionAsync(HttpResponseMessage respuesta, string mensaje, CancellationToken token)
+    {
+        if (!respuesta.IsSuccessStatusCode) return ResultadoOperacion.Fallida(await LeerErrorAsync(respuesta, token));
+        try
+        {
+            var filas = await respuesta.Content.ReadFromJsonAsync<JsonElement>(token);
+            return filas.ValueKind == JsonValueKind.Array && filas.GetArrayLength()==1
+                ? ResultadoOperacion.Correcta(mensaje)
+                : ResultadoOperacion.Fallida("El registro ya no está disponible o cambió tu permiso. Actualiza el módulo antes de reintentar.");
+        }
+        catch (JsonException) { return ResultadoOperacion.Fallida("No se pudo confirmar el cambio. Actualiza el módulo para comprobarlo."); }
     }
 
     private static async Task<string> LeerErrorAsync(

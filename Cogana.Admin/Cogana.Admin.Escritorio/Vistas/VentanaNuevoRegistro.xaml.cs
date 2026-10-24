@@ -18,7 +18,9 @@ public partial class VentanaNuevoRegistro : Window
     private readonly Guid _tiendaId;
     private readonly string _modulo;
     private readonly Guid _operacionId = Guid.NewGuid();
+    private readonly Guid _productoEnAltaId = Guid.NewGuid();
     private string? _rutaImagen;
+    private bool _guardando;
 
     public VentanaNuevoRegistro(
         IServicioCatalogoAdministrativo servicio,
@@ -33,6 +35,7 @@ public partial class VentanaNuevoRegistro : Window
         InitializeComponent();
         ConfigurarFormulario();
         Loaded += AlCargar;
+        Closing += (_,e)=>{if(_guardando)e.Cancel=true;};
     }
 
     private void ConfigurarFormulario()
@@ -118,6 +121,7 @@ public partial class VentanaNuevoRegistro : Window
 
     private async void AlGuardar(object sender, RoutedEventArgs e)
     {
+        if(_guardando)return;
         MensajeFormulario.Text = string.Empty;
         var validacion = Validar();
         if (!string.IsNullOrWhiteSpace(validacion))
@@ -127,6 +131,7 @@ public partial class VentanaNuevoRegistro : Window
         }
 
         BotonGuardar.IsEnabled = false;
+        _guardando=true;
         MensajeFormulario.Text = "Guardando en Supabase...";
 
         try
@@ -144,6 +149,9 @@ public partial class VentanaNuevoRegistro : Window
                     : $"El producto se creó, pero la imagen no pudo subirse: {subida.Mensaje}";
                 if (!subida.EsExitoso)
                 {
+                    BotonGuardar.Content = "Reintentar imagen";
+                    foreach (var campo in new Control[] { ProductoNombre, ProductoSku, ProductoMarca, ProductoDescripcion,
+                        ProductoCategoria, ProductoUnidad, ProductoStockMinimo, ProductoVencimiento }) campo.IsEnabled = false;
                     BotonGuardar.IsEnabled = true;
                     return;
                 }
@@ -152,11 +160,17 @@ public partial class VentanaNuevoRegistro : Window
             MensajeFormulario.Text = resultado.Mensaje;
             if (resultado.EsExitoso)
             {
+                _guardando=false;
                 DialogResult = true;
             }
         }
+        catch(Exception error)when(error is HttpRequestException or System.Text.Json.JsonException or OperationCanceledException or IOException or UnauthorizedAccessException)
+        {
+            MensajeFormulario.Text="No se pudo confirmar el guardado. Reintenta desde este formulario para conservar el identificador del registro.";
+        }
         finally
         {
+            _guardando=false;
             BotonGuardar.IsEnabled = true;
         }
     }
@@ -213,6 +227,8 @@ public partial class VentanaNuevoRegistro : Window
 
     private async Task<ResultadoOperacion> GuardarAsync()
     {
+        if (_modulo == "Productos" && _ultimoProductoCreadoId.HasValue)
+            return ResultadoOperacion.Correcta("El producto ya se creó. Continúa con la imagen.");
         switch (_modulo)
         {
             case "Productos":
@@ -227,7 +243,8 @@ public partial class VentanaNuevoRegistro : Window
                         ProductoCategoria.SelectedValue as Guid?,
                         ProductoUnidad.SelectedValue?.ToString() ?? "kg",
                         ProductoVencimiento.IsChecked == true,
-                        long.TryParse(ProductoStockMinimo.Text, out var minimo) ? minimo : 0));
+                        long.TryParse(ProductoStockMinimo.Text, out var minimo) ? minimo : 0,
+                        _productoEnAltaId));
                 _ultimoProductoCreadoId = creacion.ProductoId;
                 return creacion;
             }

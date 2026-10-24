@@ -7,8 +7,27 @@ using Cogana.Admin.Aplicacion.Modelos;
 namespace Cogana.Admin.Infraestructura.Servicios;
 
 public sealed class ServicioInventarioAdministrativoSupabase(ClienteSupabaseRest cliente)
-    : IServicioInventarioAdministrativo
+    : IServicioInventarioAdministrativo, IServicioPaquetesInventario
 {
+    public async Task<IReadOnlyList<PaqueteLote>> ObtenerPaquetesAsync(Guid tienda,Guid lote,CancellationToken token=default)
+    {
+        using var respuesta=await cliente.ObtenerAsync($"/rest/v1/inventory_lot_packages?store_id=eq.{tienda:D}&lot_id=eq.{lote:D}&sealed_on_hand_units=gt.0&select=presentation_id,sealed_on_hand_units,product_presentations(name,base_quantity)&order=id.asc",token);
+        respuesta.EnsureSuccessStatusCode();var datos=await respuesta.Content.ReadFromJsonAsync<JsonElement>(token);
+        return datos.EnumerateArray().Select(x=>new PaqueteLote(x.GetProperty("presentation_id").GetGuid(),x.GetProperty("product_presentations").GetProperty("name").GetString()!,
+            x.GetProperty("sealed_on_hand_units").GetInt64(),x.GetProperty("product_presentations").GetProperty("base_quantity").GetInt64())).ToList();
+    }
+    public async Task<ResultadoOperacion> AbrirPaquetesAsync(Guid tienda,Guid lote,Guid presentacion,long unidades,string motivo,Guid operacion,CancellationToken token=default)
+    {
+        try
+        {
+            using var solicitud=new HttpRequestMessage(HttpMethod.Post,"/rest/v1/rpc/open_inventory_package")
+            {Content=JsonContent.Create(new{p_store_id=tienda,p_lot_id=lote,p_presentation_id=presentacion,p_units=unidades,p_operation_id=operacion,p_reason=motivo.Trim()})};
+            using var respuesta=await cliente.EnviarAsync(solicitud,token);
+            return respuesta.IsSuccessStatusCode?ResultadoOperacion.Correcta("Paquetes abiertos y existencia suelta actualizada."):ResultadoOperacion.Fallida(await LeerErrorAsync(respuesta,token));
+        }
+        catch(Exception error)when(error is HttpRequestException or OperationCanceledException or JsonException)
+        {return ResultadoOperacion.Fallida("No se pudo confirmar la apertura. Actualiza el lote o reintenta la misma operación.");}
+    }
     private static readonly JsonSerializerOptions OpcionesJson = new()
     {
         PropertyNameCaseInsensitive = true

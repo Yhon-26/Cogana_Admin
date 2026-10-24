@@ -69,6 +69,12 @@ internal static class Program
             Console.WriteLine($"{cantidad} comprobaciones de Onboarding correctas.");
             return;
         }
+        if (args.Contains("--consolidacion"))
+        {
+            PruebasConsolidacion.Probar(Verificar);
+            Console.WriteLine($"{cantidad} comprobaciones de consolidación correctas.");
+            return;
+        }
         var superficie = new Grid { Width = 472, Height = 540, Background = Brushes.Transparent };
         var texto = new TextBox { Text = "Texto de prueba", Name = "CampoPrueba", Margin = new Thickness(24), FontSize = 18, Height = 46 };
         var boton = new Button { Content = "Acción de prueba", Margin = new Thickness(24), Height = 46 };
@@ -126,6 +132,7 @@ internal static class Program
             PruebasSkeleton.Probar(Verificar);
             PruebasMarco.Probar(Verificar);
             PruebasImagenProducto.Probar(Verificar);
+            PruebasConsolidacion.Probar(Verificar);
             Console.WriteLine($"{cantidad} verificaciones totales correctas, sin conexión a Supabase.");
         }
     }

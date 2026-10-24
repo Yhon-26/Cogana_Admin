@@ -1,5 +1,7 @@
 # Cogana Admin
 
+**Consolidación local 1.13.0 (24/10/2026):** sesión y reintentos, guardados, atención de pedidos, configuración operativa, paginación y accesibilidad. Consulta [CONSOLIDACION_2026-10-24.md](CONSOLIDACION_2026-10-24.md) para ver la implementación, las pruebas y las validaciones reales pendientes. Esta versión se prepara localmente; no implica que ya esté publicada en el canal de actualizaciones.
+
 Consulta [ESTADO_Y_HOJA_DE_RUTA.md](ESTADO_Y_HOJA_DE_RUTA.md) para ver qué está implementado, qué sigue pendiente y cómo abrir la solución en Visual Studio.
 
 Aplicación de escritorio para administrar la tienda Cogana Santa Anita.
@@ -25,7 +27,7 @@ Para comprobar geometría, renderizado, interacción y estados de acceso sin con
 
 ## Marco de ventanas y desplazamiento
 
-Las 15 ventanas WPF del escritorio usan una cabecera común integrada con su propio color de fondo. `WindowChrome` conserva las zonas nativas de arrastre y redimensionamiento; los botones accesibles llaman a los comandos de minimizar, maximizar/restaurar y cerrar. La cabecera cambia el icono y nombre accesible a Restaurar cuando corresponde. Las ventanas que no admiten cambios de tamaño deshabilitan esos comandos. La comprobación local de maximización respeta el área de trabajo y la barra de tareas del monitor de prueba.
+Las 17 ventanas WPF del escritorio usan una cabecera común integrada con su propio color de fondo. `WindowChrome` conserva las zonas nativas de arrastre y redimensionamiento; los botones accesibles llaman a los comandos de minimizar, maximizar/restaurar y cerrar. La cabecera cambia el icono y nombre accesible a Restaurar cuando corresponde. Las ventanas que no admiten cambios de tamaño deshabilitan esos comandos. La comprobación local de maximización respeta el área de trabajo y la barra de tareas del monitor de prueba.
 
 Los formularios, detalles, recuperación, imágenes, configuración y reportes muestran una sola superficie: se eliminó únicamente el margen y borde decorativo exterior duplicado. El login conserva su tarjeta central. Las barras de desplazamiento comparten un pulgar redondeado de 6 px, carril transparente y estados de puntero/arrastre, manteniendo las piezas nativas `PART_Track`, rueda, desplazamiento por página y automatización. Se verificaron ambas orientaciones y que Guardar siga visible en Nuevo producto. Los selectores de archivos y demás diálogos propios de Windows conservan la apariencia del sistema.
 
@@ -53,7 +55,7 @@ Los marcadores no interceptan clics ni se anuncian como datos. Los estados textu
 
 ## Imágenes de productos
 
-Los archivos se suben al bucket público `product-images` de Supabase Storage, con ruta `{tiendaId}/{productoId}.{extensión}`. `product_images.storage_path` vincula el objeto con el producto; el catálogo móvil lee esa ruta mediante `image_path` y obtiene la URL pública del mismo bucket. No depende del archivo original de la computadora una vez guardado correctamente. El bucket desplegado fue comprobado con límite de 5 MiB; al 11/10/2026 había cero filas de imágenes asociadas, por lo que aún falta validar la primera carga real y su visualización en ambos clientes.
+Los archivos se suben al bucket público `product-images` de Supabase Storage, con rutas versionadas `{tiendaId}/{productoId}-{version}.{extensión}`. `product_images.storage_path` vincula el objeto con el producto; el catálogo móvil lee esa ruta mediante `image_path` y obtiene la URL pública del mismo bucket. No depende del archivo original de la computadora una vez guardado correctamente. El bucket desplegado fue comprobado con límite de 5 MiB; al 11/10/2026 había cero filas de imágenes asociadas, por lo que aún falta validar la primera carga real y su visualización en ambos clientes.
 
 En Productos, selecciona una fila y pulsa **Ver imagen** para abrir una consulta de la foto actual sin editar. El visor distingue ausencia de foto, descarga fallida y formato incompatible, permite volver a cargar y cancela la consulta al cerrar. Usa los códecs disponibles de Windows; JPG y PNG se admiten de forma nativa. No cambia buckets, políticas ni el flujo de subida existente.
 

@@ -48,7 +48,7 @@
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Padding" Value="10,7" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
 
         <Style x:Key="FilaTablaConfiguracion" TargetType="DataGridRow">

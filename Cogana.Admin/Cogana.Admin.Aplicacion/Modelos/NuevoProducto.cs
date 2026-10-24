@@ -8,4 +8,5 @@ public sealed record NuevoProducto(
     Guid? CategoriaId,
     string UnidadBase,
     bool ControlaVencimiento,
-    long StockMinimo);
+    long StockMinimo,
+    Guid? IdRegistro = null);

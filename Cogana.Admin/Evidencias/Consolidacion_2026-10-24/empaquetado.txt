@@ -1,0 +1,35 @@
+  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos están actualizados para la restauración.
+  Cogana.Admin.Dominio -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Dominio\bin\Release\net10.0\win-x64\Cogana.Admin.Dominio.dll
+  Cogana.Admin.Aplicacion -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Aplicacion\bin\Release\net10.0\win-x64\Cogana.Admin.Aplicacion.dll
+  Cogana.Admin.Infraestructura -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Infraestructura\bin\Release\net10.0\win-x64\Cogana.Admin.Infraestructura.dll
+  Cogana.Admin.Escritorio -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Escritorio\bin\Release\net10.0-windows\win-x64\Cogana.Admin.Escritorio.dll
+  Cogana.Admin.Escritorio -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Escritorio\bin\Release\net10.0-windows\win-x64\publish\
+[15:47:45 INF] Velopack CLI 1.2.158, for distributing applications.
+[15:47:45 WRN] There is a newer version of vpk available (1.2.161). Run 'dotnet tool update -g vpk'
+[15:47:45 INF] Beginning to package Velopack release 1.13.0.
+[15:47:45 INF] Releases Directory: D:\Cogana_Admin\Cogana.Admin\Releases
+[15:47:46 INF] Starting: Pre-process steps
+[15:47:46 INF] Verified VelopackApp.Run() in 'System.Void Cogana.Admin.Escritorio.App::Main(System.String)'.
+[15:47:46 INF] Runtime Dependency: net10-x64-desktop
+[15:47:46 INF] Shortcuts: Desktop,StartMenuRoot
+[15:47:47 INF] Complete: Pre-process steps
+[15:47:47 INF] Starting: Code-sign application
+[15:47:47 WRN] No signing parameters provided, 8 file(s) will not be signed.
+[15:47:47 INF] Complete: Code-sign application
+[15:47:47 INF] Starting: Building portable package
+[15:47:47 INF] Starting: Building release 1.13.0
+[15:47:48 INF] Complete: Building portable package
+[15:47:48 INF] Complete: Building release 1.13.0
+[15:47:48 INF] Starting: Building setup package
+[15:47:48 INF] Starting: Building delta 1.12.0 -> 1.13.0
+[15:47:48 INF] Creating delta for 1.12.0 -> 1.13.0 with 8 parallel threads.
+[15:47:49 INF] Setup bundle created 'CoganaAdmin-win-Setup.exe'.
+[15:47:49 WRN] No signing parameters provided, 1 file(s) will not be signed.
+[15:47:49 INF] Complete: Building setup package
+[15:47:49 INF] Delta processed 0011 files. 0008 patched, 0003 unchanged, 0000 new, 0000 removed
+[15:47:49 INF] Complete: Building delta 1.12.0 -> 1.13.0
+[15:47:49 INF] Starting: Post-process steps
+[15:47:49 INF] Complete: Post-process steps
+[15:47:49 INF] Finished in 00:00:03.5789062.
+[15:47:49 WRN] There is a newer version of vpk available (1.2.161). Run 'dotnet tool update -g vpk'

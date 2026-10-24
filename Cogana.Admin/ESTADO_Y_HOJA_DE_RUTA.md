@@ -1,5 +1,9 @@
 # Cogana Admin: estado y hoja de ruta
 
+## Consolidación local 1.13.0 — 24/10/2026
+
+Se implementaron los bloques de sesión/guardados, operación de pedidos, regresiones y rendimiento/accesibilidad. El detalle, las pruebas finales y los pendientes de aceptación están en [CONSOLIDACION_2026-10-24.md](CONSOLIDACION_2026-10-24.md). El canal público continúa en 1.12.0 hasta validar y publicar esta preparación. Las secciones siguientes conservan el historial de versiones anteriores.
+
 **Ubicación del proyecto:** `D:\Cogana_Admin\Cogana.Admin`  
 **Actualizado:** 23 de octubre de 2026
 

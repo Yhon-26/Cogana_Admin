@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0-windows7.0": {
+      "Velopack": {
+        "type": "Transitive",
+        "resolved": "1.2.158",
+        "contentHash": "wQN38beVrAf0WzFMnZtl7UmwxqwaJ7xVYypqITdOI4YUTYch2UvE+xAjg9msfaitVDtgfWeIcGsjRNQ65C03ZQ=="
+      },
+      "cogana.admin.aplicacion": {
+        "type": "Project",
+        "dependencies": {
+          "Cogana.Admin.Dominio": "[1.0.0, )"
+        }
+      },
+      "cogana.admin.dominio": {
+        "type": "Project"
+      },
+      "cogana.admin.infraestructura": {
+        "type": "Project",
+        "dependencies": {
+          "Cogana.Admin.Aplicacion": "[1.0.0, )",
+          "Cogana.Admin.Dominio": "[1.0.0, )",
+          "Velopack": "[1.2.158, )"
+        }
+      }
+    },
+    "net10.0-windows7.0/win-x64": {}
+  }
+}

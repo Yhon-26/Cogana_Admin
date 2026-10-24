@@ -12,15 +12,19 @@ public partial class VentanaDetallePedido : Window
     private readonly Guid _pedidoId;
     private PedidoDetalle? _pedido;
     private bool _huboCambios;
+    public bool HuboCambios=>_huboCambios;
+    private readonly IServicioOperacionPedidos? _operaciones;
 
     public VentanaDetallePedido(
         IServicioPedidosAdministrativos servicio,
         Guid tiendaId,
-        Guid pedidoId)
+        Guid pedidoId,
+        IServicioOperacionPedidos? operaciones = null)
     {
         _servicio = servicio;
         _tiendaId = tiendaId;
         _pedidoId = pedidoId;
+        _operaciones = operaciones;
         InitializeComponent();
         Loaded += AlCargar;
     }
@@ -64,6 +68,7 @@ public partial class VentanaDetallePedido : Window
             ResumenItems.Text = items.Count == 0 ? "No hay productos registrados." : $"{items.Count:N0} productos en el pedido.";
             ResumenPagos.Text = pagos.Count == 0 ? "No hay transacciones registradas." : $"{pagos.Count:N0} transacciones registradas.";
             BotonGestionar.IsEnabled = _pedido.Estado is not ("completed" or "cancelled");
+            BotonAtender.IsEnabled = _operaciones is not null && _pedido.Estado is not ("completed" or "cancelled");
             MensajeVentana.Text = historial.Count == 0 ? "El pedido todavía no tiene historial de estados." : $"{historial.Count:N0} cambios registrados en el historial.";
         }
         catch (HttpRequestException)
@@ -173,4 +178,12 @@ public partial class VentanaDetallePedido : Window
     };
 
     private void AlCerrar(object sender, RoutedEventArgs e) => DialogResult = _huboCambios;
+
+    private async void AlAtender(object sender, RoutedEventArgs e)
+    {
+        if (_operaciones is null) return;
+        var ventana = new VentanaOperacionPedido(_servicio, _operaciones, _tiendaId, _pedidoId) { Owner = this };
+        ventana.ShowDialog();
+        if (ventana.HuboCambios) { _huboCambios = true; await CargarDatosAsync(); }
+    }
 }

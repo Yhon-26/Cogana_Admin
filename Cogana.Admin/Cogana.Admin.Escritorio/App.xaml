@@ -4,6 +4,13 @@
              xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
              xmlns:controles="clr-namespace:Cogana.Admin.Escritorio.Controles">
     <Application.Resources>
+        <Style x:Key="FocoAccesible" TargetType="Control">
+            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Control">
+                <Border BorderBrush="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" BorderThickness="3" CornerRadius="3" Margin="1" IsHitTestVisible="False">
+                    <Border BorderBrush="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" BorderThickness="1" CornerRadius="2"/>
+                </Border>
+            </ControlTemplate></Setter.Value></Setter>
+        </Style>
         <BitmapImage x:Key="LogoCogana" UriSource="pack://application:,,,/Cogana.Admin.Escritorio;component/Recursos/Marca/CoganaLogo.png" />
         <BitmapImage x:Key="IconoCogana" UriSource="pack://application:,,,/Cogana.Admin.Escritorio;component/Recursos/Marca/CoganaIcono.png" />
 
@@ -11,46 +18,46 @@
 
         <!-- Barrido global: la app usa sus propios indicadores de foco, el rectángulo punteado del sistema sobra -->
         <Style TargetType="ScrollViewer">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="ListBox">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="TabControl">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="TabItem">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="DataGrid">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="DataGridRow">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="DataGridCell">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="DataGridColumnHeader">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="PasswordBox">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="Button">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="ComboBoxItem">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
         <Style TargetType="ListBoxItem">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
 
         <!-- ======================= Paleta base ======================= -->
@@ -61,7 +68,7 @@
         <Color x:Key="ColorAcentoSuave">#D7E2DD</Color>
         <Color x:Key="ColorNegro">#141615</Color>
         <Color x:Key="ColorTexto">#1C211E</Color>
-        <Color x:Key="ColorTextoSuave">#747B76</Color>
+        <Color x:Key="ColorTextoSuave">#555F58</Color>
         <Color x:Key="ColorBorde">#D8DAD6</Color>
 
         <!-- Estados semánticos: positivo, neutro, peligro, atención e informativo -->
@@ -103,7 +110,7 @@
             <Setter Property="Margin" Value="1,0"/><Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource BrochaTexto}"/><Setter Property="Cursor" Value="Hand"/>
             <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}"/>
             <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
                 <Border x:Name="Fondo" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="1" BorderBrush="Transparent">
                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -211,7 +218,8 @@
             <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
             <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
             <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="controles:AccesibilidadVentana.Activa" Value="True" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
         </Style>
 
         <!-- ======================= Tarjetas ======================= -->
@@ -233,7 +241,7 @@
             <Setter Property="FontSize" Value="13" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -271,7 +279,7 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="SelectionBrush" Value="{StaticResource BrochaAcento}" />
             <Setter Property="CaretBrush" Value="{StaticResource BrochaTexto}" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
@@ -313,7 +321,7 @@
             <Setter Property="FontSize" Value="12" />
             <Setter Property="MaxDropDownHeight" Value="280" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
             <Setter Property="ItemContainerStyle">
                 <Setter.Value>
                     <Style TargetType="ComboBoxItem">
@@ -429,7 +437,7 @@
             <Setter Property="Padding" Value="13,8" />
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="DatePicker">
@@ -488,7 +496,7 @@
             <Setter Property="Foreground" Value="{StaticResource BrochaTexto}" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoAccesible}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">

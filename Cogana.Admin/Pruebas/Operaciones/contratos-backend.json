@@ -1,0 +1,151 @@
+{
+  "verified_at": "2026-10-24",
+  "source": "PostgreSQL pg_proc, esquema public, consulta de solo lectura",
+  "functions": [
+    {
+      "name": "assign_delivery",
+      "parameters": [
+        "p_store_id",
+        "p_order_id",
+        "p_driver_user_id",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "complete_delivery",
+      "parameters": [
+        "p_store_id",
+        "p_assignment_id",
+        "p_confirmation_code",
+        "p_evidence_storage_path",
+        "p_recipient_name",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "complete_pickup",
+      "parameters": [
+        "p_store_id",
+        "p_order_id",
+        "p_confirmation_code",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "confirm_manual_payment",
+      "parameters": [
+        "p_store_id",
+        "p_order_id",
+        "p_transaction_id",
+        "p_operation_id",
+        "p_provider_reference",
+        "p_proof_storage_path"
+      ]
+    },
+    {
+      "name": "decide_substitution",
+      "parameters": [
+        "p_store_id",
+        "p_substitution_id",
+        "p_decision",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "finalize_weighted_order",
+      "parameters": [
+        "p_store_id",
+        "p_order_id",
+        "p_items",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "open_inventory_package",
+      "parameters": [
+        "p_store_id",
+        "p_lot_id",
+        "p_presentation_id",
+        "p_units",
+        "p_operation_id",
+        "p_reason"
+      ]
+    },
+    {
+      "name": "propose_substitution",
+      "parameters": [
+        "p_store_id",
+        "p_order_id",
+        "p_order_item_id",
+        "p_replacement_presentation_id",
+        "p_proposed_quantity",
+        "p_expires_at",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "reject_manual_payment",
+      "parameters": [
+        "p_store_id",
+        "p_transaction_id",
+        "p_reason",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "save_store_configuration",
+      "parameters": [
+        "p_store_id",
+        "p_store_name",
+        "p_address",
+        "p_district",
+        "p_display_name",
+        "p_legal_name",
+        "p_tax_id",
+        "p_phone",
+        "p_whatsapp_phone",
+        "p_accepts_pickup",
+        "p_accepts_delivery",
+        "p_accepts_cash_pickup",
+        "p_accepts_yape",
+        "p_accepts_plin",
+        "p_accepts_card",
+        "p_default_preparation_minutes",
+        "p_business_hours",
+        "p_schedule_exceptions",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "set_fulfillment_rules",
+      "parameters": [
+        "p_store_id",
+        "p_mode",
+        "p_slot_minutes",
+        "p_max_orders",
+        "p_notice_minutes",
+        "p_delivery_staff_count"
+      ]
+    },
+    {
+      "name": "settle_manual_difference",
+      "parameters": [
+        "p_store_id",
+        "p_transaction_id",
+        "p_reference",
+        "p_operation_id"
+      ]
+    },
+    {
+      "name": "transition_order",
+      "parameters": [
+        "p_store_id",
+        "p_order_id",
+        "p_to_status",
+        "p_operation_id",
+        "p_reason_code",
+        "p_note"
+      ]
+    }
+  ]
+}

@@ -34,6 +34,14 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
     private long _versionCargaModulo;
     private CancellationTokenSource? _cargaModulo;
     private string _textoBusqueda = string.Empty;
+    private int _paginaModulo;
+    private CancellationTokenSource? _esperaBusqueda;
+    private const int TamanoPagina = 50;
+    public bool UsaPaginacion => _servicioModulos is IServicioModulosPaginados &&
+        ModuloSeleccionado?.Nombre is "Productos" or "Categorías" or "Presentaciones" or "Inventario y lotes" or "Proveedores" or "Pedidos" or "Clientes" or "Promociones";
+    public bool PuedePaginaAnterior => UsaPaginacion && !EstaCargandoModulo && _paginaModulo>0;
+    public bool PuedePaginaSiguiente => UsaPaginacion && !EstaCargandoModulo && TotalModulo>(_paginaModulo+1)*TamanoPagina;
+    public string TextoPagina => $"Página {_paginaModulo+1} · {TotalModulo:N0} coincidencias";
     private string _mensajeModulo = "Selecciona Actualizar para consultar Supabase.";
     private string _encabezado1 = "Nombre";
     private string _encabezado2 = "Detalle";
@@ -87,6 +95,8 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         VerificarConexionCommand = new ComandoAsincrono(CargarInicioAsync);
         ActualizarModuloCommand = new ComandoAsincrono(CargarModuloActualAsync);
         BuscarActualizacionesCommand = new ComandoAsincrono(GestionarActualizacionAsync);
+        PaginaAnteriorCommand = new ComandoAsincrono(async () => { if (PuedePaginaAnterior) { _paginaModulo--; await CargarModuloActualAsync(); } });
+        PaginaSiguienteCommand = new ComandoAsincrono(async () => { if (PuedePaginaSiguiente) { _paginaModulo++; await CargarModuloActualAsync(); } });
     }
 
     public ObservableCollection<ModuloAdministrativo> Modulos { get; }
@@ -96,6 +106,8 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
     public ICommand VerificarConexionCommand { get; }
     public ICommand ActualizarModuloCommand { get; }
     public ICommand BuscarActualizacionesCommand { get; }
+    public ICommand PaginaAnteriorCommand { get; }
+    public ICommand PaginaSiguienteCommand { get; }
     public string FechaActual => DateTime.Now.ToString(
         "dddd, d 'de' MMMM",
         new CultureInfo("es-PE"));
@@ -250,7 +262,9 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
                 return;
             }
 
-            var resultado = await _servicioModulos.ObtenerAsync(widget.Nombre, _sesion.TiendaId);
+            var resultado = _servicioModulos is IServicioModulosPaginados paginado && widget.Nombre is not ("Usuarios" or "Configuración")
+                ? await paginado.ObtenerPaginaAsync(widget.Nombre, _sesion.TiendaId, 0, 5, string.Empty)
+                : await _servicioModulos.ObtenerAsync(widget.Nombre, _sesion.TiendaId);
 
             if (resultado.EsExitoso && resultado.Datos is not null)
             {
@@ -287,6 +301,9 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
                 return;
             }
             _moduloSeleccionado = value;
+            _paginaModulo = 0;
+            _esperaBusqueda?.Cancel();
+            Notificar(nameof(UsaPaginacion));
             _versionCargaModulo++;
             _cargaModulo?.Cancel();
             EstaCargandoModulo = false;
@@ -303,7 +320,8 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
             Notificar(nameof(PuedeCambiarEstadoRegistro));
             Notificar(nameof(TextoAccionEstado));
             Notificar(nameof(PuedeExportarReporte));
-            TextoBusqueda = string.Empty;
+            _textoBusqueda = string.Empty;
+            Notificar(nameof(TextoBusqueda));
             MensajeModulo = EsModuloInicio
                 ? string.Empty
                 : "Cargando información del módulo...";
@@ -405,7 +423,11 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
     public bool EstaCargandoModulo
     {
         get => _estaCargandoModulo;
-        private set => Establecer(ref _estaCargandoModulo, value);
+        private set
+        {
+            Establecer(ref _estaCargandoModulo, value);
+            Notificar(nameof(PuedePaginaAnterior)); Notificar(nameof(PuedePaginaSiguiente)); Notificar(nameof(TextoPagina));
+        }
     }
 
     public string TextoBusqueda
@@ -415,7 +437,8 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         {
             if (Establecer(ref _textoBusqueda, value))
             {
-                AplicarFiltroModulo();
+                if (UsaPaginacion) _ = BuscarEnServidorAsync();
+                else AplicarFiltroModulo();
             }
         }
     }
@@ -535,6 +558,17 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
 
     public async Task GestionarActualizacionAsync()
     {
+        try { await GestionarActualizacionInternaAsync(); }
+        catch (Exception error)
+        {
+            System.Diagnostics.Trace.TraceWarning("Actualización fallida ({0}).", error.GetType().Name);
+            TextoBotonActualizacion = _actualizacionPendiente is null ? "Buscar actualizaciones" : $"Reintentar v{_actualizacionPendiente.VersionNueva}";
+            MensajeActualizacion = "No se pudo completar la actualización. Revisa la conexión e inténtalo nuevamente.";
+        }
+    }
+
+    private async Task GestionarActualizacionInternaAsync()
+    {
         if (!_servicioActualizaciones.EstaInstaladoComoPaquete)
         {
             MensajeActualizacion = "Estás ejecutando la app en desarrollo: las actualizaciones "
@@ -633,7 +667,9 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         MensajeModulo = $"Consultando {modulo.ToLowerInvariant()}...";
         try
         {
-            var resultado = await _servicioModulos.ObtenerAsync(modulo, _sesion.TiendaId, cancelacion.Token);
+            var resultado = UsaPaginacion && _servicioModulos is IServicioModulosPaginados paginado
+                ? await paginado.ObtenerPaginaAsync(modulo, _sesion.TiendaId, _paginaModulo*TamanoPagina, TamanoPagina, TextoBusqueda, cancelacion.Token)
+                : await _servicioModulos.ObtenerAsync(modulo, _sesion.TiendaId, cancelacion.Token);
             // Una respuesta anterior no puede terminar el skeleton ni reemplazar el módulo actual.
             if (version != _versionCargaModulo) return;
             if (!resultado.EsExitoso || resultado.Datos is null)
@@ -672,14 +708,37 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         _todasFilasModulo.Clear();
         _todasFilasModulo.AddRange(datos.Filas);
         FilaModuloSeleccionada = null;
-        TotalModulo = _todasFilasModulo.Count;
+        TotalModulo = datos.TotalRegistros ?? _todasFilasModulo.Count;
         MensajeModulo = TotalModulo == 0
             ? "No hay registros para mostrar en este módulo."
-            : $"{TotalModulo:N0} registros obtenidos desde Supabase.";
+            : UsaPaginacion ? $"Mostrando {_paginaModulo*TamanoPagina+1:N0}–{_paginaModulo*TamanoPagina+datos.Filas.Count:N0} de {TotalModulo:N0} registros." : $"{TotalModulo:N0} registros obtenidos desde Supabase.";
         AplicarFiltroModulo();
     }
 
     private void AplicarFiltroModulo()
+    {
+        AplicarFilasVisibles();
+    }
+
+    private async Task BuscarEnServidorAsync()
+    {
+        _esperaBusqueda?.Cancel();
+        using var espera = new CancellationTokenSource();
+        _esperaBusqueda = espera;
+        try
+        {
+            await Task.Delay(300, espera.Token);
+            _paginaModulo = 0;
+            _versionCargaModulo++;
+            _cargaModulo?.Cancel();
+            EstaCargandoModulo = false;
+            await CargarModuloActualAsync();
+        }
+        catch (OperationCanceledException) when (espera.IsCancellationRequested) { }
+        finally { if (ReferenceEquals(_esperaBusqueda, espera)) _esperaBusqueda = null; }
+    }
+
+    private void AplicarFilasVisibles()
     {
         if (FilasModulo is null)
         {
@@ -687,7 +746,7 @@ public sealed class VentanaPrincipalViewModel : BaseViewModel
         }
 
         var termino = TextoBusqueda.Trim();
-        var filas = string.IsNullOrWhiteSpace(termino)
+        var filas = UsaPaginacion || string.IsNullOrWhiteSpace(termino)
             ? _todasFilasModulo
             : _todasFilasModulo
                 .Where(fila => fila.TextoBusqueda.Contains(

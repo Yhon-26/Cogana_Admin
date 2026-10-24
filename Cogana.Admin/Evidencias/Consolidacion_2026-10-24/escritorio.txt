@@ -1,0 +1,170 @@
+Correcto: Plano neutro sin deformación
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: La inversa recupera las coordenadas de entrada
+Correcto: El centro de giro permanece estable
+Correcto: Límites incluyen las esquinas proyectadas
+Correcto: Clonar conserva la proyección
+Correcto: Perspectiva real: los lados cercanos y lejanos tienen distinta longitud
+Correcto: La superficie proyectada admite hit testing
+Correcto: El clic visual llega al TextBox nativo a través de EffectMapping
+Correcto: El shader dibuja contenido visible
+25 verificaciones correctas. Tier gráfico: 2.
+Correcto: Una cuenta no guardada devuelve vacío
+Correcto: Windows conserva la credencial Unicode entre instancias
+Correcto: La representación de la cuenta no expone su contraseña
+Correcto: Guardar otra cuenta reemplaza la anterior
+Correcto: Olvidar borra la credencial de Windows
+Correcto: Olvidar una cuenta ya eliminada es seguro
+Correcto: El login no muestra la opción de reducir movimiento
+Correcto: Recordar cuenta comienza desmarcado
+Correcto: Una solicitud pendiente no abre el panel
+Correcto: La espera muestra un estado textual real
+Correcto: El movimiento se activa sin un control adicional
+Correcto: Minimizar pausa el indicador y las partículas
+Correcto: Restaurar conserva el estado pendiente y reanuda el movimiento activo
+Correcto: No envía dos solicitudes durante la carga
+Correcto: Un error vuelve al formulario sin confirmar acceso
+Correcto: Borra la contraseña y conserva el mensaje de error
+Correcto: El error nunca muestra bienvenida
+Correcto: Un acceso rechazado nunca guarda la contraseña
+Correcto: La validación local no inicia una carga falsa
+Correcto: Solo una sesión válida completa la transición
+Correcto: La confirmación termina el indicador sin medir tiempos inventados
+Correcto: Solo el acceso válido y elegido guarda la cuenta
+Correcto: El siguiente ingreso rellena correo y contraseña protegida
+Correcto: Recordar cuenta no inicia sesión ni omite comprobar permisos
+Correcto: Cambiar de correo elimina la contraseña de la cuenta anterior del formulario
+Correcto: Desmarcar recordar elimina la credencial guardada
+Correcto: Ingresar sin marcar recordar no persiste la contraseña
+Correcto: Si Windows rechaza eliminar, conserva la opción y muestra el problema
+Correcto: Una falla del almacén informa el problema y permite el acceso válido
+Correcto: Recuperación comienza con una sola acción: solicitar el correo
+Correcto: El botón para volver permanece visible en el tamaño mínimo
+Correcto: El correo vacío se valida sin fallar ni enviar solicitudes
+Correcto: Enviar muestra espera y bloquea solicitudes duplicadas
+Correcto: La recuperación no envía dos correos durante la misma espera
+Correcto: El envío confirmado muestra verificación y cuenta regresiva de reenvío
+Correcto: Un enlace vacío no llega al servicio
+Correcto: Un enlace vencido conserva el paso y limpia el secreto
+Correcto: Solo un enlace verificado permite crear la contraseña
+Correcto: Una contraseña corta se valida antes de guardar
+Correcto: Una confirmación diferente no cambia la contraseña
+Correcto: La coincidencia se muestra mientras se escribe
+Correcto: Un guardado rechazado nunca muestra éxito
+Correcto: El guardado confirmado muestra el cierre y elimina las contraseñas de los campos
+Correcto: Cerrar limpia la sesión de recuperación
+Correcto: Un correo ya recibido permite verificar sin solicitar otro
+Correcto: La contraseña temporal abre directamente el cambio obligatorio
+Correcto: El panel elimina la bandeja duplicada
+Correcto: El menú izquierdo conecta los eventos de clic y arrastre
+Correcto: La selección del menú abre el módulo completo
+Correcto: Ver imagen requiere seleccionar un producto
+Correcto: Seleccionar un producto habilita Ver imagen
+Correcto: Otros módulos no ofrecen la foto de producto
+Correcto: Agregar desde el menú guarda la tarjeta
+Correcto: Descarta duplicados, Inicio y nombres ajenos
+Correcto: Reordenar mantiene la persistencia existente
+Correcto: Quitar una tarjeta también actualiza la disposición
+Correcto: Contraer utiliza una transición de ancho cuando Windows permite animaciones
+Correcto: Invertir una transición parte del ancho actual sin saltos
+Correcto: Alternar rápidamente termina compacto y libera el reloj
+Correcto: El menú compacto recupera espacio y conserva la navegación
+Correcto: Cerrar sesión permanece disponible en el menú compacto
+Correcto: Expandir recupera el ancho completo
+Correcto: El efecto avanza sin interceptar clics o arrastres
+Correcto: Un clic repetido reinicia la onda desde el nuevo punto
+Correcto: Los anillos se dibujan fuera del botón sobre las filas vecinas
+Correcto: Sin animaciones de Windows la selección permanece inmediata
+Correcto: Cambiar de módulo cancela el efecto de la opción anterior
+Correcto: El efecto concluye y libera su reloj
+Correcto: Descargar la opción cancela cualquier efecto pendiente
+Correcto: El menú puede volver a mostrar los nombres
+Correcto: La barra de estado permanece en el borde inferior
+Correcto: El panel vacío ofrece restaurar las tarjetas iniciales
+Correcto: Reabrir respeta un panel guardado vacío
+Correcto: Restaurar recupera y guarda las tres tarjetas iniciales
+Correcto: Restaurar no duplica tarjetas
+Correcto: Cuatro tarjetas aprovechan el ancho de una fila amplia
+Correcto: Al reducir el ancho las tarjetas pasan a dos columnas sin recortarse
+Correcto: Una columna mantiene el contenido en espacios estrechos
+Correcto: Cerrar sesión es visible junto a la cuenta
+Correcto: Cerrar sesión bloquea acciones y pulsaciones repetidas
+Correcto: La acción finaliza sin dejar el panel bloqueado
+Correcto: El ciclo real de App reemplaza el login por el panel
+Correcto: Cerrar sesión vuelve al login real sin cerrar la aplicación
+Correcto: El nuevo login espera otro ingreso y no reutiliza la identidad anterior
+Correcto: Inicio muestra skeleton durante la consulta real pendiente
+Correcto: No presenta ceros como resumen cargado durante la espera
+Correcto: Un panel vacío conserva su estructura con marcadores de carga
+Correcto: El barrido avanza mientras la consulta sigue pendiente
+Correcto: Minimizar detiene el barrido y libera el reloj
+Correcto: Restaurar reanuda solo la carga activa
+Correcto: La respuesta muestra datos reales y termina el skeleton sin espera artificial
+Correcto: Agregar una tarjeta consulta sus datos antes de mostrar contenido
+Correcto: La tarjeta finaliza la carga al recibir sus filas
+Correcto: Un módulo pendiente oculta filas y estado vacío con skeleton de tabla
+Correcto: Una respuesta tardía no reemplaza el módulo ni termina su carga
+Correcto: Solo la respuesta del módulo actual muestra contenido
+Correcto: Un error termina el skeleton y ofrece recuperación
+Correcto: Cerrar la ventana libera los relojes de skeleton
+Correcto: Una conexión rechazada no deja tarjetas cargando indefinidamente
+Correcto: Reportes muestra estructura de indicadores y gráficos mientras consulta
+Correcto: Un error de Reportes retira el skeleton y conserva su mensaje
+Correcto: La cabecera común conserva las zonas nativas de arrastre y redimensionamiento
+Correcto: La cabecera adopta el fondo de la ventana sin una franja blanca separada
+Correcto: Las barras vertical y horizontal mantienen su Track funcional
+Correcto: El desplazamiento usa carriles finos en ambas orientaciones
+Correcto: El desplazamiento por página sigue funcionando
+Correcto: Arrastrar el pulgar vertical mueve el contenido
+Correcto: Arrastrar el pulgar horizontal mueve el contenido
+Correcto: El botón integrado maximiza la ventana
+Correcto: Maximizar respeta el área de trabajo y la barra de tareas
+Correcto: Restaurar recupera el tamaño anterior
+Correcto: El botón integrado minimiza la ventana
+Correcto: Cerrar usa el ciclo normal de Window y conserva sus eventos
+Correcto: Las ventanas fijas no habilitan comandos de tamaño incompatibles
+Correcto: Nuevo producto usa una sola superficie sin el contorno exterior duplicado
+Correcto: El formulario y su marco comparten el color de superficie
+Correcto: Guardar permanece visible con la cabecera integrada
+Correcto: El formulario permite llegar a los campos inferiores con las barras comunes
+Correcto: Ver imagen descarga y muestra la foto asociada
+Correcto: Consulta el producto de la tienda sin subir ni modificar imágenes
+Correcto: Un producto sin foto informa el estado sin descarga
+Correcto: Una descarga rechazada no muestra una foto anterior
+Correcto: Volver a cargar recupera la foto tras un error
+Correcto: Una imagen dañada informa el problema sin cerrar el programa
+Correcto: Reintentar una foto desde el formulario no repite el alta del producto
+Correcto: El guardado parcial conserva los datos confirmados y ofrece reintentar la foto
+Correcto: Atención de pedidos carga los artículos del contrato real
+Correcto: No ofrece cierre con código mientras el pedido está en preparación
+Correcto: La atención conserva el identificador de la misma operación cuando falla y se reintenta
+Correcto: La preparación finalizada queda bloqueada al consultar el resultado del servidor
+Correcto: Las acciones operativas tienen indicador de foco por teclado
+Correcto: El alto contraste usa la paleta de texto de Windows
+Correcto: Desactivar alto contraste recupera la paleta anterior
+Correcto: Configuración integra destinatarios, estado y reglas de atención con contratos vigentes
+Correcto: Operación y pagos usa el guardado de su sección y oculta el guardado general
+Correcto: Guardar parámetros operativos notifica que el panel debe actualizarse al volver
+Correcto: El panel habilita navegación con el total real del servidor
+Correcto: Siguiente consulta otra página en lugar de filtrar la primera
+Correcto: Buscar reinicia la paginación y consulta el servidor
+Correcto: El panel admite un espacio lógico de 900 por 560
+Correcto: Un fallo del actualizador informa el problema y permite reintentar sin cerrar la aplicación
+Correcto: El texto secundario supera 4,5 a 1 sobre el fondo del panel
+Correcto: Cambiar estado no ofrece el cierre que el backend exige realizar por código
+168 verificaciones totales correctas, sin conexión a Supabase.

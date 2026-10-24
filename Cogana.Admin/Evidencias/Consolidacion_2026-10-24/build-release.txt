@@ -1,0 +1,10 @@
+  Cogana.Admin.Dominio -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Dominio\bin\Release\net10.0\Cogana.Admin.Dominio.dll
+  Cogana.Admin.Aplicacion -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Aplicacion\bin\Release\net10.0\Cogana.Admin.Aplicacion.dll
+  Cogana.Admin.Infraestructura -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Infraestructura\bin\Release\net10.0\Cogana.Admin.Infraestructura.dll
+  Cogana.Admin.Escritorio -> D:\Cogana_Admin\Cogana.Admin\Cogana.Admin.Escritorio\bin\Release\net10.0-windows\Cogana.Admin.Escritorio.dll
+
+Compilación correcta.
+    0 Advertencia(s)
+    0 Errores
+
+Tiempo transcurrido 00:00:01.26
