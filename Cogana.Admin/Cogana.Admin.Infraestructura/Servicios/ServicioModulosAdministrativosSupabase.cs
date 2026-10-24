@@ -351,13 +351,13 @@ public sealed class ServicioModulosAdministrativosSupabase(ClienteSupabaseRest c
         valor.ValueKind is JsonValueKind.True;
 
     private static int Entero(JsonElement item, string nombre) =>
-        item.TryGetProperty(nombre, out var valor) && valor.TryGetInt32(out var numero) ? numero : 0;
+        item.TryGetProperty(nombre, out var valor) && valor.ValueKind == JsonValueKind.Number && valor.TryGetInt32(out var numero) ? numero : 0;
 
     private static long EnteroLargo(JsonElement item, string nombre) =>
-        item.TryGetProperty(nombre, out var valor) && valor.TryGetInt64(out var numero) ? numero : 0;
+        item.TryGetProperty(nombre, out var valor) && valor.ValueKind == JsonValueKind.Number && valor.TryGetInt64(out var numero) ? numero : 0;
 
     private static long? EnteroLargoNullable(JsonElement item, string nombre) =>
-        item.TryGetProperty(nombre, out var valor) && valor.TryGetInt64(out var numero) ? numero : null;
+        item.TryGetProperty(nombre, out var valor) && valor.ValueKind == JsonValueKind.Number && valor.TryGetInt64(out var numero) ? numero : null;
 
     private static string Fecha(JsonElement item, string nombre) =>
         DateTimeOffset.TryParse(Texto(item, nombre), out var fecha)
